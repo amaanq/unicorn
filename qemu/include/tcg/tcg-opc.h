@@ -278,11 +278,14 @@ DEF(sars_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shs_vec))
 DEF(rotls_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_rots_vec))
 
 #ifdef _MSC_VER
-DEF(shlv_vec, 1, 2, 0, IMPLVEC)
-DEF(shrv_vec, 1, 2, 0, IMPLVEC)
-DEF(sarv_vec, 1, 2, 0, IMPLVEC)
-DEF(rotlv_vec, 1, 2, 0, IMPLVEC)
-DEF(rotrv_vec, 1, 2, 0, IMPLVEC)
+// For MSVC, pre-compute the flags since it can't evaluate the OR at compile time
+#define VEC_FLAGS (TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)
+DEF(shlv_vec, 1, 2, 0,  VEC_FLAGS)
+DEF(shrv_vec, 1, 2, 0,  VEC_FLAGS)
+DEF(sarv_vec, 1, 2, 0,  VEC_FLAGS)
+DEF(rotlv_vec, 1, 2, 0, VEC_FLAGS)
+DEF(rotrv_vec, 1, 2, 0, VEC_FLAGS)
+#undef VEC_FLAGS
 #else
 DEF(shlv_vec, 1, 2, 0,  IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
 DEF(shrv_vec, 1, 2, 0,  IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
