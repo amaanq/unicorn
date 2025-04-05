@@ -69,6 +69,26 @@ typedef size_t uc_hook;
 #define UNICORN_DEPRECATED
 #endif
 
+#ifdef _MSC_VER
+#define UNICORN_UNUSED __pragma(warning(suppress : 4101))
+#else
+#define UNICORN_UNUSED __attribute__((unused))
+#endif
+
+#ifdef _MSC_VER
+#define UNICORN_NONNULL
+#else
+#define UNICORN_NONNULL __attribute__((nonnull))
+#endif
+
+#ifdef _MSC_VER
+#define UNICORN_PACKED_ENUM __pragma(pack(push, 1)) enum
+#define UNICORN_PACKED_ENUM_END __pragma(pack(pop))
+#else
+#define UNICORN_PACKED_ENUM enum __attribute__((packed))
+#define UNICORN_PACKED_ENUM_END
+#endif
+
 // Unicorn API version
 #define UC_API_MAJOR 2
 #define UC_API_MINOR 1

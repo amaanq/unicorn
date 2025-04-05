@@ -236,27 +236,25 @@ static void m68k_cpu_class_init(CPUClass *c)
     cc->tcg_initialize = m68k_tcg_init;
 }
 
-#define DEFINE_M68K_CPU_TYPE(cpu_model, initfn) \
-    {                                           \
-        .name = cpu_model,  \
-        .initfn = initfn,                \
-    }
-
 struct M68kCPUInfo {
     const char *name;
     void (*initfn)(CPUState *obj);
 };
 
+#define DEFINE_M68K_CPU_TYPE_M68K(model) \
+    { #model, model ## _cpu_initfn }
+
+
 static struct M68kCPUInfo m68k_cpus_type_infos[] = {
-    { "m68000", m68000_cpu_initfn },
-    { "m68020", m68020_cpu_initfn },
-    { "m68030", m68030_cpu_initfn },
-    { "m68040", m68040_cpu_initfn },
-    { "m68060", m68060_cpu_initfn },
-    { "m5206", m5206_cpu_initfn },
-    { "m5208", m5208_cpu_initfn },
-    { "cfv4e", cfv4e_cpu_initfn },
-    { "any", any_cpu_initfn },
+    DEFINE_M68K_CPU_TYPE_M68K(m68000),
+    DEFINE_M68K_CPU_TYPE_M68K(m68020),
+    DEFINE_M68K_CPU_TYPE_M68K(m68030),
+    DEFINE_M68K_CPU_TYPE_M68K(m68040),
+    DEFINE_M68K_CPU_TYPE_M68K(m68060),
+    DEFINE_M68K_CPU_TYPE_M68K(m5206),
+    DEFINE_M68K_CPU_TYPE_M68K(m5208),
+    DEFINE_M68K_CPU_TYPE_M68K(cfv4e),
+    DEFINE_M68K_CPU_TYPE_M68K(any)
 };
 
 M68kCPU *cpu_m68k_init(struct uc_struct *uc)
