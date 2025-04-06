@@ -955,3 +955,69 @@ fn test_arm_cp15_c1_c0_2() {
 
     assert_eq!(val, read_val);
 }
+
+// THUMB_CODE = b"\x4f\xf0\x00\x54\x54\xf8\x04\x5b\x54\xf8\x04\x5b\x54\xf8\x04\x5b\x54\xf8\x04\x5b"
+//
+// ROM_START = 0x08000000
+// ROM_SIZE = 128 * 1024
+// RAM_START = 0x20000000
+// RAM_SIZE = 8 * 1024
+//
+// def hook_read(uc, type, address, size, value, user_data):
+//     print("READ: addr=%08X, size=%d" %(address, size))
+//
+// uc = Uc(UC_ARCH_ARM, UC_MODE_THUMB + UC_MODE_MCLASS + UC_MODE_LITTLE_ENDIAN)
+// uc.ctl_set_cpu_model(UC_CPU_ARM_CORTEX_M3)
+// uc.mem_map(ROM_START, ROM_SIZE, UC_PROT_EXEC + UC_PROT_READ)
+// uc.mem_map(RAM_START, RAM_SIZE, UC_PROT_READ + UC_PROT_WRITE)
+// uc.mem_write(ROM_START, THUMB_CODE)
+// uc.hook_add(UC_HOOK_MEM_READ, hook_read, begin=RAM_START, end=RAM_START+RAM_SIZE)
+// uc.emu_start(ROM_START | 1, ROM_START + len(THUMB_CODE))
+// print("R4: %08x" %uc.reg_read(UC_ARM_REG_R4))
+
+#[test]
+fn test_inline() {
+    let code = b"\x4f\xf0\x00\x54\x54\xf8\x04\x5b\x54\xf8\x04\x5b\x54\xf8\x04\x5b\x54\xf8\x04\x5b";
+    let ROM_START = 0x08000000;
+    let ROM_SIZE = 128 * 1024;
+    let RAM_START = 0x20000000;
+    let RAM_SIZE = 8 * 1024;
+
+    fn hook_read(
+        uc: &mut Unicorn<'_, i64>,
+        _type: unicorn_engine_sys::MemType,
+        address: u64,
+        size: usize,
+        _value: i64,
+    ) -> bool {
+        std::println!("READ: addr={:#08X}, size={}", address, size);
+        *uc.get_data_mut() += 1;
+        false
+    }
+
+    let mut uc = Unicorn::new_with_data(
+        Arch::ARM,
+        Mode::THUMB | Mode::MCLASS | Mode::LITTLE_ENDIAN,
+        0,
+    )
+    .unwrap();
+    uc.ctl_set_cpu_model(ArmCpuModel::CORTEX_M3 as i32).unwrap();
+    uc.mem_map(ROM_START, ROM_SIZE, Prot::EXEC | Prot::READ)
+        .unwrap();
+    uc.mem_map(RAM_START, RAM_SIZE, Prot::READ | Prot::WRITE)
+        .unwrap();
+    uc.mem_write(ROM_START, code).unwrap();
+    uc.add_mem_hook(
+        HookType::MEM_READ,
+        RAM_START,
+        RAM_START + RAM_SIZE as u64,
+        hook_read,
+    )
+    .unwrap();
+    uc.emu_start(ROM_START | 1, ROM_START + code.len() as u64, 0, 0)
+        .unwrap();
+    let r4 = uc.reg_read(RegisterARM::R4).unwrap();
+    std::println!("R4: {:#08x}", r4);
+    let hooked = uc.get_data();
+    std::println!("Hooked: {:#08x}", hooked);
+}
