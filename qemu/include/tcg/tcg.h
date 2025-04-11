@@ -839,6 +839,24 @@ struct TCGContext {
     TCGv cpu_sp;
     TCGv cpu_skip;
     char cpu_avr_reg_names[32][8];
+
+    // target/rh850/translate.c
+    TCGv rh850_cpu_sys_reg[7][32];
+    TCGv_i32 cpu_SF;
+    TCGv_i32 cpu_OVF;
+    TCGv_i32 cpu_CYF;
+    TCGv_i32 cpu_SATF;
+    TCGv_i32 cpu_ID;
+    TCGv_i32 cpu_EP;
+    TCGv_i32 cpu_NP;
+    TCGv_i32 cpu_EBV;
+    TCGv_i32 cpu_CU0;
+    TCGv_i32 cpu_CU1;
+    TCGv_i32 cpu_CU2;
+    TCGv_i32 cpu_UM;
+    TCGv cpu_LLbit;
+    TCGv cpu_LLAddress;
+    TCGv cpu_sys_databuf_reg;
 };
 
 static inline size_t temp_idx(TCGContext *tcg_ctx, TCGTemp *ts)
