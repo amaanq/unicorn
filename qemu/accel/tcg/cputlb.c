@@ -1598,7 +1598,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
                         continue;
                     if (!HOOK_BOUND_CHECK(hook, paddr))
                         continue;
-                    if (!synced && retaddr) {
+                    if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                         cpu_restore_state(uc->cpu, retaddr, false);
                         synced = true;
                     }
@@ -1619,7 +1619,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
                         continue;
                     if (!HOOK_BOUND_CHECK(hook, paddr))
                         continue;
-                    if (!synced && retaddr) {
+                    if (!synced &&!uc->skip_sync_pc_on_exit && retaddr) {
                         cpu_restore_state(uc->cpu, retaddr, false);
                         synced = true;
                     }
@@ -1687,7 +1687,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
                 continue;
             if (!HOOK_BOUND_CHECK(hook, paddr))
                 continue;
-            if (!synced && retaddr) {
+            if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                 cpu_restore_state(uc->cpu, retaddr, false);
                 synced = true;
             }
@@ -1719,7 +1719,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
                     continue;
                 if (!HOOK_BOUND_CHECK(hook, paddr))
                     continue;
-                if (!synced && retaddr) {
+                if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                     cpu_restore_state(uc->cpu, retaddr, false);
                     synced = true;
                 }
@@ -1769,7 +1769,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
                     continue;
                 if (!HOOK_BOUND_CHECK(hook, paddr))
                     continue;
-                if (!synced && retaddr) {
+                if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                     cpu_restore_state(uc->cpu, retaddr, false);
                     synced = true;
                 }
@@ -1883,6 +1883,10 @@ _out:
                     continue;
                 if (!HOOK_BOUND_CHECK(hook, paddr))
                     continue;
+                if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
+                    cpu_restore_state(uc->cpu, retaddr, false);
+                    synced = true;
+                }
                 JIT_CALLBACK_GUARD(((uc_cb_hookmem_t)hook->callback)(env->uc, UC_MEM_READ_AFTER, paddr, size, res, hook->user_data));
                 // the last callback may already asked to stop emulation
                 if (uc->stop_request)
@@ -2290,7 +2294,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
                 continue;
             if (!HOOK_BOUND_CHECK(hook, paddr))
                 continue;
-            if (!synced && retaddr) {
+            if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                 cpu_restore_state(uc->cpu, retaddr, false);
                 synced = true;
             }
@@ -2309,7 +2313,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
                 continue;
             if (!HOOK_BOUND_CHECK(hook, paddr))
                 continue;
-            if (!synced && retaddr) {
+            if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                 cpu_restore_state(uc->cpu, retaddr, false);
                 synced = true;
             }
@@ -2362,7 +2366,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
                 continue;
             if (!HOOK_BOUND_CHECK(hook, paddr))
                 continue;
-            if (!synced && retaddr) {
+            if (!synced && !uc->skip_sync_pc_on_exit && retaddr) {
                 cpu_restore_state(uc->cpu, retaddr, false);
                 synced = true;
             }
