@@ -28,6 +28,7 @@ typedef size_t uc_hook;
 
 #include "m68k.h"
 #include "x86.h"
+#include "alpha.h"
 #include "arm.h"
 #include "arm64.h"
 #include "mips.h"
@@ -106,6 +107,7 @@ typedef enum uc_arch {
     UC_ARCH_RISCV,   // RISCV architecture
     UC_ARCH_S390X,   // S390X architecture
     UC_ARCH_TRICORE, // TriCore architecture
+    UC_ARCH_ALPHA,   // Alpha architecture
     UC_ARCH_MAX,
 } uc_arch;
 

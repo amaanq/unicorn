@@ -1732,6 +1732,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
 
  buffer_overflow:
     tb = tcg_tb_alloc(tcg_ctx);
+    printf("tb: %p\n", tb);
     if (unlikely(!tb)) {
         /* flush must be done */
         tb_flush(cpu);
@@ -1752,6 +1753,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     tcg_ctx->tb_cflags = cflags;
  tb_overflow:
 
+    printf("idk\n");
     tcg_func_start(tcg_ctx);
 
     tcg_ctx->cpu = env_cpu(env);

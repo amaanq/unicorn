@@ -891,6 +891,7 @@ void tcg_func_start(TCGContext *s)
     s->goto_tb_issue_mask = 0;
 #endif
 
+    printf("init!\n");
     QTAILQ_INIT(&s->ops);
     QTAILQ_INIT(&s->free_ops);
     QSIMPLEQ_INIT(&s->labels);

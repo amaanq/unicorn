@@ -22,6 +22,10 @@ if test -e $DIR/sample_x86; then
   echo "=========================="
   $DIR/mem_apis
 fi
+if test -e $DIR/sample_alpha; then
+  echo "=========================="
+  $DIR/sample_alpha
+fi
 if test -e $DIR/sample_arm; then
   echo "=========================="
   $DIR/sample_arm

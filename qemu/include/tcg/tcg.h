@@ -815,6 +815,13 @@ struct TCGContext {
 
     char s390x_cpu_reg_names[16][4]; // renamed from original cpu_reg_names[][] to avoid name clash with m68k
     TCGv_i64 regs[16];
+
+    // target/alpha/translate.c
+    TCGv cpu_std_ir[31];
+    TCGv cpu_fir[31];
+    TCGv cpu_lock_addr;
+    TCGv cpu_lock_value;
+    TCGv cpu_pal_ir[31];
 };
 
 static inline size_t temp_idx(TCGContext *tcg_ctx, TCGTemp *ts)

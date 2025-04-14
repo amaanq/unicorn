@@ -6551,7 +6551,11 @@ restore_state_to_opc \
 helper_uc_tricore_exit \
 "
 
-ARCHS="x86_64 arm aarch64 riscv32 riscv64 mips mipsel mips64 mips64el sparc sparc64 m68k ppc ppc64 s390x tricore"
+alpha_SYMBOLS="
+alpha_tcg_init \
+"
+
+ARCHS="x86_64 alpha arm aarch64 riscv32 riscv64 mips mipsel mips64 mips64el sparc sparc64 m68k ppc ppc64 s390x tricore"
 
 for arch in $ARCHS; do
 

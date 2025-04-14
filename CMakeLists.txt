@@ -86,7 +86,7 @@ option(UNICORN_FUZZ "Enable fuzzing" OFF)
 option(UNICORN_LOGGING "Enable logging" OFF)
 option(UNICORN_BUILD_TESTS "Build unicorn tests" ${PROJECT_IS_TOP_LEVEL})
 option(UNICORN_INSTALL "Enable unicorn installation" ${PROJECT_IS_TOP_LEVEL})
-set(UNICORN_ARCH "x86;arm;aarch64;riscv;mips;sparc;m68k;ppc;s390x;tricore" CACHE STRING "Enabled unicorn architectures")
+set(UNICORN_ARCH "x86;alpha;arm;aarch64;riscv;mips;sparc;m68k;ppc;s390x;tricore" CACHE STRING "Enabled unicorn architectures")
 option(UNICORN_TRACER "Trace unicorn execution" OFF)
 
 foreach(ARCH_LOOP ${UNICORN_ARCH})
@@ -281,6 +281,9 @@ else()
     if(UNICORN_HAS_X86)
         set(EXTRA_CFLAGS "${EXTRA_CFLAGS}-DUNICORN_HAS_X86 ")
     endif()
+    if(UNICORN_HAS_ALPHA)
+        set(EXTRA_CFLAGS "${EXTRA_CFLAGS}-DUNICORN_HAS_ALPHA ")
+    endif()
     if(UNICORN_HAS_ARM)
         set(EXTRA_CFLAGS "${EXTRA_CFLAGS}-DUNICORN_HAS_ARM ")
     endif()
@@ -332,6 +335,9 @@ else()
     if(UNICORN_HAS_X86)
         set(TARGET_LIST "${TARGET_LIST}x86_64-softmmu, ")
     endif()
+    if(UNICORN_HAS_ALPHA)
+        set(TARGET_LIST "${TARGET_LIST}alpha-softmmu, ")
+    endif()
     if(UNICORN_HAS_ARM)
         set(TARGET_LIST "${TARGET_LIST}arm-softmmu, ")
     endif()
@@ -376,6 +382,12 @@ else()
         execute_process(COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qemu/scripts/create_config
             INPUT_FILE ${CMAKE_BINARY_DIR}/x86_64-softmmu/config-target.mak
             OUTPUT_FILE ${CMAKE_BINARY_DIR}/x86_64-softmmu/config-target.h
+        )
+    endif()
+	if(UNICORN_HAS_ALPHA)
+        execute_process(COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qemu/scripts/create_config
+            INPUT_FILE ${CMAKE_BINARY_DIR}/alpha-softmmu/config-target.mak
+            OUTPUT_FILE ${CMAKE_BINARY_DIR}/alpha-softmmu/config-target.h
         )
     endif()
     if(UNICORN_HAS_ARM)
@@ -554,6 +566,39 @@ endif()
 
 if(UNICORN_TRACER)
     target_compile_options(x86_64-softmmu PRIVATE -DUNICORN_TRACER)
+endif()
+
+endif()
+
+if(UNICORN_HAS_ALPHA)
+add_library(alpha-softmmu STATIC
+    ${UNICORN_ARCH_COMMON}
+
+    qemu/target/alpha/cpu.c
+    qemu/target/alpha/fpu_helper.c
+    qemu/target/alpha/helper.c
+    qemu/target/alpha/int_helper.c
+    qemu/target/alpha/mem_helper.c
+    qemu/target/alpha/sys_helper.c
+    qemu/target/alpha/translate.c
+    qemu/target/alpha/vax_helper.c
+    qemu/target/alpha/unicorn.c
+)
+
+if(MSVC)
+    target_compile_options(alpha-softmmu PRIVATE
+        -DNEED_CPU_H
+        /FIalpha.h
+        /I${CMAKE_CURRENT_SOURCE_DIR}/msvc/alpha-softmmu
+        /I${CMAKE_CURRENT_SOURCE_DIR}/qemu/target/alpha
+    )
+else()
+    target_compile_options(alpha-softmmu PRIVATE
+        -DNEED_CPU_H
+        -include alpha.h
+        -I${CMAKE_BINARY_DIR}/alpha-softmmu
+        -I${CMAKE_CURRENT_SOURCE_DIR}/qemu/target/alpha
+    )
 endif()
 
 endif()
@@ -1259,6 +1304,13 @@ if(UNICORN_HAS_X86)
     target_link_libraries(x86_64-softmmu PRIVATE unicorn-common)
     set(UNICORN_TEST_FILE ${UNICORN_TEST_FILE} test_x86)
 endif()
+if(UNICORN_HAS_ALPHA)
+    set(UNICORN_COMPILE_OPTIONS ${UNICORN_COMPILE_OPTIONS} -DUNICORN_HAS_ALPHA)
+    set(UNICORN_LINK_LIBRARIES ${UNICORN_LINK_LIBRARIES} alpha-softmmu)
+    set(UNICORN_SAMPLE_FILE ${UNICORN_SAMPLE_FILE} sample_alpha)
+    target_link_libraries(alpha-softmmu PRIVATE unicorn-common)
+    set(UNICORN_TEST_FILE ${UNICORN_TEST_FILE} test_alpha)
+endif()
 if(UNICORN_HAS_ARM)
     set(UNICORN_COMPILE_OPTIONS ${UNICORN_COMPILE_OPTIONS} -DUNICORN_HAS_ARM)
     set(UNICORN_LINK_LIBRARIES ${UNICORN_LINK_LIBRARIES} arm-softmmu)
@@ -1458,7 +1510,7 @@ if (UNICORN_LEGACY_STATIC_ARCHIVE)
 endif()
 
 if(UNICORN_FUZZ)
-    set(UNICORN_FUZZ_SUFFIX "arm_arm;arm_armbe;arm_thumb;arm64_arm;arm64_armbe;m68k_be;mips_32be;mips_32le;sparc_32be;x86_16;x86_32;x86_64;s390x_be")
+    set(UNICORN_FUZZ_SUFFIX "alpha_le;alpha_be;arm_arm;arm_armbe;arm_thumb;arm64_arm;arm64_armbe;m68k_be;mips_32be;mips_32le;sparc_32be;x86_16;x86_32;x86_64;s390x_be")
     if (NOT APPLE)
         set(SAMPLES_LIB ${SAMPLES_LIB} rt)
     endif()

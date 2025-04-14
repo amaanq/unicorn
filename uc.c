@@ -19,6 +19,7 @@
 // target specific headers
 #include "qemu/target/m68k/unicorn.h"
 #include "qemu/target/i386/unicorn.h"
+#include "qemu/target/alpha/unicorn.h"
 #include "qemu/target/arm/unicorn.h"
 #include "qemu/target/mips/unicorn.h"
 #include "qemu/target/sparc/unicorn.h"
@@ -198,6 +199,10 @@ UNICORN_EXPORT
 bool uc_arch_supported(uc_arch arch)
 {
     switch (arch) {
+#ifdef UNICORN_HAS_ALPHA
+    case UC_ARCH_ALPHA:
+        return true;
+#endif
 #ifdef UNICORN_HAS_ARM
     case UC_ARCH_ARM:
         return true;
@@ -353,6 +358,15 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
                 return UC_ERR_MODE;
             }
             uc->init_arch = uc_init_x86_64;
+            break;
+#endif
+#ifdef UNICORN_HAS_ALPHA
+        case UC_ARCH_ALPHA:
+            if ((mode & ~UC_MODE_ALPHA_MASK)) {
+                free(uc);
+                return UC_ERR_MODE;
+            }
+            uc->init_arch = uc_init_alpha;
             break;
 #endif
 #ifdef UNICORN_HAS_ARM
@@ -1010,6 +1024,11 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
             uc_reg_write(uc, UC_X86_REG_RIP, &begin);
             break;
         }
+        break;
+#endif
+#ifdef UNICORN_HAS_ALPHA
+    case UC_ARCH_ALPHA:
+        uc_reg_write(uc, UC_ALPHA_REG_PC, &begin);
         break;
 #endif
 #ifdef UNICORN_HAS_ARM
@@ -2217,6 +2236,12 @@ static context_reg_rw_t find_context_reg_rw(uc_arch arch, uc_mode mode)
         rw.write = reg_write_x86_64;
         break;
 #endif
+#ifdef UNICORN_HAS_ALPHA
+    case UC_ARCH_ALPHA:
+        rw.read = reg_read_alpha;
+        rw.write = reg_write_alpha;
+        break;
+#endif
 #ifdef UNICORN_HAS_ARM
     case UC_ARCH_ARM:
         rw.read = reg_read_arm;
@@ -2664,6 +2689,11 @@ uc_err uc_ctl(uc_engine *uc, uc_control_type control, ...)
 
             if (uc->arch == UC_ARCH_X86) {
                 if (model >= UC_CPU_X86_ENDING) {
+                    err = UC_ERR_ARG;
+                    break;
+                }
+            } else if (uc->arch == UC_ARCH_ALPHA) {
+                if (model >= UC_CPU_ALPHA_ENDING) {
                     err = UC_ERR_ARG;
                     break;
                 }
