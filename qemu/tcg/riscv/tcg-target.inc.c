@@ -1119,50 +1119,62 @@ static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
 }
 #endif /* CONFIG_SOFTMMU */
 
-static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg lo, TCGReg hi,
-                                   TCGReg base, MemOp opc, bool is_64)
+static void tcg_out_qemu_ld_direct(TCGContext *s, MemOp opc, TCGReg data,
+                                   TCGReg base, TCGReg index, int disp)
 {
-    const MemOp bswap = opc & MO_BSWAP;
-
-    /* We don't yet handle byteswapping, assert */
-    g_assert(!bswap);
-
-    switch (opc & (MO_SSIZE)) {
+    switch (opc & (MO_SSIZE | MO_BSWAP)) {
     case MO_UB:
-        tcg_out_opc_imm(s, OPC_LBU, lo, base, 0);
+        tcg_out_insn(s, RXY, LLGC, data, base, index, disp);
         break;
     case MO_SB:
-        tcg_out_opc_imm(s, OPC_LB, lo, base, 0);
+        tcg_out_insn(s, RXY, LGB, data, base, index, disp);
+        break;
+
+    case MO_UW | MO_BSWAP:
+        /* swapped unsigned halfword load with upper bits zeroed */
+        tcg_out_insn(s, RXY, LRVH, data, base, index, disp);
+        tgen_ext16u(s, TCG_TYPE_I64, data, data);
         break;
     case MO_UW:
-        tcg_out_opc_imm(s, OPC_LHU, lo, base, 0);
+        tcg_out_insn(s, RXY, LLGH, data, base, index, disp);
+        break;
+
+    case MO_SW | MO_BSWAP:
+        /* swapped sign-extended halfword load */
+        tcg_out_insn(s, RXY, LRVH, data, base, index, disp);
+        tgen_ext16s(s, TCG_TYPE_I64, data, data);
         break;
     case MO_SW:
-        tcg_out_opc_imm(s, OPC_LH, lo, base, 0);
+        tcg_out_insn(s, RXY, LGH, data, base, index, disp);
+        break;
+
+    case MO_UL | MO_BSWAP:
+        /* swapped unsigned int load with upper bits zeroed */
+        tcg_out_insn(s, RXY, LRV, data, base, index, disp);
+        tgen_ext32u(s, data, data);
         break;
     case MO_UL:
-        if (TCG_TARGET_REG_BITS == 64 && is_64) {
-            tcg_out_opc_imm(s, OPC_LWU, lo, base, 0);
-            break;
-        }
-        /* FALLTHRU */
+        tcg_out_insn(s, RXY, LLGF, data, base, index, disp);
+        break;
+
+    case MO_SL | MO_BSWAP:
+        /* swapped sign-extended int load */
+        tcg_out_insn(s, RXY, LRV, data, base, index, disp);
+        tgen_ext32s(s, data, data);
+        break;
     case MO_SL:
-        tcg_out_opc_imm(s, OPC_LW, lo, base, 0);
+        tcg_out_insn(s, RXY, LGF, data, base, index, disp);
         break;
-    case MO_Q:
-        /* Prefer to load from offset 0 first, but allow for overlap.  */
-        if (TCG_TARGET_REG_BITS == 64) {
-            tcg_out_opc_imm(s, OPC_LD, lo, base, 0);
-        } else if (lo != base) {
-            tcg_out_opc_imm(s, OPC_LW, lo, base, 0);
-            tcg_out_opc_imm(s, OPC_LW, hi, base, 4);
-        } else {
-            tcg_out_opc_imm(s, OPC_LW, hi, base, 4);
-            tcg_out_opc_imm(s, OPC_LW, lo, base, 0);
-        }
+
+    case MO_UQ | MO_BSWAP:
+        tcg_out_insn(s, RXY, LRVG, data, base, index, disp);
         break;
+    case MO_UQ:
+        tcg_out_insn(s, RXY, LG, data, base, index, disp);
+        break;
+
     default:
-        g_assert_not_reached();
+        tcg_abort();
     }
 }
 

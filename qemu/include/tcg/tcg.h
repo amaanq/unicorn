@@ -494,11 +494,27 @@ typedef enum TCGTempVal {
     TEMP_VAL_CONST,
 } TCGTempVal;
 
+typedef enum TCGTempKind {
+    /* Temp is dead at the end of all basic blocks. */
+    TEMP_NORMAL,
+    /* Temp is live across conditional branch, but dead otherwise. */
+    TEMP_EBB,
+    /* Temp is saved across basic blocks but dead at the end of TBs. */
+    TEMP_LOCAL,
+    /* Temp is saved across both basic blocks and translation blocks. */
+    TEMP_GLOBAL,
+    /* Temp is in a fixed register. */
+    TEMP_FIXED,
+    /* Temp is a fixed constant. */
+    TEMP_CONST,
+} TCGTempKind;
+
 typedef struct TCGTemp {
     TCGReg reg:8;
     TCGTempVal val_type:8;
     TCGType base_type:8;
     TCGType type:8;
+    TCGTempKind kind:3;
     unsigned int fixed_reg:1;
     unsigned int indirect_reg:1;
     unsigned int indirect_base:1;
@@ -674,6 +690,8 @@ struct TCGContext {
     struct TCGLabelPoolData *pool_labels;
 #endif
 
+    GHashTable *const_table[TCG_TYPE_COUNT];
+
     TCGv_i32 delay_slot_flag;
 
     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
@@ -723,7 +741,7 @@ struct TCGContext {
     void *tb_ret_addr;
 
     /* target/riscv/translate.c */
-    TCGv cpu_gpr[32], cpu_pc, cpu_vl; // also target/mips/translate.c
+    TCGv cpu_gpr[32], cpu_pc, cpu_vl; // also target/mips/translate.c, target/loongarch/translate.c
     TCGv_i64 cpu_fpr[32]; /* assume F and D extensions */
     TCGv load_res;
     TCGv load_val;
@@ -802,7 +820,7 @@ struct TCGContext {
     TCGv_i32 cpu_gpr_d[16];
     TCGv_i32 cpu_PSW_C, cpu_PSW_V, cpu_PSW_SV, cpu_PSW_AV, cpu_PSW_SAV;
     TCGv_i32 cpu_PC, cpu_PCXI, cpu_PSW, cpu_ICR;
-    
+
     // Used to store the start of current instrution.
     uint64_t pc_start;
 
@@ -1182,6 +1200,23 @@ TCGv_vec tcg_const_zeros_vec(TCGContext *tcg_ctx, TCGType);
 TCGv_vec tcg_const_ones_vec(TCGContext *tcg_ctx, TCGType);
 TCGv_vec tcg_const_zeros_vec_matching(TCGContext *tcg_ctx, TCGv_vec);
 TCGv_vec tcg_const_ones_vec_matching(TCGContext *tcg_ctx, TCGv_vec);
+
+/*
+ * Locate or create a read-only temporary that is a constant.
+ * This kind of temporary need not be freed, but for convenience
+ * will be silently ignored by tcg_temp_free_*.
+ */
+TCGTemp *tcg_constant_internal(TCGContext *tcg_ctx, TCGType type, int64_t val);
+
+static inline TCGv_i32 tcg_constant_i32(TCGContext *tcg_ctx, int32_t val)
+{
+    return temp_tcgv_i32(tcg_ctx, tcg_constant_internal(tcg_ctx, TCG_TYPE_I32, val));
+}
+
+static inline TCGv_i64 tcg_constant_i64(TCGContext *tcg_ctx, int64_t val)
+{
+    return temp_tcgv_i64(tcg_ctx, tcg_constant_internal(tcg_ctx, TCG_TYPE_I64, val));
+}
 
 #if UINTPTR_MAX == UINT32_MAX
 # define tcg_const_ptr(tcg_ctx, x)        ((TCGv_ptr)tcg_const_i32(tcg_ctx, (intptr_t)(x)))

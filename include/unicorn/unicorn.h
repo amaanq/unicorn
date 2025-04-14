@@ -30,6 +30,7 @@ typedef size_t uc_hook;
 #include "x86.h"
 #include "arm.h"
 #include "arm64.h"
+#include "loongarch.h"
 #include "mips.h"
 #include "sparc.h"
 #include "ppc.h"
@@ -108,16 +109,17 @@ typedef size_t uc_hook;
 
 // Architecture type
 typedef enum uc_arch {
-    UC_ARCH_ARM = 1, // ARM architecture (including Thumb, Thumb-2)
-    UC_ARCH_ARM64,   // ARM-64, also called AArch64
-    UC_ARCH_MIPS,    // Mips architecture
-    UC_ARCH_X86,     // X86 architecture (including x86 & x86-64)
-    UC_ARCH_PPC,     // PowerPC architecture
-    UC_ARCH_SPARC,   // Sparc architecture
-    UC_ARCH_M68K,    // M68K architecture
-    UC_ARCH_RISCV,   // RISCV architecture
-    UC_ARCH_S390X,   // S390X architecture
-    UC_ARCH_TRICORE, // TriCore architecture
+    UC_ARCH_ARM = 1,   // ARM architecture (including Thumb, Thumb-2)
+    UC_ARCH_ARM64,     // ARM-64, also called AArch64
+    UC_ARCH_MIPS,      // Mips architecture
+    UC_ARCH_X86,       // X86 architecture (including x86 & x86-64)
+    UC_ARCH_PPC,       // PowerPC architecture
+    UC_ARCH_SPARC,     // Sparc architecture
+    UC_ARCH_M68K,      // M68K architecture
+    UC_ARCH_RISCV,     // RISCV architecture
+    UC_ARCH_S390X,     // S390X architecture
+    UC_ARCH_TRICORE,   // TriCore architecture
+	UC_ARCH_LOONGARCH, // LoongArch architecture
     UC_ARCH_MAX,
 } uc_arch;
 

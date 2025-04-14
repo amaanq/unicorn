@@ -16,9 +16,10 @@
 #include "uc_priv.h"
 
 // target specific headers
-#include "qemu/target/m68k/unicorn.h"
 #include "qemu/target/i386/unicorn.h"
 #include "qemu/target/arm/unicorn.h"
+#include "qemu/target/loongarch/unicorn.h"
+#include "qemu/target/m68k/unicorn.h"
 #include "qemu/target/mips/unicorn.h"
 #include "qemu/target/sparc/unicorn.h"
 #include "qemu/target/ppc/unicorn.h"
@@ -209,6 +210,10 @@ bool uc_arch_supported(uc_arch arch)
     case UC_ARCH_M68K:
         return true;
 #endif
+#ifdef UNICORN_HAS_LOONGARCH
+    case UC_ARCH_LOONGARCH:
+        return true;
+#endif
 #ifdef UNICORN_HAS_MIPS
     case UC_ARCH_MIPS:
         return true;
@@ -280,7 +285,9 @@ static uc_err uc_init_engine(uc_engine *uc)
 
     uc->ctl_exits = g_tree_new_full(uc_exits_cmp, NULL, g_free, NULL);
 
-    if (machine_initialize(uc)) {
+    int e = machine_initialize(uc);
+
+    if (e) {
         return UC_ERR_RESOURCE;
     }
 
@@ -376,7 +383,15 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
             uc->init_arch = uc_init_aarch64;
             break;
 #endif
-
+#ifdef UNICORN_HAS_LOONGARCH
+        case UC_ARCH_LOONGARCH:
+            if ((mode & ~UC_MODE_LOONGARCH_MASK)) {
+                free(uc);
+                return UC_ERR_MODE;
+            }
+            uc->init_arch = uc_init_loongarch;
+            break;
+#endif
 #if defined(UNICORN_HAS_MIPS) || defined(UNICORN_HAS_MIPSEL) ||                \
     defined(UNICORN_HAS_MIPS64) || defined(UNICORN_HAS_MIPS64EL)
         case UC_ARCH_MIPS:
@@ -1019,6 +1034,11 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
 #ifdef UNICORN_HAS_ARM64
     case UC_ARCH_ARM64:
         uc_reg_write(uc, UC_ARM64_REG_PC, &begin);
+        break;
+#endif
+#ifdef UNICORN_HAS_LOONGARCH
+    case UC_ARCH_LOONGARCH:
+        uc_reg_write(uc, UC_LOONGARCH_REG_PC, &begin);
         break;
 #endif
 #ifdef UNICORN_HAS_MIPS
@@ -2228,7 +2248,12 @@ static context_reg_rw_t find_context_reg_rw(uc_arch arch, uc_mode mode)
         rw.write = reg_write_aarch64;
         break;
 #endif
-
+#ifdef UNICORN_HAS_LOONGARCH
+    case UC_ARCH_LOONGARCH:
+        rw.read = reg_read_loongarch;
+        rw.write = reg_write_loongarch;
+        break;
+#endif
 #if defined(UNICORN_HAS_MIPS) || defined(UNICORN_HAS_MIPSEL) ||                \
     defined(UNICORN_HAS_MIPS64) || defined(UNICORN_HAS_MIPS64EL)
     case UC_ARCH_MIPS:
@@ -2682,6 +2707,11 @@ uc_err uc_ctl(uc_engine *uc, uc_control_type control, ...)
                 }
             } else if (uc->arch == UC_ARCH_ARM64) {
                 if (model >= UC_CPU_ARM64_ENDING) {
+                    err = UC_ERR_ARG;
+                    break;
+                }
+            } else if (uc->arch == UC_ARCH_LOONGARCH) {
+                if (model >= UC_CPU_LOONGARCH_ENDING) {
                     err = UC_ERR_ARG;
                     break;
                 }

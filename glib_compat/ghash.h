@@ -73,5 +73,7 @@ void g_hash_table_unref (GHashTable *hash_table);
  */
 gboolean g_int_equal (gconstpointer v1, gconstpointer v2);
 guint    g_int_hash (gconstpointer v);
+gboolean g_int64_equal (gconstpointer v1, gconstpointer v2);
+guint    g_int64_hash (gconstpointer v);
 
 #endif /* __G_HASH_H__ */

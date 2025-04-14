@@ -84,12 +84,12 @@
     d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,          \
                   R_ ## reg ## _ ## field ## _LENGTH, v.v);              \
     }
-#define FIELD_DP64(storage, reg, field, val, d) {                        \
-    struct {                                                             \
-        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;               \
-    } v = { .v = val };                                                  \
-    d = deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,          \
-                  R_ ## reg ## _ ## field ## _LENGTH, v.v);              \
+#define FIELD_DP64(storage, reg, field, val, d) {                         \
+    struct {                                                              \
+        uint64_t v:R_ ## reg ## _ ## field ## _LENGTH;                \
+    } v = { .v = val };                                                   \
+    d = deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
     }
 
 /* Deposit a field to array of registers.  */

@@ -883,6 +883,13 @@ void tcg_func_start(TCGContext *s)
     /* No temps have been previously allocated for size or locality.  */
     memset(s->free_temps, 0, sizeof(s->free_temps));
 
+    /* No constant temps have been previously allocated. */
+    for (int i = 0; i < TCG_TYPE_COUNT; ++i) {
+        if (s->const_table[i]) {
+            g_hash_table_remove_all(s->const_table[i]);
+        }
+    }
+
     s->nb_ops = 0;
     s->nb_labels = 0;
     s->current_frame_offset = s->frame_start;
@@ -1095,6 +1102,54 @@ void tcg_temp_free_internal(TCGContext *s, TCGTemp *ts)
     idx = temp_idx(s, ts);
     k = ts->base_type + (ts->temp_local ? TCG_TYPE_COUNT : 0);
     set_bit(idx, s->free_temps[k].l);
+}
+
+TCGTemp *tcg_constant_internal(TCGContext *tcg_ctx, TCGType type, int64_t val)
+{
+    TCGContext *s = tcg_ctx;
+    GHashTable *h = s->const_table[type];
+    TCGTemp *ts;
+
+    if (h == NULL) {
+        h = g_hash_table_new(g_int64_hash, g_int64_equal);
+        tcg_ctx->const_table[type] = h;
+    }
+
+    ts = g_hash_table_lookup(h, &val);
+    if (ts == NULL) {
+        ts = tcg_temp_alloc(tcg_ctx);
+
+        if (TCG_TARGET_REG_BITS == 32 && type == TCG_TYPE_I64) {
+            TCGTemp *ts2 = tcg_temp_alloc(tcg_ctx);
+
+            ts->base_type = TCG_TYPE_I64;
+            ts->type = TCG_TYPE_I32;
+            ts->kind = TEMP_CONST;
+            ts->temp_allocated = 1;
+            /*
+             * Retain the full value of the 64-bit constant in the low
+             * part, so that the hash table works.  Actual uses will
+             * truncate the value to the low part.
+             */
+            ts->val = val;
+
+            tcg_debug_assert(ts2 == ts + 1);
+            ts2->base_type = TCG_TYPE_I64;
+            ts2->type = TCG_TYPE_I32;
+            ts2->kind = TEMP_CONST;
+            ts2->temp_allocated = 1;
+            ts2->val = val >> 32;
+        } else {
+            ts->base_type = type;
+            ts->type = type;
+            ts->kind = TEMP_CONST;
+            ts->temp_allocated = 1;
+            ts->val = val;
+        }
+        g_hash_table_insert(h, &ts->val, ts);
+    }
+
+    return ts;
 }
 
 TCGv_i32 tcg_const_i32(TCGContext *tcg_ctx, int32_t val)
@@ -1685,12 +1740,12 @@ static const char * const ldst_name[] =
     [MO_LESW] = "lesw",
     [MO_LEUL] = "leul",
     [MO_LESL] = "lesl",
-    [MO_LEQ]  = "leq",
+    [MO_LEUQ] = "leq",
     [MO_BEUW] = "beuw",
     [MO_BESW] = "besw",
     [MO_BEUL] = "beul",
     [MO_BESL] = "besl",
-    [MO_BEQ]  = "beq",
+    [MO_BEUQ] = "beq",
 };
 
 static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] = {

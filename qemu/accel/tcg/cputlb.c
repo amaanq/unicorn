@@ -367,6 +367,17 @@ void tlb_flush_all_cpus_synced(CPUState *src_cpu)
     tlb_flush_by_mmuidx_all_cpus_synced(src_cpu, ALL_MMUIDX_BITS);
 }
 
+static bool tlb_hit_page_mask_anyprot(CPUTLBEntry *tlb_entry,
+                                      target_ulong page, target_ulong mask)
+{
+    page &= mask;
+    mask &= TARGET_PAGE_MASK | TLB_INVALID_MASK;
+
+    return (page == (tlb_entry->addr_read & mask) ||
+            page == (tlb_addr_write(tlb_entry) & mask) ||
+            page == (tlb_entry->addr_code & mask));
+}
+
 static inline bool tlb_hit_page_anyprot(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
                                         target_ulong page)
 {
@@ -384,6 +395,17 @@ static inline bool tlb_entry_is_empty(const CPUTLBEntry *te)
     return te->addr_read == -1 && te->addr_write == -1 && te->addr_code == -1;
 }
 
+static bool tlb_flush_entry_mask_locked(CPUTLBEntry *tlb_entry,
+                                        target_ulong page,
+                                        target_ulong mask)
+{
+    if (tlb_hit_page_mask_anyprot(tlb_entry, page, mask)) {
+        memset(tlb_entry, -1, sizeof(*tlb_entry));
+        return true;
+    }
+    return false;
+}
+
 /* Called with tlb_c.lock held */
 static inline bool tlb_flush_entry_locked(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
                                           target_ulong page)
@@ -393,6 +415,20 @@ static inline bool tlb_flush_entry_locked(struct uc_struct *uc, CPUTLBEntry *tlb
         return true;
     }
     return false;
+}
+
+static void tlb_flush_vtlb_page_mask_locked(CPUArchState *env, int mmu_idx,
+                                            target_ulong page,
+                                            target_ulong mask)
+{
+    CPUTLBDesc *d = &env_tlb(env)->d[mmu_idx];
+    int k;
+
+    for (k = 0; k < CPU_VTLB_SIZE; k++) {
+        if (tlb_flush_entry_mask_locked(&d->vtable[k], page, mask)) {
+            tlb_n_used_entries_dec(env, mmu_idx);
+        }
+    }
 }
 
 /* Called with tlb_c.lock held */
@@ -615,6 +651,118 @@ void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
 void tlb_flush_page_all_cpus_synced(CPUState *src, target_ulong addr)
 {
     tlb_flush_page_by_mmuidx_all_cpus_synced(src, addr, ALL_MMUIDX_BITS);
+}
+
+static void tlb_flush_range_locked(CPUArchState *env, int midx,
+                                   target_ulong addr, target_ulong len,
+                                   unsigned bits)
+{
+    CPUTLBDesc *d = &env_tlb(env)->d[midx];
+    CPUTLBDescFast *f = &env_tlb(env)->f[midx];
+    target_ulong mask = MAKE_64BIT_MASK(0, bits);
+
+    /*
+     * If @bits is smaller than the tlb size, there may be multiple entries
+     * within the TLB; otherwise all addresses that match under @mask hit
+     * the same TLB entry.
+     * TODO: Perhaps allow bits to be a few bits less than the size.
+     * For now, just flush the entire TLB.
+     *
+     * If @len is larger than the tlb size, then it will take longer to
+     * test all of the entries in the TLB than it will to flush it all.
+     */
+    if (mask < f->mask || len > f->mask) {
+        // tlb_debug("forcing full flush midx %d ("
+        //           TARGET_FMT_lx "/" TARGET_FMT_lx "+" TARGET_FMT_lx ")\n",
+        //           midx, addr, mask, len);
+        tlb_flush_one_mmuidx_locked(env, midx, get_clock_realtime());
+        return;
+    }
+
+    /*
+     * Check if we need to flush due to large pages.
+     * Because large_page_mask contains all 1's from the msb,
+     * we only need to test the end of the range.
+     */
+    if (((addr + len - 1) & d->large_page_mask) == d->large_page_addr) {
+        // tlb_debug("forcing full flush midx %d ("
+        //           TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+        //           midx, d->large_page_addr, d->large_page_mask);
+        tlb_flush_one_mmuidx_locked(env, midx, get_clock_realtime());
+        return;
+    }
+
+    for (target_ulong i = 0; i < len; i += TARGET_PAGE_SIZE) {
+        target_ulong page = addr + i;
+        CPUTLBEntry *entry = tlb_entry(env, midx, page);
+
+        if (tlb_flush_entry_mask_locked(entry, page, mask)) {
+            tlb_n_used_entries_dec(env, midx);
+        }
+        tlb_flush_vtlb_page_mask_locked(env, midx, page, mask);
+    }
+}
+
+typedef struct {
+    target_ulong addr;
+    target_ulong len;
+    uint16_t idxmap;
+    uint16_t bits;
+} TLBFlushRangeData;
+
+static void tlb_flush_range_by_mmuidx_async_0(CPUState *cpu,
+                                              TLBFlushRangeData d)
+{
+    CPUArchState *env = cpu->env_ptr;
+    int mmu_idx;
+
+    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+        if ((d.idxmap >> mmu_idx) & 1) {
+            tlb_flush_range_locked(env, mmu_idx, d.addr, d.len, d.bits);
+        }
+    }
+
+    /*
+     * If the length is larger than the jump cache size, then it will take
+     * longer to clear each entry individually than it will to clear it all.
+     */
+    if (d.len >= (TARGET_PAGE_SIZE * TB_JMP_CACHE_SIZE)) {
+        cpu_tb_jmp_cache_clear(cpu);
+        return;
+    }
+
+    for (target_ulong i = 0; i < d.len; i += TARGET_PAGE_SIZE) {
+        tb_flush_jmp_cache(cpu, d.addr + i);
+    }
+}
+
+void tlb_flush_range_by_mmuidx(CPUState *cpu, target_ulong addr,
+                               target_ulong len, uint16_t idxmap,
+                               unsigned bits)
+{
+    TLBFlushRangeData d;
+
+    /*
+     * If all bits are significant, and len is small,
+     * this devolves to tlb_flush_page.
+     */
+    if (bits >= TARGET_LONG_BITS && len <= TARGET_PAGE_SIZE) {
+        tlb_flush_page_by_mmuidx(cpu, addr, idxmap);
+        return;
+    }
+    /* If no page bits are significant, this devolves to tlb_flush. */
+    if (bits < TARGET_PAGE_BITS) {
+        tlb_flush_by_mmuidx(cpu, idxmap);
+        return;
+    }
+
+    /* This should already be page aligned */
+    d.addr = addr & TARGET_PAGE_MASK;
+    d.len = len;
+    d.idxmap = idxmap;
+    d.bits = bits;
+
+    tlb_flush_range_by_mmuidx_async_0(cpu, d);
 }
 
 /* update the TLBs so that writes to code in the virtual page 'addr'
@@ -1513,7 +1661,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
 typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
                                 TCGMemOpIdx oi, uintptr_t retaddr);
 
-static inline uint64_t
+static inline uint64_t QEMU_ALWAYS_INLINE
 load_memop(const void *haddr, MemOp op)
 {
     switch (op) {
@@ -1527,13 +1675,12 @@ load_memop(const void *haddr, MemOp op)
         return (uint32_t)ldl_be_p(haddr);
     case MO_LEUL:
         return (uint32_t)ldl_le_p(haddr);
-    case MO_BEQ:
+    case MO_BEUQ:
         return ldq_be_p(haddr);
-    case MO_LEQ:
+    case MO_LEUQ:
         return ldq_le_p(haddr);
     default:
-        // qemu_build_not_reached();
-        return 0;
+        qemu_build_not_reached();
     }
 }
 
@@ -1975,14 +2122,14 @@ tcg_target_ulong helper_be_ldul_mmu(CPUArchState *env, target_ulong addr,
 uint64_t helper_le_ldq_mmu(CPUArchState *env, target_ulong addr,
                            TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    return load_helper(env, addr, oi, retaddr, MO_LEQ, false,
+    return load_helper(env, addr, oi, retaddr, MO_LEUQ, false,
                        helper_le_ldq_mmu);
 }
 
 uint64_t helper_be_ldq_mmu(CPUArchState *env, target_ulong addr,
                            TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    return load_helper(env, addr, oi, retaddr, MO_BEQ, false,
+    return load_helper(env, addr, oi, retaddr, MO_BEUQ, false,
                        helper_be_ldq_mmu);
 }
 
@@ -2027,194 +2174,61 @@ tcg_target_ulong helper_be_ldsl_mmu(CPUArchState *env, target_ulong addr,
  */
 
 static inline uint64_t cpu_load_helper(CPUArchState *env, abi_ptr addr,
-                                       int mmu_idx, uintptr_t retaddr,
-                                       MemOp op, FullLoadHelper *full_load) // qq
+                                       TCGMemOpIdx oi, uintptr_t retaddr,
+                                       FullLoadHelper *full_load)
 {
-    TCGMemOpIdx oi;
     uint64_t ret;
 
-    op &= ~MO_SIGN;
-    oi = make_memop_idx(op, mmu_idx);
     ret = full_load(env, addr, oi, retaddr);
-
     return ret;
 }
 
-uint32_t cpu_ldub_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                            int mmu_idx, uintptr_t ra)
+uint8_t cpu_ldb_mmu(CPUArchState *env, abi_ptr addr, TCGMemOpIdx oi, uintptr_t ra)
 {
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_UB, full_ldub_mmu);
+    return cpu_load_helper(env, addr, oi, ra, full_ldub_mmu);
 }
 
-int cpu_ldsb_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                       int mmu_idx, uintptr_t ra)
+uint16_t cpu_ldw_be_mmu(CPUArchState *env, abi_ptr addr,
+                        TCGMemOpIdx oi, uintptr_t ra)
 {
-    return (int8_t)cpu_load_helper(env, addr, mmu_idx, ra, MO_SB,
-                                   full_ldub_mmu);
+    return cpu_load_helper(env, addr, oi, ra, full_be_lduw_mmu);
 }
 
-uint32_t cpu_lduw_be_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                               int mmu_idx, uintptr_t ra)
+uint32_t cpu_ldl_be_mmu(CPUArchState *env, abi_ptr addr,
+                        TCGMemOpIdx oi, uintptr_t ra)
 {
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_BEUW, full_be_lduw_mmu);
+    return cpu_load_helper(env, addr, oi, ra, full_be_ldul_mmu);
 }
 
-int cpu_ldsw_be_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                          int mmu_idx, uintptr_t ra)
+uint64_t cpu_ldq_be_mmu(CPUArchState *env, abi_ptr addr,
+                        TCGMemOpIdx oi, uintptr_t ra)
 {
-    return (int16_t)cpu_load_helper(env, addr, mmu_idx, ra, MO_BESW,
-                                    full_be_lduw_mmu);
+    return cpu_load_helper(env, addr, oi, ra, helper_be_ldq_mmu);
 }
 
-uint32_t cpu_ldl_be_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                              int mmu_idx, uintptr_t ra)
+uint16_t cpu_ldw_le_mmu(CPUArchState *env, abi_ptr addr,
+                        TCGMemOpIdx oi, uintptr_t ra)
 {
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_BEUL, full_be_ldul_mmu);
+    return cpu_load_helper(env, addr, oi, ra, full_le_lduw_mmu);
 }
 
-uint64_t cpu_ldq_be_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                              int mmu_idx, uintptr_t ra)
+uint32_t cpu_ldl_le_mmu(CPUArchState *env, abi_ptr addr,
+                        TCGMemOpIdx oi, uintptr_t ra)
 {
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_BEQ, helper_be_ldq_mmu);
+    return cpu_load_helper(env, addr, oi, ra, full_le_ldul_mmu);
 }
 
-uint32_t cpu_lduw_le_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                               int mmu_idx, uintptr_t ra)
+uint64_t cpu_ldq_le_mmu(CPUArchState *env, abi_ptr addr,
+                        TCGMemOpIdx oi, uintptr_t ra)
 {
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_LEUW, full_le_lduw_mmu);
-}
-
-int cpu_ldsw_le_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                          int mmu_idx, uintptr_t ra)
-{
-    return (int16_t)cpu_load_helper(env, addr, mmu_idx, ra, MO_LESW,
-                                    full_le_lduw_mmu);
-}
-
-uint32_t cpu_ldl_le_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                              int mmu_idx, uintptr_t ra)
-{
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_LEUL, full_le_ldul_mmu);
-}
-
-uint64_t cpu_ldq_le_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-                              int mmu_idx, uintptr_t ra)
-{
-    return cpu_load_helper(env, addr, mmu_idx, ra, MO_LEQ, helper_le_ldq_mmu);
-}
-
-uint32_t cpu_ldub_data_ra(CPUArchState *env, target_ulong ptr,
-                          uintptr_t retaddr)
-{
-    return cpu_ldub_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-int cpu_ldsb_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
-{
-    return cpu_ldsb_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint32_t cpu_lduw_be_data_ra(CPUArchState *env, target_ulong ptr,
-                             uintptr_t retaddr)
-{
-    return cpu_lduw_be_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-int cpu_ldsw_be_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
-{
-    return cpu_ldsw_be_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint32_t cpu_ldl_be_data_ra(CPUArchState *env, target_ulong ptr,
-                            uintptr_t retaddr)
-{
-    return cpu_ldl_be_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint64_t cpu_ldq_be_data_ra(CPUArchState *env, target_ulong ptr,
-                            uintptr_t retaddr)
-{
-    return cpu_ldq_be_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint32_t cpu_lduw_le_data_ra(CPUArchState *env, target_ulong ptr,
-                             uintptr_t retaddr)
-{
-    return cpu_lduw_le_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-int cpu_ldsw_le_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
-{
-    return cpu_ldsw_le_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint32_t cpu_ldl_le_data_ra(CPUArchState *env, target_ulong ptr,
-                            uintptr_t retaddr)
-{
-    return cpu_ldl_le_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint64_t cpu_ldq_le_data_ra(CPUArchState *env, target_ulong ptr,
-                            uintptr_t retaddr)
-{
-    return cpu_ldq_le_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
-}
-
-uint32_t cpu_ldub_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldub_data_ra(env, ptr, 0);
-}
-
-int cpu_ldsb_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldsb_data_ra(env, ptr, 0);
-}
-
-uint32_t cpu_lduw_be_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_lduw_be_data_ra(env, ptr, 0);
-}
-
-int cpu_ldsw_be_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldsw_be_data_ra(env, ptr, 0);
-}
-
-uint32_t cpu_ldl_be_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldl_be_data_ra(env, ptr, 0);
-}
-
-uint64_t cpu_ldq_be_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldq_be_data_ra(env, ptr, 0);
-}
-
-uint32_t cpu_lduw_le_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_lduw_le_data_ra(env, ptr, 0);
-}
-
-int cpu_ldsw_le_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldsw_le_data_ra(env, ptr, 0);
-}
-
-uint32_t cpu_ldl_le_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldl_le_data_ra(env, ptr, 0);
-}
-
-uint64_t cpu_ldq_le_data(CPUArchState *env, target_ulong ptr)
-{
-    return cpu_ldq_le_data_ra(env, ptr, 0);
+    return cpu_load_helper(env, addr, oi, ra, helper_le_ldq_mmu);
 }
 
 /*
  * Store Helpers
  */
 
-static inline void
+static inline void QEMU_ALWAYS_INLINE
 store_memop(void *haddr, uint64_t val, MemOp op)
 {
     switch (op) {
@@ -2233,17 +2247,19 @@ store_memop(void *haddr, uint64_t val, MemOp op)
     case MO_LEUL:
         stl_le_p(haddr, val);
         break;
-    case MO_BEQ:
+    case MO_BEUQ:
         stq_be_p(haddr, val);
         break;
-    case MO_LEQ:
+    case MO_LEUQ:
         stq_le_p(haddr, val);
         break;
     default:
-        // qemu_build_not_reached();
-        break;
+        qemu_build_not_reached();
     }
 }
+
+static void full_stb_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                         TCGMemOpIdx oi, uintptr_t retaddr);
 
 static inline void
 store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
@@ -2544,180 +2560,136 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
     store_memop(haddr, val, op);
 }
 
+static void __attribute__((noinline))
+full_stb_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+             TCGMemOpIdx oi, uintptr_t retaddr)
+{
+    store_helper(env, addr, val, oi, retaddr, MO_UB);
+}
+
 void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
                         TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_UB);
+    full_stb_mmu(env, addr, val, oi, retaddr);
+}
+
+static void full_le_stw_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                            TCGMemOpIdx oi, uintptr_t retaddr)
+{
+    store_helper(env, addr, val, oi, retaddr, MO_LEUW);
 }
 
 void helper_le_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
                        TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_LEUW);
+    full_le_stw_mmu(env, addr, val, oi, retaddr);
+}
+
+static void full_be_stw_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                            TCGMemOpIdx oi, uintptr_t retaddr)
+{
+    store_helper(env, addr, val, oi, retaddr, MO_BEUW);
 }
 
 void helper_be_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
                        TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_BEUW);
+    full_be_stw_mmu(env, addr, val, oi, retaddr);
+}
+
+static void full_le_stl_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                            TCGMemOpIdx oi, uintptr_t retaddr)
+{
+    store_helper(env, addr, val, oi, retaddr, MO_LEUL);
 }
 
 void helper_le_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
                        TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_LEUL);
+    full_le_stl_mmu(env, addr, val, oi, retaddr);
+}
+
+static void full_be_stl_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                            TCGMemOpIdx oi, uintptr_t retaddr)
+{
+    store_helper(env, addr, val, oi, retaddr, MO_BEUL);
 }
 
 void helper_be_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
                        TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_BEUL);
+    full_be_stl_mmu(env, addr, val, oi, retaddr);
 }
 
 void helper_le_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
                        TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_LEQ);
+    store_helper(env, addr, val, oi, retaddr, MO_LEUQ);
 }
 
 void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
                        TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    store_helper(env, addr, val, oi, retaddr, MO_BEQ);
+    store_helper(env, addr, val, oi, retaddr, MO_BEUQ);
 }
 
 /*
  * Store Helpers for cpu_ldst.h
  */
 
-static inline void
-cpu_store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-                 int mmu_idx, uintptr_t retaddr, MemOp op) // qq
-{
-    TCGMemOpIdx oi;
+typedef void FullStoreHelper(CPUArchState *env, target_ulong addr,
+                             uint64_t val, TCGMemOpIdx oi, uintptr_t retaddr);
 
-    oi = make_memop_idx(op, mmu_idx);
-    store_helper(env, addr, val, oi, retaddr, op);
+static inline void cpu_store_helper(CPUArchState *env, target_ulong addr,
+                                    uint64_t val, TCGMemOpIdx oi, uintptr_t ra,
+                                    FullStoreHelper *full_store)
+{
+    full_store(env, addr, val, oi, ra);
 }
 
-void cpu_stb_mmuidx_ra(CPUArchState *env, target_ulong addr, uint32_t val,
-                       int mmu_idx, uintptr_t retaddr)
+void cpu_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
+                 TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_UB);
+    cpu_store_helper(env, addr, val, oi, retaddr, full_stb_mmu);
 }
 
-void cpu_stw_be_mmuidx_ra(CPUArchState *env, target_ulong addr, uint32_t val,
-                          int mmu_idx, uintptr_t retaddr)
+void cpu_stw_be_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
+                    TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_BEUW);
+    cpu_store_helper(env, addr, val, oi, retaddr, full_be_stw_mmu);
 }
 
-void cpu_stl_be_mmuidx_ra(CPUArchState *env, target_ulong addr, uint32_t val,
-                          int mmu_idx, uintptr_t retaddr)
+void cpu_stl_be_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
+                    TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_BEUL);
+    cpu_store_helper(env, addr, val, oi, retaddr, full_be_stl_mmu);
 }
 
-void cpu_stq_be_mmuidx_ra(CPUArchState *env, target_ulong addr, uint64_t val,
-                          int mmu_idx, uintptr_t retaddr)
+void cpu_stq_be_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                    TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_BEQ);
+    cpu_store_helper(env, addr, val, oi, retaddr, helper_be_stq_mmu);
 }
 
-void cpu_stw_le_mmuidx_ra(CPUArchState *env, target_ulong addr, uint32_t val,
-                          int mmu_idx, uintptr_t retaddr)
+void cpu_stw_le_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
+                    TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_LEUW);
+    cpu_store_helper(env, addr, val, oi, retaddr, full_le_stw_mmu);
 }
 
-void cpu_stl_le_mmuidx_ra(CPUArchState *env, target_ulong addr, uint32_t val,
-                          int mmu_idx, uintptr_t retaddr)
+void cpu_stl_le_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
+                    TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_LEUL);
+    cpu_store_helper(env, addr, val, oi, retaddr, full_le_stl_mmu);
 }
 
-void cpu_stq_le_mmuidx_ra(CPUArchState *env, target_ulong addr, uint64_t val,
-                          int mmu_idx, uintptr_t retaddr)
+void cpu_stq_le_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                    TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_LEQ);
+    cpu_store_helper(env, addr, val, oi, retaddr, helper_le_stq_mmu);
 }
 
-void cpu_stb_data_ra(CPUArchState *env, target_ulong ptr,
-                     uint32_t val, uintptr_t retaddr)
-{
-    cpu_stb_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stw_be_data_ra(CPUArchState *env, target_ulong ptr,
-                        uint32_t val, uintptr_t retaddr)
-{
-    cpu_stw_be_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stl_be_data_ra(CPUArchState *env, target_ulong ptr,
-                        uint32_t val, uintptr_t retaddr)
-{
-    cpu_stl_be_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stq_be_data_ra(CPUArchState *env, target_ulong ptr,
-                        uint64_t val, uintptr_t retaddr)
-{
-    cpu_stq_be_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stw_le_data_ra(CPUArchState *env, target_ulong ptr,
-                        uint32_t val, uintptr_t retaddr)
-{
-    cpu_stw_le_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stl_le_data_ra(CPUArchState *env, target_ulong ptr,
-                        uint32_t val, uintptr_t retaddr)
-{
-    cpu_stl_le_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stq_le_data_ra(CPUArchState *env, target_ulong ptr,
-                        uint64_t val, uintptr_t retaddr)
-{
-    cpu_stq_le_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-}
-
-void cpu_stb_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-{
-    cpu_stb_data_ra(env, ptr, val, 0);
-}
-
-void cpu_stw_be_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-{
-    cpu_stw_be_data_ra(env, ptr, val, 0);
-}
-
-void cpu_stl_be_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-{
-    cpu_stl_be_data_ra(env, ptr, val, 0);
-}
-
-void cpu_stq_be_data(CPUArchState *env, target_ulong ptr, uint64_t val)
-{
-    cpu_stq_be_data_ra(env, ptr, val, 0);
-}
-
-void cpu_stw_le_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-{
-    cpu_stw_le_data_ra(env, ptr, val, 0);
-}
-
-void cpu_stl_le_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-{
-    cpu_stl_le_data_ra(env, ptr, val, 0);
-}
-
-void cpu_stq_le_data(CPUArchState *env, target_ulong ptr, uint64_t val)
-{
-    cpu_stq_le_data_ra(env, ptr, val, 0);
-}
+#include "ldst_common.inc.c"
 
 /* First set of helpers allows passing in of OI and RETADDR.  This makes
    them callable from other helpers.  */
@@ -2814,11 +2786,11 @@ uint32_t cpu_ldl_code(CPUArchState *env, abi_ptr addr)
 static uint64_t full_ldq_code(CPUArchState *env, target_ulong addr,
                               TCGMemOpIdx oi, uintptr_t retaddr)
 {
-    return load_helper(env, addr, oi, retaddr, MO_TEQ, true, full_ldq_code);
+    return load_helper(env, addr, oi, retaddr, MO_TEUQ, true, full_ldq_code);
 }
 
 uint64_t cpu_ldq_code(CPUArchState *env, abi_ptr addr)
 {
-    TCGMemOpIdx oi = make_memop_idx(MO_TEQ, cpu_mmu_index(env, true));
+    TCGMemOpIdx oi = make_memop_idx(MO_TEUQ, cpu_mmu_index(env, true));
     return full_ldq_code(env, addr, oi, 0);
 }

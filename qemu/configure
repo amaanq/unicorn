@@ -856,7 +856,7 @@ cross_cc_vars="$cross_cc_vars cross_cc_${cpu}"
 QEMU_CFLAGS="$CPU_CFLAGS $QEMU_CFLAGS"
 
 default_target_list="aarch64-softmmu \
-    arm-softmmu m68k-softmmu mips64el-softmmu mips64-softmmu mipsel-softmmu \
+    arm-softmmu loongarch64-softmmu m68k-softmmu mips64el-softmmu mips64-softmmu mipsel-softmmu \
     mips-softmmu ppc64-softmmu ppc-softmmu sparc64-softmmu sparc-softmmu \
     x86_64-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu \
     tricore-softmmu"
@@ -2685,6 +2685,11 @@ case "$target_name" in
     TARGET_SYSTBL_ABI=common,32
   ;;
   lm32)
+  ;;
+  loongarch64)
+    TARGET_ARCH=loongarch64
+    TARGET_BASE_ARCH=loongarch
+    mttcg="yes"
   ;;
   m68k)
     TARGET_SYSTBL_ABI=common

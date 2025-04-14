@@ -86,7 +86,7 @@ option(UNICORN_FUZZ "Enable fuzzing" OFF)
 option(UNICORN_LOGGING "Enable logging" OFF)
 option(UNICORN_BUILD_TESTS "Build unicorn tests" ${PROJECT_IS_TOP_LEVEL})
 option(UNICORN_INSTALL "Enable unicorn installation" ${PROJECT_IS_TOP_LEVEL})
-set(UNICORN_ARCH "x86;arm;aarch64;riscv;mips;sparc;m68k;ppc;s390x;tricore" CACHE STRING "Enabled unicorn architectures")
+set(UNICORN_ARCH "x86;arm;aarch64;riscv;loongarch;mips;sparc;m68k;ppc;s390x;tricore" CACHE STRING "Enabled unicorn architectures")
 option(UNICORN_TRACER "Trace unicorn execution" OFF)
 
 foreach(ARCH_LOOP ${UNICORN_ARCH})
@@ -287,6 +287,9 @@ else()
     if(UNICORN_HAS_AARCH64)
         set(EXTRA_CFLAGS "${EXTRA_CFLAGS}-DUNICORN_HAS_ARM64 ")
     endif()
+	if(UNICORN_HAS_LOONGARCH)
+        set(EXTRA_CFLAGS "${EXTRA_CFLAGS}-DUNICORN_HAS_LOONGARCH ")
+    endif()
     if(UNICORN_HAS_M68K)
         set(EXTRA_CFLAGS "${EXTRA_CFLAGS}-DUNICORN_HAS_M68K ")
     endif()
@@ -338,6 +341,9 @@ else()
     if(UNICORN_HAS_AARCH64)
         set(TARGET_LIST "${TARGET_LIST}aarch64-softmmu, ")
     endif()
+	if(UNICORN_HAS_LOONGARCH)
+        set(TARGET_LIST "${TARGET_LIST}loongarch64-softmmu, ")
+    endif()
     if(UNICORN_HAS_M68K)
         set(TARGET_LIST "${TARGET_LIST}m68k-softmmu, ")
     endif()
@@ -388,6 +394,12 @@ else()
         execute_process(COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qemu/scripts/create_config
             INPUT_FILE ${CMAKE_BINARY_DIR}/aarch64-softmmu/config-target.mak
             OUTPUT_FILE ${CMAKE_BINARY_DIR}/aarch64-softmmu/config-target.h
+        )
+    endif()
+	if(UNICORN_HAS_LOONGARCH)
+        execute_process(COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qemu/scripts/create_config
+            INPUT_FILE ${CMAKE_BINARY_DIR}/loongarch64-softmmu/config-target.mak
+            OUTPUT_FILE ${CMAKE_BINARY_DIR}/loongarch64-softmmu/config-target.h
         )
     endif()
     if(UNICORN_HAS_M68K)
@@ -646,6 +658,43 @@ endif()
 
 if(UNICORN_TRACER)
     target_compile_options(aarch64-softmmu PRIVATE -DUNICORN_TRACER)
+endif()
+
+endif()
+
+if(UNICORN_HAS_LOONGARCH)
+add_library(loongarch64-softmmu STATIC
+    ${UNICORN_ARCH_COMMON}
+
+    qemu/target/loongarch/constant_timer.c
+    qemu/target/loongarch/cpu.c
+    qemu/target/loongarch/csr_helper.c
+    qemu/target/loongarch/fpu_helper.c
+    qemu/target/loongarch/iocsr_helper.c
+    qemu/target/loongarch/op_helper.c
+    qemu/target/loongarch/tlb_helper.c
+    qemu/target/loongarch/translate.c
+    qemu/target/loongarch/unicorn.c
+)
+
+if(MSVC)
+    target_compile_options(loongarch64-softmmu PRIVATE
+        -DNEED_CPU_H
+        /FIloongarch.h
+        /I${CMAKE_CURRENT_SOURCE_DIR}/msvc/loongarch64-softmmu
+        /I${CMAKE_CURRENT_SOURCE_DIR}/qemu/target/loongarch
+    )
+else()
+    target_compile_options(loongarch64-softmmu PRIVATE
+        -DNEED_CPU_H
+        -include loongarch.h
+        -I${CMAKE_BINARY_DIR}/loongarch64-softmmu
+        -I${CMAKE_CURRENT_SOURCE_DIR}/qemu/target/loongarch
+    )
+endif()
+
+if(UNICORN_TRACER)
+    target_compile_options(loongarch64-softmmu PRIVATE -DUNICORN_TRACER)
 endif()
 
 endif()
@@ -1277,6 +1326,13 @@ if(UNICORN_HAS_AARCH64)
     target_link_libraries(aarch64-softmmu PRIVATE unicorn-common)
     set(UNICORN_TEST_FILE ${UNICORN_TEST_FILE} test_arm64)
 endif()
+if(UNICORN_HAS_LOONGARCH)
+	set(UNICORN_COMPILE_OPTIONS ${UNICORN_COMPILE_OPTIONS} -DUNICORN_HAS_LOONGARCH)
+    set(UNICORN_LINK_LIBRARIES ${UNICORN_LINK_LIBRARIES} loongarch64-softmmu)
+    set(UNICORN_SAMPLE_FILE ${UNICORN_SAMPLE_FILE} sample_loongarch)
+    target_link_libraries(loongarch64-softmmu PRIVATE unicorn-common)
+    set(UNICORN_TEST_FILE ${UNICORN_TEST_FILE} test_loongarch)
+endif()
 if(UNICORN_HAS_M68K)
     set(UNICORN_COMPILE_OPTIONS ${UNICORN_COMPILE_OPTIONS} -DUNICORN_HAS_M68K)
     set(UNICORN_LINK_LIBRARIES ${UNICORN_LINK_LIBRARIES} m68k-softmmu)
@@ -1462,7 +1518,7 @@ if (UNICORN_LEGACY_STATIC_ARCHIVE)
 endif()
 
 if(UNICORN_FUZZ)
-    set(UNICORN_FUZZ_SUFFIX "arm_arm;arm_armbe;arm_thumb;arm64_arm;arm64_armbe;m68k_be;mips_32be;mips_32le;sparc_32be;x86_16;x86_32;x86_64;s390x_be")
+    set(UNICORN_FUZZ_SUFFIX "arm_arm;arm_armbe;arm_thumb;arm64_arm;arm64_armbe;loongarch;m68k_be;mips_32be;mips_32le;sparc_32be;x86_16;x86_32;x86_64;s390x_be")
     if (NOT APPLE)
         set(SAMPLES_LIB ${SAMPLES_LIB} rt)
     endif()
