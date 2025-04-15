@@ -26,28 +26,28 @@ static void glue(gen_, name)(DisasContext *ctx)                               \
     }                                                                         \
     gen_set_access_type(ctx, ACCESS_INT);                                     \
     avr = tcg_temp_new_i64(tcg_ctx);                                          \
-    EA = tcg_temp_new(tcg_ctx);                                                      \
+    EA = tcg_temp_new(tcg_ctx);                                               \
     gen_addr_reg_index(ctx, EA);                                              \
-    tcg_gen_andi_tl(tcg_ctx, EA, EA, ~0xf);                                            \
+    tcg_gen_andi_tl(tcg_ctx, EA, EA, ~0xf);                                   \
     /*                                                                        \
      * We only need to swap high and low halves. gen_qemu_ld64_i64            \
      * does necessary 64-bit byteswap already.                                \
      */                                                                       \
     if (ctx->le_mode) {                                                       \
         gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-        set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                               \
-        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                           \
+        set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                      \
+        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                  \
         gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-        set_avr64(tcg_ctx, rD(ctx->opcode), avr, true);                                \
+        set_avr64(tcg_ctx, rD(ctx->opcode), avr, true);                       \
     } else {                                                                  \
         gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-        set_avr64(tcg_ctx, rD(ctx->opcode), avr, true);                                \
-        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                           \
+        set_avr64(tcg_ctx, rD(ctx->opcode), avr, true);                       \
+        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                  \
         gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-        set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                               \
+        set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                      \
     }                                                                         \
-    tcg_temp_free(tcg_ctx, EA);                                                        \
-    tcg_temp_free_i64(tcg_ctx, avr);                                                   \
+    tcg_temp_free(tcg_ctx, EA);                                               \
+    tcg_temp_free_i64(tcg_ctx, avr);                                          \
 }
 
 #define GEN_VR_STX(name, opc2, opc3)                                          \
@@ -62,9 +62,9 @@ static void gen_st##name(DisasContext *ctx)                                   \
     }                                                                         \
     gen_set_access_type(ctx, ACCESS_INT);                                     \
     avr = tcg_temp_new_i64(tcg_ctx);                                          \
-    EA = tcg_temp_new(tcg_ctx);                                                      \
+    EA = tcg_temp_new(tcg_ctx);                                               \
     gen_addr_reg_index(ctx, EA);                                              \
-    tcg_gen_andi_tl(tcg_ctx, EA, EA, ~0xf);                                            \
+    tcg_gen_andi_tl(tcg_ctx, EA, EA, ~0xf);                                   \
     /*                                                                        \
      * We only need to swap high and low halves. gen_qemu_st64_i64            \
      * does necessary 64-bit byteswap already.                                \
@@ -72,18 +72,18 @@ static void gen_st##name(DisasContext *ctx)                                   \
     if (ctx->le_mode) {                                                       \
         get_avr64(tcg_ctx, avr, rD(ctx->opcode), false);                               \
         gen_qemu_st64_i64(ctx, avr, EA);                                      \
-        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                           \
+        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                  \
         get_avr64(tcg_ctx, avr, rD(ctx->opcode), true);                                \
         gen_qemu_st64_i64(ctx, avr, EA);                                      \
     } else {                                                                  \
         get_avr64(tcg_ctx, avr, rD(ctx->opcode), true);                                \
         gen_qemu_st64_i64(ctx, avr, EA);                                      \
-        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                           \
+        tcg_gen_addi_tl(tcg_ctx, EA, EA, 8);                                  \
         get_avr64(tcg_ctx, avr, rD(ctx->opcode), false);                               \
         gen_qemu_st64_i64(ctx, avr, EA);                                      \
     }                                                                         \
-    tcg_temp_free(tcg_ctx, EA);                                                        \
-    tcg_temp_free_i64(tcg_ctx, avr);                                                   \
+    tcg_temp_free(tcg_ctx, EA);                                               \
+    tcg_temp_free_i64(tcg_ctx, avr);                                          \
 }
 
 #define GEN_VR_LVE(name, opc2, opc3, size)                              \
@@ -97,15 +97,15 @@ static void gen_lve##name(DisasContext *ctx)                            \
             return;                                                     \
         }                                                               \
         gen_set_access_type(ctx, ACCESS_INT);                           \
-        EA = tcg_temp_new(tcg_ctx);                                            \
+        EA = tcg_temp_new(tcg_ctx);                                     \
         gen_addr_reg_index(ctx, EA);                                    \
         if (size > 1) {                                                 \
-            tcg_gen_andi_tl(tcg_ctx, EA, EA, ~(size - 1));                       \
+            tcg_gen_andi_tl(tcg_ctx, EA, EA, ~(size - 1));              \
         }                                                               \
         rs = gen_avr_ptr(tcg_ctx, rS(ctx->opcode));                     \
-        gen_helper_lve##name(tcg_ctx, tcg_ctx->cpu_env, rs, EA);                 \
-        tcg_temp_free(tcg_ctx, EA);                                              \
-        tcg_temp_free_ptr(tcg_ctx, rs);                                          \
+        gen_helper_lve##name(tcg_ctx, tcg_ctx->cpu_env, rs, EA);        \
+        tcg_temp_free(tcg_ctx, EA);                                     \
+        tcg_temp_free_ptr(tcg_ctx, rs);                                 \
     }
 
 #define GEN_VR_STVE(name, opc2, opc3, size)                             \
@@ -119,15 +119,15 @@ static void gen_stve##name(DisasContext *ctx)                           \
             return;                                                     \
         }                                                               \
         gen_set_access_type(ctx, ACCESS_INT);                           \
-        EA = tcg_temp_new(tcg_ctx);                                            \
+        EA = tcg_temp_new(tcg_ctx);                                     \
         gen_addr_reg_index(ctx, EA);                                    \
         if (size > 1) {                                                 \
-            tcg_gen_andi_tl(tcg_ctx, EA, EA, ~(size - 1));                       \
+            tcg_gen_andi_tl(tcg_ctx, EA, EA, ~(size - 1));              \
         }                                                               \
         rs = gen_avr_ptr(tcg_ctx, rS(ctx->opcode));                     \
-        gen_helper_stve##name(tcg_ctx, tcg_ctx->cpu_env, rs, EA);                \
-        tcg_temp_free(tcg_ctx, EA);                                              \
-        tcg_temp_free_ptr(tcg_ctx, rs);                                          \
+        gen_helper_stve##name(tcg_ctx, tcg_ctx->cpu_env, rs, EA);       \
+        tcg_temp_free(tcg_ctx, EA);                                     \
+        tcg_temp_free_ptr(tcg_ctx, rs);                                 \
     }
 
 GEN_VR_LDX(lvx, 0x07, 0x03);
@@ -211,28 +211,28 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
     z = tcg_const_i64(tcg_ctx, 0);                                      \
                                                                         \
     if (add_cin) {                                                      \
-        get_avr64(tcg_ctx, avr, rA(ctx->opcode), false);                \
-        tcg_gen_mulu2_i64(tcg_ctx, t0, t1, avr, ten);                            \
-        get_avr64(tcg_ctx, avr, rB(ctx->opcode), false);                \
-        tcg_gen_andi_i64(tcg_ctx, t2, avr, 0xF);                                 \
-        tcg_gen_add2_i64(tcg_ctx, avr, t2, t0, t1, t2, z);                       \
+        get_avr64(tcg_ctx, avr, rA(ctx->opcode), false);                         \
+        tcg_gen_mulu2_i64(tcg_ctx, t0, t1, avr, ten);                   \
+        get_avr64(tcg_ctx, avr, rB(ctx->opcode), false);                         \
+        tcg_gen_andi_i64(tcg_ctx, t2, avr, 0xF);                        \
+        tcg_gen_add2_i64(tcg_ctx, avr, t2, t0, t1, t2, z);              \
         set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                \
     } else {                                                            \
-        get_avr64(tcg_ctx, avr, rA(ctx->opcode), false);                \
-        tcg_gen_mulu2_i64(tcg_ctx, avr, t2, avr, ten);                           \
+        get_avr64(tcg_ctx, avr, rA(ctx->opcode), false);                         \
+        tcg_gen_mulu2_i64(tcg_ctx, avr, t2, avr, ten);                  \
         set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                \
     }                                                                   \
                                                                         \
     if (ret_carry) {                                                    \
-        get_avr64(tcg_ctx, avr, rA(ctx->opcode), true);                 \
-        tcg_gen_mulu2_i64(tcg_ctx, t0, t1, avr, ten);                            \
-        tcg_gen_add2_i64(tcg_ctx, t0, avr, t0, t1, t2, z);                       \
+        get_avr64(tcg_ctx, avr, rA(ctx->opcode), true);                          \
+        tcg_gen_mulu2_i64(tcg_ctx, t0, t1, avr, ten);                   \
+        tcg_gen_add2_i64(tcg_ctx, t0, avr, t0, t1, t2, z);              \
         set_avr64(tcg_ctx, rD(ctx->opcode), avr, false);                \
         set_avr64(tcg_ctx, rD(ctx->opcode), z, true);                   \
     } else {                                                            \
-        get_avr64(tcg_ctx, avr, rA(ctx->opcode), true);                 \
-        tcg_gen_mul_i64(tcg_ctx, t0, avr, ten);                                  \
-        tcg_gen_add_i64(tcg_ctx, avr, t0, t2);                                   \
+        get_avr64(tcg_ctx, avr, rA(ctx->opcode), true);                          \
+        tcg_gen_mul_i64(tcg_ctx, t0, avr, ten);                         \
+        tcg_gen_add_i64(tcg_ctx, avr, t0, t2);                          \
         set_avr64(tcg_ctx, rD(ctx->opcode), avr, true);                 \
     }                                                                   \
                                                                         \
@@ -410,9 +410,9 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
         gen_exception(ctx, POWERPC_EXCP_VPU);                           \
         return;                                                         \
     }                                                                   \
-    rb = gen_avr_ptr(tcg_ctx, rB(ctx->opcode));                         \
-    gen_helper_##name(tcg_ctx, cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)], rb); \
-    tcg_temp_free_ptr(tcg_ctx, rb);                                     \
+    rb = gen_avr_ptr(tcg_ctx, rB(ctx->opcode));                                  \
+    gen_helper_##name(tcg_ctx, tcg_ctx->cpu_gpr[rD(ctx->opcode)], tcg_ctx->cpu_gpr[rA(ctx->opcode)], rb);   \
+    tcg_temp_free_ptr(tcg_ctx, rb);                                              \
 }
 
 GEN_VXFORM_V(vaddubm, MO_8, tcg_gen_gvec_add, 0, 0);
@@ -518,7 +518,7 @@ static void trans_vmrgow(DisasContext *ctx)
 /*
  * lvsl VRT,RA,RB - Load Vector for Shift Left
  *
- * Let the EA be the sum (rA|0)+(rB). Let sh=EA[28-31].
+ * Let the EA be the sum (rA|0)+(rB). Let sh=EA[28–31].
  * Let X be the 32-byte value 0x00 || 0x01 || 0x02 || ... || 0x1E || 0x1F.
  * Bytes sh:sh+15 of X are placed into vD.
  */
@@ -557,7 +557,7 @@ static void trans_lvsl(DisasContext *ctx)
 /*
  * lvsr VRT,RA,RB - Load Vector for Shift Right
  *
- * Let the EA be the sum (rA|0)+(rB). Let sh=EA[28-31].
+ * Let the EA be the sum (rA|0)+(rB). Let sh=EA[28–31].
  * Let X be the 32-byte value 0x00 || 0x01 || 0x02 || ... || 0x1E || 0x1F.
  * Bytes (16-sh):(31-sh) of X are placed into vD.
  */
@@ -822,18 +822,27 @@ static void trans_vclzd(DisasContext *ctx)
 GEN_VXFORM(vmuloub, 4, 0);
 GEN_VXFORM(vmulouh, 4, 1);
 GEN_VXFORM(vmulouw, 4, 2);
-GEN_VXFORM(vmuluwm, 4, 2);
+GEN_VXFORM_V(vmuluwm, MO_32, tcg_gen_gvec_mul, 4, 2);
 GEN_VXFORM_DUAL(vmulouw, PPC_ALTIVEC, PPC_NONE,
                 vmuluwm, PPC_NONE, PPC2_ALTIVEC_207)
 GEN_VXFORM(vmulosb, 4, 4);
 GEN_VXFORM(vmulosh, 4, 5);
 GEN_VXFORM(vmulosw, 4, 6);
+GEN_VXFORM_V(vmulld, MO_64, tcg_gen_gvec_mul, 4, 7);
 GEN_VXFORM(vmuleub, 4, 8);
 GEN_VXFORM(vmuleuh, 4, 9);
 GEN_VXFORM(vmuleuw, 4, 10);
+GEN_VXFORM(vmulhuw, 4, 10);
+GEN_VXFORM(vmulhud, 4, 11);
+GEN_VXFORM_DUAL(vmuleuw, PPC_ALTIVEC, PPC_NONE,
+                vmulhuw, PPC_NONE, PPC2_ISA310);
 GEN_VXFORM(vmulesb, 4, 12);
 GEN_VXFORM(vmulesh, 4, 13);
 GEN_VXFORM(vmulesw, 4, 14);
+GEN_VXFORM(vmulhsw, 4, 14);
+GEN_VXFORM_DUAL(vmulesw, PPC_ALTIVEC, PPC_NONE,
+                vmulhsw, PPC_NONE, PPC2_ISA310);
+GEN_VXFORM(vmulhsd, 4, 15);
 GEN_VXFORM_V(vslb, MO_8, tcg_gen_gvec_shlv, 2, 4);
 GEN_VXFORM_V(vslh, MO_16, tcg_gen_gvec_shlv, 2, 5);
 GEN_VXFORM_V(vslw, MO_32, tcg_gen_gvec_shlv, 2, 6);
@@ -857,13 +866,13 @@ GEN_VXFORM(vaddcuw, 0, 6);
 GEN_VXFORM(vsubcuw, 0, 22);
 
 #define GEN_VXFORM_SAT(NAME, VECE, NORM, SAT, OPC2, OPC3)               \
-static void glue(glue(gen_, NAME), _vec)(TCGContext *tcg_ctx, unsigned vece, TCGv_vec t,     \
+static void glue(glue(gen_, NAME), _vec)(TCGContext *tcg_ctx, unsigned vece, TCGv_vec t, \
                                          TCGv_vec sat, TCGv_vec a,      \
                                          TCGv_vec b)                    \
 {                                                                       \
     TCGv_vec x = tcg_temp_new_vec_matching(tcg_ctx, t);                 \
-    glue(glue(tcg_gen_, NORM), _vec)(tcg_ctx, VECE, x, a, b);                    \
-    glue(glue(tcg_gen_, SAT), _vec)(tcg_ctx, VECE, t, a, b);                     \
+    glue(glue(tcg_gen_, NORM), _vec)(tcg_ctx, VECE, x, a, b);           \
+    glue(glue(tcg_gen_, SAT), _vec)(tcg_ctx, VECE, t, a, b);            \
     tcg_gen_cmp_vec(tcg_ctx, TCG_COND_NE, VECE, x, x, t);               \
     tcg_gen_or_vec(tcg_ctx, VECE, sat, sat, x);                         \
     tcg_temp_free_vec(tcg_ctx, x);                                      \
@@ -1067,6 +1076,7 @@ static void gen_vsplti(DisasContext *ctx, int vece)
         gen_exception(ctx, POWERPC_EXCP_VPU);
         return;
     }
+
     simm = SIMM5(ctx->opcode);
     tcg_gen_gvec_dup_imm(tcg_ctx, vece, avr_full_offset(rD(ctx->opcode)), 16, 16, simm);
 }
@@ -1137,7 +1147,7 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
             return;                                                     \
         }                                                               \
         rb = gen_avr_ptr(tcg_ctx, rB(ctx->opcode));                     \
-        gen_helper_##name(tcg_ctx, cpu_gpr[rD(ctx->opcode)], rb);       \
+        gen_helper_##name(tcg_ctx, tcg_ctx->cpu_gpr[rD(ctx->opcode)], rb); \
         tcg_temp_free_ptr(tcg_ctx, rb);                                 \
     }
 GEN_VXFORM_NOA(vupkhsb, 7, 8);
@@ -1198,7 +1208,7 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
             gen_exception(ctx, POWERPC_EXCP_VPU);                       \
             return;                                                     \
         }                                                               \
-        uimm = tcg_const_i32(tcg_ctx, UIMM5(ctx->opcode));                       \
+        uimm = tcg_const_i32(tcg_ctx, UIMM5(ctx->opcode));              \
         rb = gen_avr_ptr(tcg_ctx, rB(ctx->opcode));                     \
         rd = gen_avr_ptr(tcg_ctx, rD(ctx->opcode));                     \
         gen_helper_##name(tcg_ctx, tcg_ctx->cpu_env, rd, rb, uimm);     \
@@ -1293,9 +1303,9 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
         rc = gen_avr_ptr(tcg_ctx, rC(ctx->opcode));                     \
         rd = gen_avr_ptr(tcg_ctx, rD(ctx->opcode));                     \
         if (Rc(ctx->opcode)) {                                          \
-            gen_helper_##name1(tcg_ctx, tcg_ctx->cpu_env, rd, ra, rb, rc);       \
+            gen_helper_##name1(tcg_ctx, tcg_ctx->cpu_env, rd, ra, rb, rc); \
         } else {                                                        \
-            gen_helper_##name0(tcg_ctx, tcg_ctx->cpu_env, rd, ra, rb, rc);       \
+            gen_helper_##name0(tcg_ctx, tcg_ctx->cpu_env, rd, ra, rb, rc); \
         }                                                               \
         tcg_temp_free_ptr(tcg_ctx, ra);                                 \
         tcg_temp_free_ptr(tcg_ctx, rb);                                 \
@@ -1404,7 +1414,7 @@ static void gen_##op(DisasContext *ctx)             \
                                                     \
     ps = tcg_const_i32(tcg_ctx, (ctx->opcode & 0x200) != 0); \
                                                     \
-    gen_helper_##op(tcg_ctx, cpu_crf[6], rd, ra, rb, ps);    \
+    gen_helper_##op(tcg_ctx, cpu_crf[6], rd, ra, rb, ps); \
                                                     \
     tcg_temp_free_ptr(tcg_ctx, ra);                 \
     tcg_temp_free_ptr(tcg_ctx, rb);                 \
@@ -1429,7 +1439,7 @@ static void gen_##op(DisasContext *ctx)             \
                                                     \
     ps = tcg_const_i32(tcg_ctx, (ctx->opcode & 0x200) != 0); \
                                                     \
-    gen_helper_##op(tcg_ctx, cpu_crf[6], rd, rb, ps);        \
+    gen_helper_##op(tcg_ctx, cpu_crf[6], rd, rb, ps); \
                                                     \
     tcg_temp_free_ptr(tcg_ctx, rb);                 \
     tcg_temp_free_ptr(tcg_ctx, rd);                 \
@@ -1576,9 +1586,9 @@ static void gen_##op(DisasContext *ctx)       \
     rd = gen_avr_ptr(tcg_ctx, rD(ctx->opcode));        \
     st_six = tcg_const_i32(tcg_ctx, rB(ctx->opcode));  \
     gen_helper_##op(tcg_ctx, rd, ra, st_six);          \
-    tcg_temp_free_ptr(tcg_ctx, ra);           \
-    tcg_temp_free_ptr(tcg_ctx, rd);           \
-    tcg_temp_free_i32(tcg_ctx, st_six);       \
+    tcg_temp_free_ptr(tcg_ctx, ra);                    \
+    tcg_temp_free_ptr(tcg_ctx, rd);                    \
+    tcg_temp_free_i32(tcg_ctx, st_six);                \
 }
 
 VSHASIGMA(vshasigmaw)

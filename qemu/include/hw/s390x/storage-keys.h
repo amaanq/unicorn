@@ -25,7 +25,7 @@
 */
 
 typedef struct S390SKeysState {
-    //CPUState parent_obj;
+    // CPUState parent_obj;
     bool migration_enabled; // Unicorn: Dummy struct member
 } S390SKeysState;
 
@@ -41,9 +41,8 @@ typedef struct S390SKeysState {
 */
 #define S390_SKEYS_GET_CLASS(obj) (((QEMUS390SKeysState *)obj)->class)
 
-
 typedef struct S390SKeysClass {
-    //CPUClass parent_class;
+    // CPUClass parent_class;
     int (*skeys_enabled)(S390SKeysState *ks);
     int (*get_skeys)(S390SKeysState *ks, uint64_t start_gfn, uint64_t count,
                      uint8_t *keys);

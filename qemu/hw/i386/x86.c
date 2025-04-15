@@ -24,8 +24,7 @@
 /* Modified for Unicorn Engine by Nguyen Anh Quynh, 2015 */
 /* Modified for Unicorn Engine by Chen Huitao<chenhuitao@hfmrit.com>, 2020 */
 
-#include "qemu/compiler.h"
-#include "sysemu/sysemu.h"
+#include "sysemu/cpu-timers.h"
 #include "target/i386/cpu.h"
 
 
@@ -34,4 +33,3 @@ uint64_t cpu_get_tsc(CPUX86State *env)
 {
     return cpu_get_ticks();
 }
-

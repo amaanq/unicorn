@@ -213,43 +213,34 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
 {
     switch(*ct_str++) {
     case 'a':
-        ct->ct |= TCG_CT_REG;
-        tcg_regset_set_reg(ct->u.regs, TCG_REG_EAX);
+        tcg_regset_set_reg(ct->regs, TCG_REG_EAX);
         break;
     case 'b':
-        ct->ct |= TCG_CT_REG;
-        tcg_regset_set_reg(ct->u.regs, TCG_REG_EBX);
+        tcg_regset_set_reg(ct->regs, TCG_REG_EBX);
         break;
     case 'c':
-        ct->ct |= TCG_CT_REG;
-        tcg_regset_set_reg(ct->u.regs, TCG_REG_ECX);
+        tcg_regset_set_reg(ct->regs, TCG_REG_ECX);
         break;
     case 'd':
-        ct->ct |= TCG_CT_REG;
-        tcg_regset_set_reg(ct->u.regs, TCG_REG_EDX);
+        tcg_regset_set_reg(ct->regs, TCG_REG_EDX);
         break;
     case 'S':
-        ct->ct |= TCG_CT_REG;
-        tcg_regset_set_reg(ct->u.regs, TCG_REG_ESI);
+        tcg_regset_set_reg(ct->regs, TCG_REG_ESI);
         break;
     case 'D':
-        ct->ct |= TCG_CT_REG;
-        tcg_regset_set_reg(ct->u.regs, TCG_REG_EDI);
+        tcg_regset_set_reg(ct->regs, TCG_REG_EDI);
         break;
     case 'q':
         /* A register that can be used as a byte operand.  */
-        ct->ct |= TCG_CT_REG;
-        ct->u.regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xf;
+        ct->regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xf;
         break;
     case 'Q':
         /* A register with an addressable second byte (e.g. %ah).  */
-        ct->ct |= TCG_CT_REG;
-        ct->u.regs = 0xf;
+        ct->regs = 0xf;
         break;
     case 'r':
         /* A general register.  */
-        ct->ct |= TCG_CT_REG;
-        ct->u.regs |= ALL_GENERAL_REGS;
+        ct->regs |= ALL_GENERAL_REGS;
         break;
     case 'W':
         /* With TZCNT/LZCNT, we can have operand-size as an input.  */
@@ -257,16 +248,14 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
         break;
     case 'x':
         /* A vector register.  */
-        ct->ct |= TCG_CT_REG;
-        ct->u.regs |= ALL_VECTOR_REGS;
+        ct->regs |= ALL_VECTOR_REGS;
         break;
 
         /* qemu_ld/st address constraint */
     case 'L':
-        ct->ct |= TCG_CT_REG;
-        ct->u.regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xff;
-        tcg_regset_reset_reg(ct->u.regs, TCG_REG_L0);
-        tcg_regset_reset_reg(ct->u.regs, TCG_REG_L1);
+        ct->regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xff;
+        tcg_regset_reset_reg(ct->regs, TCG_REG_L0);
+        tcg_regset_reset_reg(ct->regs, TCG_REG_L1);
         break;
 
     case 'e':
@@ -644,7 +633,7 @@ static void tcg_out_modrm(TCGContext *s, int opc, int r, int rm)
 static void tcg_out_vex_opc(TCGContext *s, int opc, int r, int v,
                             int rm, int index)
 {
-    int tmp = 0;
+    int tmp;
 
     /* Use the two byte form if possible, which cannot encode
        VEX.W, VEX.B, VEX.X, or an m-mmmm field other than P_EXT.  */
@@ -974,7 +963,7 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
         new_pool_label(s, arg, R_386_PC32, s->code_ptr - 4, -4);
     } else {
         if (have_avx2) {
-            tcg_out_vex_modrm_pool(s, OPC_VPBROADCASTW + vex_l, ret);
+            tcg_out_vex_modrm_pool(s, OPC_VPBROADCASTD + vex_l, ret);
         } else {
             tcg_out_vex_modrm_pool(s, OPC_VBROADCASTSS, ret);
         }
@@ -1311,7 +1300,7 @@ static void tcg_out_addi(TCGContext *s, int reg, tcg_target_long val)
 }
 
 /* Use SMALL != 0 to force a short forward branch.  */
-static void tcg_out_jxx(TCGContext *s, int opc, TCGLabel *l, int _small)
+static void tcg_out_jxx(TCGContext *s, int opc, TCGLabel *l, int small)
 {
     int32_t val, val1;
 
@@ -1326,7 +1315,7 @@ static void tcg_out_jxx(TCGContext *s, int opc, TCGLabel *l, int _small)
             }
             tcg_out8(s, val1);
         } else {
-            if (_small) {
+            if (small) {
                 tcg_abort();
             }
             if (opc == -1) {
@@ -1337,7 +1326,7 @@ static void tcg_out_jxx(TCGContext *s, int opc, TCGLabel *l, int _small)
                 tcg_out32(s, val - 6);
             }
         }
-    } else if (_small) {
+    } else if (small) {
         if (opc == -1) {
             tcg_out8(s, OPC_JMP_short);
         } else {
@@ -1373,25 +1362,25 @@ static void tcg_out_cmp(TCGContext *s, TCGArg arg1, TCGArg arg2,
 
 static void tcg_out_brcond32(TCGContext *s, TCGCond cond,
                              TCGArg arg1, TCGArg arg2, int const_arg2,
-                             TCGLabel *label, int _small)
+                             TCGLabel *label, int small)
 {
     tcg_out_cmp(s, arg1, arg2, const_arg2, 0);
-    tcg_out_jxx(s, tcg_cond_to_jcc[cond], label, _small);
+    tcg_out_jxx(s, tcg_cond_to_jcc[cond], label, small);
 }
 
 #if TCG_TARGET_REG_BITS == 64
 static void tcg_out_brcond64(TCGContext *s, TCGCond cond,
                              TCGArg arg1, TCGArg arg2, int const_arg2,
-                             TCGLabel *label, int _small)
+                             TCGLabel *label, int small)
 {
     tcg_out_cmp(s, arg1, arg2, const_arg2, P_REXW);
-    tcg_out_jxx(s, tcg_cond_to_jcc[cond], label, _small);
+    tcg_out_jxx(s, tcg_cond_to_jcc[cond], label, small);
 }
 #else
 /* XXX: we implement it at the target level to avoid having to
    handle cross basic blocks temporaries */
 static void tcg_out_brcond2(TCGContext *s, const TCGArg *args,
-                            const int *const_args, int _small)
+                            const int *const_args, int small)
 {
     TCGLabel *label_next = gen_new_label(s);
     TCGLabel *label_this = arg_label(args[5]);
@@ -1401,69 +1390,69 @@ static void tcg_out_brcond2(TCGContext *s, const TCGArg *args,
         tcg_out_brcond32(s, TCG_COND_NE, args[0], args[2], const_args[2],
                          label_next, 1);
         tcg_out_brcond32(s, TCG_COND_EQ, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_NE:
         tcg_out_brcond32(s, TCG_COND_NE, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_brcond32(s, TCG_COND_NE, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_LT:
         tcg_out_brcond32(s, TCG_COND_LT, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_LTU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_LE:
         tcg_out_brcond32(s, TCG_COND_LT, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_LEU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_GT:
         tcg_out_brcond32(s, TCG_COND_GT, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_GTU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_GE:
         tcg_out_brcond32(s, TCG_COND_GT, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_GEU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_LTU:
         tcg_out_brcond32(s, TCG_COND_LTU, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_LTU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_LEU:
         tcg_out_brcond32(s, TCG_COND_LTU, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_LEU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_GTU:
         tcg_out_brcond32(s, TCG_COND_GTU, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_GTU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     case TCG_COND_GEU:
         tcg_out_brcond32(s, TCG_COND_GTU, args[1], args[3], const_args[3],
-                         label_this, _small);
+                         label_this, small);
         tcg_out_jxx(s, JCC_JNE, label_next, 1);
         tcg_out_brcond32(s, TCG_COND_GEU, args[0], args[2], const_args[2],
-                         label_this, _small);
+                         label_this, small);
         break;
     default:
         tcg_abort();
@@ -2076,7 +2065,7 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
 static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
 {
     TCGReg datalo, datahi, addrlo;
-    TCGReg addrhi QEMU_UNUSED_VAR;
+    TCGReg addrhi __attribute__((unused));
     TCGMemOpIdx oi;
     MemOp opc;
     int mem_index;
@@ -2186,7 +2175,7 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
 static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
 {
     TCGReg datalo, datahi, addrlo;
-    TCGReg addrhi QEMU_UNUSED_VAR;
+    TCGReg addrhi __attribute__((unused));
     TCGMemOpIdx oi;
     MemOp opc;
     int mem_index;
@@ -2733,7 +2722,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
     };
 
     TCGType type = vecl + TCG_TYPE_V64;
-    int insn = 0, sub;
+    int insn, sub;
     TCGArg a0, a1, a2;
 
     a0 = args[0];
@@ -3531,7 +3520,7 @@ static bool expand_vec_cmp_noinv(TCGContext *tcg_ctx, TCGType type, unsigned vec
         NEED_UMAX = 16,
     };
     TCGv_vec t1, t2;
-    uint8_t fixup = 0;
+    uint8_t fixup;
 
     switch (cond) {
     case TCG_COND_EQ:

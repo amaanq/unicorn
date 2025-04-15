@@ -1037,7 +1037,7 @@ static bool trans_ST1_zprz(DisasContext *ctx, arg_ST1_zprz *a);
 typedef arg_rpri_scatter_store arg_ST1_zpiz;
 static bool trans_ST1_zpiz(DisasContext *ctx, arg_ST1_zpiz *a);
 
-static void disas_sve_extract_disas_sve_Fmt_55(DisasContext *ctx, arg_disas_sve25 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_57(DisasContext *ctx, arg_disas_sve25 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->imm2 = sextract32(insn, 16, 5);
@@ -1045,7 +1045,7 @@ static void disas_sve_extract_disas_sve_Fmt_55(DisasContext *ctx, arg_disas_sve2
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_56(DisasContext *ctx, arg_disas_sve26 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_58(DisasContext *ctx, arg_disas_sve26 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->rm = extract32(insn, 16, 5);
@@ -1053,7 +1053,7 @@ static void disas_sve_extract_disas_sve_Fmt_56(DisasContext *ctx, arg_disas_sve2
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_57(DisasContext *ctx, arg_rri_esz *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_59(DisasContext *ctx, arg_rri_esz *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->imm = sextract32(insn, 16, 5);
@@ -1061,25 +1061,25 @@ static void disas_sve_extract_disas_sve_Fmt_57(DisasContext *ctx, arg_rri_esz *a
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_58(DisasContext *ctx, arg_disas_sve27 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_60(DisasContext *ctx, arg_disas_sve27 *a, uint32_t insn)
 {
     a->imm = sextract32(insn, 5, 6);
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_59(DisasContext *ctx, arg_disas_sve28 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_61(DisasContext *ctx, arg_disas_sve28 *a, uint32_t insn)
 {
     a->rn = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_60(DisasContext *ctx, arg_disas_sve29 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_62(DisasContext *ctx, arg_disas_sve29 *a, uint32_t insn)
 {
     a->dbm = extract32(insn, 5, 13);
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_61(DisasContext *ctx, arg_rrri *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_63(DisasContext *ctx, arg_rrri *a, uint32_t insn)
 {
     a->rm = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
@@ -1087,14 +1087,14 @@ static void disas_sve_extract_disas_sve_Fmt_61(DisasContext *ctx, arg_rrri *a, u
     a->imm = deposit32(extract32(insn, 10, 3), 3, 29, extract32(insn, 16, 5));
 }
 
-static void disas_sve_extract_disas_sve_Fmt_62(DisasContext *ctx, arg_rri *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_64(DisasContext *ctx, arg_rri *a, uint32_t insn)
 {
     a->rn = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
     a->imm = deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2));
 }
 
-static void disas_sve_extract_disas_sve_Fmt_63(DisasContext *ctx, arg_disas_sve30 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_65(DisasContext *ctx, arg_disas_sve30 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->u = extract32(insn, 17, 1);
@@ -1103,13 +1103,13 @@ static void disas_sve_extract_disas_sve_Fmt_63(DisasContext *ctx, arg_disas_sve3
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_64(DisasContext *ctx, arg_disas_sve31 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_66(DisasContext *ctx, arg_disas_sve31 *a, uint32_t insn)
 {
     a->pg = extract32(insn, 10, 4);
     a->rn = extract32(insn, 5, 4);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_65(DisasContext *ctx, arg_ptrue *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_67(DisasContext *ctx, arg_ptrue *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->s = extract32(insn, 16, 1);
@@ -1117,28 +1117,28 @@ static void disas_sve_extract_disas_sve_Fmt_65(DisasContext *ctx, arg_ptrue *a, 
     a->rd = extract32(insn, 0, 4);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_66(DisasContext *ctx, arg_disas_sve32 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_68(DisasContext *ctx, arg_disas_sve32 *a, uint32_t insn)
 {
 }
 
-static void disas_sve_extract_disas_sve_Fmt_67(DisasContext *ctx, arg_disas_sve33 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_69(DisasContext *ctx, arg_disas_sve33 *a, uint32_t insn)
 {
     a->rd = extract32(insn, 0, 4);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_68(DisasContext *ctx, arg_disas_sve34 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_70(DisasContext *ctx, arg_disas_sve34 *a, uint32_t insn)
 {
     a->s = extract32(insn, 22, 1);
     a->pg = extract32(insn, 5, 4);
     a->rd = extract32(insn, 0, 4);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_69(DisasContext *ctx, arg_disas_sve35 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_71(DisasContext *ctx, arg_disas_sve35 *a, uint32_t insn)
 {
     a->rn = extract32(insn, 5, 4);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_70(DisasContext *ctx, arg_disas_sve36 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_72(DisasContext *ctx, arg_disas_sve36 *a, uint32_t insn)
 {
     a->sf = extract32(insn, 22, 1);
     a->rm = extract32(insn, 16, 5);
@@ -1146,7 +1146,7 @@ static void disas_sve_extract_disas_sve_Fmt_70(DisasContext *ctx, arg_disas_sve3
     a->ne = extract32(insn, 4, 1);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_71(DisasContext *ctx, arg_disas_sve37 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_73(DisasContext *ctx, arg_disas_sve37 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->rm = extract32(insn, 16, 5);
@@ -1157,21 +1157,21 @@ static void disas_sve_extract_disas_sve_Fmt_71(DisasContext *ctx, arg_disas_sve3
     a->rd = extract32(insn, 0, 4);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_72(DisasContext *ctx, arg_disas_sve38 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_74(DisasContext *ctx, arg_disas_sve38 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->imm = extract32(insn, 5, 8);
     a->rd = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_73(DisasContext *ctx, arg_disas_sve38 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_75(DisasContext *ctx, arg_disas_sve38 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->rd = extract32(insn, 0, 5);
     a->imm = expand_imm_sh8s(ctx, extract32(insn, 5, 9));
 }
 
-static void disas_sve_extract_disas_sve_Fmt_74(DisasContext *ctx, arg_disas_sve39 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_76(DisasContext *ctx, arg_disas_sve39 *a, uint32_t insn)
 {
     a->sz = extract32(insn, 22, 1);
     a->rm = extract32(insn, 16, 5);
@@ -1181,7 +1181,7 @@ static void disas_sve_extract_disas_sve_Fmt_74(DisasContext *ctx, arg_disas_sve3
     a->ra = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_75(DisasContext *ctx, arg_disas_sve40 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_77(DisasContext *ctx, arg_disas_sve40 *a, uint32_t insn)
 {
     a->index = extract32(insn, 19, 2);
     a->rm = extract32(insn, 16, 3);
@@ -1192,7 +1192,7 @@ static void disas_sve_extract_disas_sve_Fmt_75(DisasContext *ctx, arg_disas_sve4
     a->ra = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_76(DisasContext *ctx, arg_disas_sve40 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_78(DisasContext *ctx, arg_disas_sve40 *a, uint32_t insn)
 {
     a->index = extract32(insn, 20, 1);
     a->rm = extract32(insn, 16, 4);
@@ -1203,7 +1203,7 @@ static void disas_sve_extract_disas_sve_Fmt_76(DisasContext *ctx, arg_disas_sve4
     a->ra = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_77(DisasContext *ctx, arg_disas_sve41 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_79(DisasContext *ctx, arg_disas_sve41 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->rot = extract32(insn, 16, 1);
@@ -1213,7 +1213,7 @@ static void disas_sve_extract_disas_sve_Fmt_77(DisasContext *ctx, arg_disas_sve4
     a->rn = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_78(DisasContext *ctx, arg_disas_sve42 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_80(DisasContext *ctx, arg_disas_sve42 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->rm = extract32(insn, 16, 5);
@@ -1224,7 +1224,7 @@ static void disas_sve_extract_disas_sve_Fmt_78(DisasContext *ctx, arg_disas_sve4
     a->ra = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_79(DisasContext *ctx, arg_disas_sve43 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_81(DisasContext *ctx, arg_disas_sve43 *a, uint32_t insn)
 {
     a->index = extract32(insn, 19, 2);
     a->rm = extract32(insn, 16, 3);
@@ -1235,33 +1235,11 @@ static void disas_sve_extract_disas_sve_Fmt_79(DisasContext *ctx, arg_disas_sve4
     a->esz = 1;
 }
 
-static void disas_sve_extract_disas_sve_Fmt_80(DisasContext *ctx, arg_disas_sve43 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_82(DisasContext *ctx, arg_disas_sve43 *a, uint32_t insn)
 {
     a->index = extract32(insn, 20, 1);
     a->rm = extract32(insn, 16, 4);
     a->rot = extract32(insn, 10, 2);
-    a->rn = extract32(insn, 5, 5);
-    a->rd = extract32(insn, 0, 5);
-    a->ra = extract32(insn, 0, 5);
-    a->esz = 2;
-}
-
-static void disas_sve_extract_disas_sve_Fmt_81(DisasContext *ctx, arg_disas_sve44 *a, uint32_t insn)
-{
-    a->rm = extract32(insn, 16, 3);
-    a->sub = extract32(insn, 10, 1);
-    a->rn = extract32(insn, 5, 5);
-    a->rd = extract32(insn, 0, 5);
-    a->ra = extract32(insn, 0, 5);
-    a->index = deposit32(extract32(insn, 19, 2), 2, 30, extract32(insn, 22, 1));
-    a->esz = 1;
-}
-
-static void disas_sve_extract_disas_sve_Fmt_82(DisasContext *ctx, arg_disas_sve44 *a, uint32_t insn)
-{
-    a->index = extract32(insn, 19, 2);
-    a->rm = extract32(insn, 16, 3);
-    a->sub = extract32(insn, 10, 1);
     a->rn = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
     a->ra = extract32(insn, 0, 5);
@@ -1270,6 +1248,28 @@ static void disas_sve_extract_disas_sve_Fmt_82(DisasContext *ctx, arg_disas_sve4
 
 static void disas_sve_extract_disas_sve_Fmt_83(DisasContext *ctx, arg_disas_sve44 *a, uint32_t insn)
 {
+    a->rm = extract32(insn, 16, 3);
+    a->sub = extract32(insn, 10, 1);
+    a->rn = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
+    a->ra = extract32(insn, 0, 5);
+    a->index = deposit32(extract32(insn, 19, 2), 2, 30, extract32(insn, 22, 1));
+    a->esz = 1;
+}
+
+static void disas_sve_extract_disas_sve_Fmt_84(DisasContext *ctx, arg_disas_sve44 *a, uint32_t insn)
+{
+    a->index = extract32(insn, 19, 2);
+    a->rm = extract32(insn, 16, 3);
+    a->sub = extract32(insn, 10, 1);
+    a->rn = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
+    a->ra = extract32(insn, 0, 5);
+    a->esz = 2;
+}
+
+static void disas_sve_extract_disas_sve_Fmt_85(DisasContext *ctx, arg_disas_sve44 *a, uint32_t insn)
+{
     a->index = extract32(insn, 20, 1);
     a->rm = extract32(insn, 16, 4);
     a->sub = extract32(insn, 10, 1);
@@ -1279,7 +1279,7 @@ static void disas_sve_extract_disas_sve_Fmt_83(DisasContext *ctx, arg_disas_sve4
     a->esz = 3;
 }
 
-static void disas_sve_extract_disas_sve_Fmt_84(DisasContext *ctx, arg_disas_sve45 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_86(DisasContext *ctx, arg_disas_sve45 *a, uint32_t insn)
 {
     a->rm = extract32(insn, 16, 3);
     a->rn = extract32(insn, 5, 5);
@@ -1288,7 +1288,7 @@ static void disas_sve_extract_disas_sve_Fmt_84(DisasContext *ctx, arg_disas_sve4
     a->esz = 1;
 }
 
-static void disas_sve_extract_disas_sve_Fmt_85(DisasContext *ctx, arg_disas_sve45 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_87(DisasContext *ctx, arg_disas_sve45 *a, uint32_t insn)
 {
     a->index = extract32(insn, 19, 2);
     a->rm = extract32(insn, 16, 3);
@@ -1297,7 +1297,7 @@ static void disas_sve_extract_disas_sve_Fmt_85(DisasContext *ctx, arg_disas_sve4
     a->esz = 2;
 }
 
-static void disas_sve_extract_disas_sve_Fmt_86(DisasContext *ctx, arg_disas_sve45 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_88(DisasContext *ctx, arg_disas_sve45 *a, uint32_t insn)
 {
     a->index = extract32(insn, 20, 1);
     a->rm = extract32(insn, 16, 4);
@@ -1306,7 +1306,7 @@ static void disas_sve_extract_disas_sve_Fmt_86(DisasContext *ctx, arg_disas_sve4
     a->esz = 3;
 }
 
-static void disas_sve_extract_disas_sve_Fmt_87(DisasContext *ctx, arg_disas_sve46 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_89(DisasContext *ctx, arg_disas_sve46 *a, uint32_t insn)
 {
     a->esz = extract32(insn, 22, 2);
     a->imm = extract32(insn, 16, 3);
@@ -1315,7 +1315,7 @@ static void disas_sve_extract_disas_sve_Fmt_87(DisasContext *ctx, arg_disas_sve4
     a->rn = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_disas_sve_Fmt_88(DisasContext *ctx, arg_rpri_load *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_90(DisasContext *ctx, arg_rpri_load *a, uint32_t insn)
 {
     a->imm = extract32(insn, 16, 6);
     a->pg = extract32(insn, 10, 3);
@@ -1325,7 +1325,7 @@ static void disas_sve_extract_disas_sve_Fmt_88(DisasContext *ctx, arg_rpri_load 
     a->nreg = 0;
 }
 
-static void disas_sve_extract_disas_sve_Fmt_89(DisasContext *ctx, arg_disas_sve47 *a, uint32_t insn)
+static void disas_sve_extract_disas_sve_Fmt_91(DisasContext *ctx, arg_disas_sve47 *a, uint32_t insn)
 {
     a->rm = extract32(insn, 16, 5);
 }
@@ -1529,11 +1529,20 @@ static void disas_sve_extract_rd_rn_rm_e0(DisasContext *ctx, arg_rrr_esz *a, uin
     a->esz = 0;
 }
 
-static void disas_sve_extract_rd_rn_tszimm(DisasContext *ctx, arg_rri_esz *a, uint32_t insn)
+static void disas_sve_extract_rd_rn_tszimm_shl(DisasContext *ctx, arg_rri_esz *a, uint32_t insn)
 {
     a->rn = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
     a->esz = tszimm_esz(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
+    a->imm = tszimm_shl(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
+}
+
+static void disas_sve_extract_rd_rn_tszimm_shr(DisasContext *ctx, arg_rri_esz *a, uint32_t insn)
+{
+    a->rn = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
+    a->esz = tszimm_esz(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
+    a->imm = tszimm_shr(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
 }
 
 static void disas_sve_extract_rda_pg_rn_rm(DisasContext *ctx, arg_rprrr_esz *a, uint32_t insn)
@@ -1624,12 +1633,22 @@ static void disas_sve_extract_rdn_pg_rm_ra(DisasContext *ctx, arg_rprrr_esz *a, 
     a->rn = extract32(insn, 0, 5);
 }
 
-static void disas_sve_extract_rdn_pg_tszimm(DisasContext *ctx, arg_rpri_esz *a, uint32_t insn)
+static void disas_sve_extract_rdn_pg_tszimm_shl(DisasContext *ctx, arg_rpri_esz *a, uint32_t insn)
 {
     a->pg = extract32(insn, 10, 3);
     a->rd = extract32(insn, 0, 5);
     a->rn = extract32(insn, 0, 5);
     a->esz = tszimm_esz(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+    a->imm = tszimm_shl(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+}
+
+static void disas_sve_extract_rdn_pg_tszimm_shr(DisasContext *ctx, arg_rpri_esz *a, uint32_t insn)
+{
+    a->pg = extract32(insn, 10, 3);
+    a->rd = extract32(insn, 0, 5);
+    a->rn = extract32(insn, 0, 5);
+    a->esz = tszimm_esz(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+    a->imm = tszimm_shr(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
 }
 
 static void disas_sve_extract_rdn_rm(DisasContext *ctx, arg_rrr_esz *a, uint32_t insn)
@@ -1873,381 +1892,377 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 16) & 0x1f) {
                 case 0x0:
                     /* 00000100 ..000000 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:245 */
+                    /* ../target/arm/sve.decode:249 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_ADD_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..000001 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:246 */
+                    /* ../target/arm/sve.decode:250 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SUB_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..000011 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:247 */
+                    /* ../target/arm/sve.decode:251 */
                     disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                     if (trans_SUB_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x8:
                     /* 00000100 ..001000 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:250 */
+                    /* ../target/arm/sve.decode:254 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SMAX_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x9:
                     /* 00000100 ..001001 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:251 */
+                    /* ../target/arm/sve.decode:255 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_UMAX_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0xa:
                     /* 00000100 ..001010 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:252 */
+                    /* ../target/arm/sve.decode:256 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SMIN_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0xb:
                     /* 00000100 ..001011 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:253 */
+                    /* ../target/arm/sve.decode:257 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_UMIN_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0xc:
                     /* 00000100 ..001100 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:254 */
+                    /* ../target/arm/sve.decode:258 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SABD_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0xd:
                     /* 00000100 ..001101 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:255 */
+                    /* ../target/arm/sve.decode:259 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_UABD_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* 00000100 ..010000 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:258 */
+                    /* ../target/arm/sve.decode:262 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_MUL_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x12:
                     /* 00000100 ..010010 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:259 */
+                    /* ../target/arm/sve.decode:263 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SMULH_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x13:
                     /* 00000100 ..010011 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:260 */
+                    /* ../target/arm/sve.decode:264 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_UMULH_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x14:
                     /* 00000100 ..010100 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:262 */
+                    /* ../target/arm/sve.decode:266 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SDIV_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x15:
                     /* 00000100 ..010101 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:263 */
+                    /* ../target/arm/sve.decode:267 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_UDIV_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x16:
                     /* 00000100 ..010110 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:264 */
+                    /* ../target/arm/sve.decode:268 */
                     disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                     if (trans_SDIV_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x17:
                     /* 00000100 ..010111 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:265 */
+                    /* ../target/arm/sve.decode:269 */
                     disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                     if (trans_UDIV_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x18:
                     /* 00000100 ..011000 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:239 */
+                    /* ../target/arm/sve.decode:243 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_ORR_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x19:
                     /* 00000100 ..011001 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:240 */
+                    /* ../target/arm/sve.decode:244 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_EOR_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1a:
                     /* 00000100 ..011010 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:241 */
+                    /* ../target/arm/sve.decode:245 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_AND_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1b:
                     /* 00000100 ..011011 000..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:242 */
+                    /* ../target/arm/sve.decode:246 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_BIC_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 00000100 ..0..... 001..... ........ */
                 disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                 switch ((insn >> 16) & 0x1f) {
                 case 0x0:
                     /* 00000100 ..000000 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:281 */
+                    /* ../target/arm/sve.decode:285 */
                     if (trans_SADDV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..000001 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:280 */
+                    /* ../target/arm/sve.decode:284 */
                     if (trans_UADDV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x8:
                     /* 00000100 ..001000 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:284 */
+                    /* ../target/arm/sve.decode:288 */
                     if (trans_SMAXV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x9:
                     /* 00000100 ..001001 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:285 */
+                    /* ../target/arm/sve.decode:289 */
                     if (trans_UMAXV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0xa:
                     /* 00000100 ..001010 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:286 */
+                    /* ../target/arm/sve.decode:290 */
                     if (trans_SMINV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0xb:
                     /* 00000100 ..001011 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:287 */
+                    /* ../target/arm/sve.decode:291 */
                     if (trans_UMINV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* 00000100 ..010000 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:275 */
+                    /* ../target/arm/sve.decode:279 */
                     if (trans_MOVPRFX_z(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x11:
                     /* 00000100 ..010001 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:276 */
+                    /* ../target/arm/sve.decode:280 */
                     if (trans_MOVPRFX_m(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x18:
                     /* 00000100 ..011000 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:270 */
+                    /* ../target/arm/sve.decode:274 */
                     if (trans_ORV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x19:
                     /* 00000100 ..011001 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:271 */
+                    /* ../target/arm/sve.decode:275 */
                     if (trans_EORV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1a:
                     /* 00000100 ..011010 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:272 */
+                    /* ../target/arm/sve.decode:276 */
                     if (trans_ANDV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* 00000100 ..0..... 010..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:352 */
+                /* ../target/arm/sve.decode:352 */
                 disas_sve_extract_rda_pg_rn_rm(ctx, &u.f_rprrr_esz, insn);
                 if (trans_MLA(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 00000100 ..0..... 011..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:353 */
+                /* ../target/arm/sve.decode:353 */
                 disas_sve_extract_rda_pg_rn_rm(ctx, &u.f_rprrr_esz, insn);
                 if (trans_MLS(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 00000100 ..0..... 100..... ........ */
                 switch ((insn >> 16) & 0x1f) {
                 case 0x0:
                     /* 00000100 ..000000 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:292 */
-                    disas_sve_extract_rdn_pg_tszimm(ctx, &u.f_rpri_esz, insn);
-                    u.f_rpri_esz.imm = tszimm_shr(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:296 */
+                    disas_sve_extract_rdn_pg_tszimm_shr(ctx, &u.f_rpri_esz, insn);
                     if (trans_ASR_zpzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..000001 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:294 */
-                    disas_sve_extract_rdn_pg_tszimm(ctx, &u.f_rpri_esz, insn);
-                    u.f_rpri_esz.imm = tszimm_shr(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:297 */
+                    disas_sve_extract_rdn_pg_tszimm_shr(ctx, &u.f_rpri_esz, insn);
                     if (trans_LSR_zpzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..000011 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:296 */
-                    disas_sve_extract_rdn_pg_tszimm(ctx, &u.f_rpri_esz, insn);
-                    u.f_rpri_esz.imm = tszimm_shl(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:298 */
+                    disas_sve_extract_rdn_pg_tszimm_shl(ctx, &u.f_rpri_esz, insn);
                     if (trans_LSL_zpzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x4:
                     /* 00000100 ..000100 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:298 */
-                    disas_sve_extract_rdn_pg_tszimm(ctx, &u.f_rpri_esz, insn);
-                    u.f_rpri_esz.imm = tszimm_shr(ctx, deposit32(extract32(insn, 5, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:299 */
+                    disas_sve_extract_rdn_pg_tszimm_shr(ctx, &u.f_rpri_esz, insn);
                     if (trans_ASRD(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* 00000100 ..010000 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:302 */
+                    /* ../target/arm/sve.decode:302 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_ASR_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x11:
                     /* 00000100 ..010001 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:303 */
+                    /* ../target/arm/sve.decode:303 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_LSR_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x13:
                     /* 00000100 ..010011 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:304 */
+                    /* ../target/arm/sve.decode:304 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_LSL_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x14:
                     /* 00000100 ..010100 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:305 */
+                    /* ../target/arm/sve.decode:305 */
                     disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                     if (trans_ASR_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x15:
                     /* 00000100 ..010101 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:306 */
+                    /* ../target/arm/sve.decode:306 */
                     disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                     if (trans_LSR_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x17:
                     /* 00000100 ..010111 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:307 */
+                    /* ../target/arm/sve.decode:307 */
                     disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                     if (trans_LSL_zpzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x18:
                     /* 00000100 ..011000 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:311 */
+                    /* ../target/arm/sve.decode:311 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_ASR_zpzw(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x19:
                     /* 00000100 ..011001 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:312 */
+                    /* ../target/arm/sve.decode:312 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_LSR_zpzw(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1b:
                     /* 00000100 ..011011 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:313 */
+                    /* ../target/arm/sve.decode:313 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_LSL_zpzw(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x5:
                 /* 00000100 ..0..... 101..... ........ */
                 disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                 switch ((insn >> 16) & 0x1f) {
                 case 0x10:
                     /* 00000100 ..010000 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:331 */
+                    /* ../target/arm/sve.decode:331 */
                     if (trans_SXTB(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x11:
                     /* 00000100 ..010001 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:332 */
+                    /* ../target/arm/sve.decode:332 */
                     if (trans_UXTB(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x12:
                     /* 00000100 ..010010 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:333 */
+                    /* ../target/arm/sve.decode:333 */
                     if (trans_SXTH(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x13:
                     /* 00000100 ..010011 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:334 */
+                    /* ../target/arm/sve.decode:334 */
                     if (trans_UXTH(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x14:
                     /* 00000100 ..010100 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:335 */
+                    /* ../target/arm/sve.decode:335 */
                     if (trans_SXTW(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x15:
                     /* 00000100 ..010101 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:336 */
+                    /* ../target/arm/sve.decode:336 */
                     if (trans_UXTW(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x16:
                     /* 00000100 ..010110 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:329 */
+                    /* ../target/arm/sve.decode:329 */
                     if (trans_ABS(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x17:
                     /* 00000100 ..010111 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:330 */
+                    /* ../target/arm/sve.decode:330 */
                     if (trans_NEG(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x18:
                     /* 00000100 ..011000 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:319 */
+                    /* ../target/arm/sve.decode:319 */
                     if (trans_CLS(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x19:
                     /* 00000100 ..011001 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:320 */
+                    /* ../target/arm/sve.decode:320 */
                     if (trans_CLZ(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1a:
                     /* 00000100 ..011010 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:321 */
+                    /* ../target/arm/sve.decode:321 */
                     if (trans_CNT_zpz(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1b:
                     /* 00000100 ..011011 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:322 */
+                    /* ../target/arm/sve.decode:322 */
                     if (trans_CNOT(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1c:
                     /* 00000100 ..011100 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:324 */
+                    /* ../target/arm/sve.decode:324 */
                     if (trans_FABS(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1d:
                     /* 00000100 ..011101 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:325 */
+                    /* ../target/arm/sve.decode:325 */
                     if (trans_FNEG(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1e:
                     /* 00000100 ..011110 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:323 */
+                    /* ../target/arm/sve.decode:323 */
                     if (trans_NOT_zpz(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x6:
                 /* 00000100 ..0..... 110..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:356 */
+                /* ../target/arm/sve.decode:356 */
                 disas_sve_extract_rdn_pg_ra_rm(ctx, &u.f_rprrr_esz, insn);
                 if (trans_MLA(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 00000100 ..0..... 111..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:357 */
+                /* ../target/arm/sve.decode:357 */
                 disas_sve_extract_rdn_pg_ra_rm(ctx, &u.f_rprrr_esz, insn);
                 if (trans_MLS(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00200000:
             /* 00000100 ..1..... ........ ........ */
             switch ((insn >> 12) & 0xf) {
@@ -2257,254 +2272,253 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 00000100 ..1..... 000000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:362 */
+                    /* ../target/arm/sve.decode:362 */
                     if (trans_ADD_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..1..... 000001.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:363 */
+                    /* ../target/arm/sve.decode:363 */
                     if (trans_SUB_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 00000100 ..1..... 0001.... ........ */
                 disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 00000100 ..1..... 000100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:364 */
+                    /* ../target/arm/sve.decode:364 */
                     if (trans_SQADD_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..1..... 000101.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:365 */
+                    /* ../target/arm/sve.decode:365 */
                     if (trans_UQADD_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 00000100 ..1..... 000110.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:366 */
+                    /* ../target/arm/sve.decode:366 */
                     if (trans_SQSUB_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..1..... 000111.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:367 */
+                    /* ../target/arm/sve.decode:367 */
                     if (trans_UQSUB_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 00000100 ..1..... 0011.... ........ */
                 disas_sve_extract_rd_rn_rm_e0(ctx, &u.f_rrr_esz, insn);
                 switch (insn & 0x00c00c00) {
                 case 0x00000000:
                     /* 00000100 001..... 001100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:372 */
+                    /* ../target/arm/sve.decode:372 */
                     if (trans_AND_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00400000:
                     /* 00000100 011..... 001100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:373 */
+                    /* ../target/arm/sve.decode:373 */
                     if (trans_ORR_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00800000:
                     /* 00000100 101..... 001100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:374 */
+                    /* ../target/arm/sve.decode:374 */
                     if (trans_EOR_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00c00000:
                     /* 00000100 111..... 001100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:375 */
+                    /* ../target/arm/sve.decode:375 */
                     if (trans_BIC_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x4:
                 /* 00000100 ..1..... 0100.... ........ */
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 00000100 ..1..... 010000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:380 */
-                    disas_sve_extract_disas_sve_Fmt_55(ctx, &u.f_disas_sve25, insn);
+                    /* ../target/arm/sve.decode:380 */
+                    disas_sve_extract_disas_sve_Fmt_57(ctx, &u.f_disas_sve25, insn);
                     if (trans_INDEX_ii(ctx, &u.f_disas_sve25)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..1..... 010001.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:386 */
-                    disas_sve_extract_disas_sve_Fmt_57(ctx, &u.f_rri_esz, insn);
+                    /* ../target/arm/sve.decode:386 */
+                    disas_sve_extract_disas_sve_Fmt_59(ctx, &u.f_rri_esz, insn);
                     if (trans_INDEX_ri(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 00000100 ..1..... 010010.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:383 */
-                    disas_sve_extract_disas_sve_Fmt_56(ctx, &u.f_disas_sve26, insn);
+                    /* ../target/arm/sve.decode:383 */
+                    disas_sve_extract_disas_sve_Fmt_58(ctx, &u.f_disas_sve26, insn);
                     if (trans_INDEX_ir(ctx, &u.f_disas_sve26)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..1..... 010011.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:389 */
+                    /* ../target/arm/sve.decode:389 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_INDEX_rr(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x5:
                 /* 00000100 ..1..... 0101.... ........ */
                 switch (insn & 0x00c00800) {
                 case 0x00000000:
                     /* 00000100 001..... 01010... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:394 */
+                    /* ../target/arm/sve.decode:394 */
                     disas_sve_extract_rd_rn_i6(ctx, &u.f_rri, insn);
                     if (trans_ADDVL(ctx, &u.f_rri)) return true;
-                    return false;
+                    break;
                 case 0x00400000:
                     /* 00000100 011..... 01010... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:395 */
+                    /* ../target/arm/sve.decode:395 */
                     disas_sve_extract_rd_rn_i6(ctx, &u.f_rri, insn);
                     if (trans_ADDPL(ctx, &u.f_rri)) return true;
-                    return false;
+                    break;
                 case 0x00800000:
                     /* 00000100 101..... 01010... ........ */
-                    disas_sve_extract_disas_sve_Fmt_58(ctx, &u.f_disas_sve27, insn);
+                    disas_sve_extract_disas_sve_Fmt_60(ctx, &u.f_disas_sve27, insn);
                     switch ((insn >> 16) & 0x1f) {
                     case 0x1f:
                         /* 00000100 10111111 01010... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:398 */
+                        /* ../target/arm/sve.decode:398 */
                         if (trans_RDVL(ctx, &u.f_disas_sve27)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x8:
                 /* 00000100 ..1..... 1000.... ........ */
                 disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 00000100 ..1..... 100000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:412 */
+                    /* ../target/arm/sve.decode:409 */
                     if (trans_ASR_zzw(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..1..... 100001.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:413 */
+                    /* ../target/arm/sve.decode:410 */
                     if (trans_LSR_zzw(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..1..... 100011.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:414 */
+                    /* ../target/arm/sve.decode:411 */
                     if (trans_LSL_zzw(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x9:
                 /* 00000100 ..1..... 1001.... ........ */
-                disas_sve_extract_rd_rn_tszimm(ctx, &u.f_rri_esz, insn);
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 00000100 ..1..... 100100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:403 */
-                    u.f_rri_esz.imm = tszimm_shr(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:403 */
+                    disas_sve_extract_rd_rn_tszimm_shr(ctx, &u.f_rri_esz, insn);
                     if (trans_ASR_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..1..... 100101.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:405 */
-                    u.f_rri_esz.imm = tszimm_shr(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:404 */
+                    disas_sve_extract_rd_rn_tszimm_shr(ctx, &u.f_rri_esz, insn);
                     if (trans_LSR_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..1..... 100111.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:407 */
-                    u.f_rri_esz.imm = tszimm_shl(ctx, deposit32(extract32(insn, 16, 5), 5, 27, extract32(insn, 22, 2)));
+                    /* ../target/arm/sve.decode:405 */
+                    disas_sve_extract_rd_rn_tszimm_shl(ctx, &u.f_rri_esz, insn);
                     if (trans_LSL_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0xa:
                 /* 00000100 ..1..... 1010.... ........ */
                 disas_sve_extract_rd_rn_msz_rm(ctx, &u.f_rrri, insn);
                 switch ((insn >> 22) & 0x3) {
                 case 0x0:
                     /* 00000100 001..... 1010.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:419 */
+                    /* ../target/arm/sve.decode:416 */
                     if (trans_ADR_s32(ctx, &u.f_rrri)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 011..... 1010.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:420 */
+                    /* ../target/arm/sve.decode:417 */
                     if (trans_ADR_u32(ctx, &u.f_rrri)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 00000100 101..... 1010.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:421 */
+                    /* ../target/arm/sve.decode:418 */
                     if (trans_ADR_p32(ctx, &u.f_rrri)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 111..... 1010.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:422 */
+                    /* ../target/arm/sve.decode:419 */
                     if (trans_ADR_p64(ctx, &u.f_rrri)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0xb:
                 /* 00000100 ..1..... 1011.... ........ */
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 00000100 ..1..... 101100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:435 */
+                    /* ../target/arm/sve.decode:432 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_FTSSEL(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 00000100 ..1..... 101110.. ........ */
                     disas_sve_extract_rd_rn(ctx, &u.f_rr_esz, insn);
                     switch ((insn >> 16) & 0x1f) {
                     case 0x0:
                         /* 00000100 ..100000 101110.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:431 */
+                        /* ../target/arm/sve.decode:428 */
                         if (trans_FEXPA(ctx, &u.f_rr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000100 ..1..... 101111.. ........ */
-                    disas_sve_extract_disas_sve_Fmt_59(ctx, &u.f_disas_sve28, insn);
+                    disas_sve_extract_disas_sve_Fmt_61(ctx, &u.f_disas_sve28, insn);
                     switch (insn & 0x00df0000) {
                     case 0x00000000:
                         /* 00000100 00100000 101111.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:427 */
+                        /* ../target/arm/sve.decode:424 */
                         if (trans_MOVPRFX(ctx, &u.f_disas_sve28)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0xc:
                 /* 00000100 ..1..... 1100.... ........ */
                 disas_sve_extract_incdec2_cnt(ctx, &u.f_incdec2_cnt, insn);
                 switch ((insn >> 20) & 0x1) {
                 case 0x0:
                     /* 00000100 ..10.... 1100.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:455 */
+                    /* ../target/arm/sve.decode:452 */
                     u.f_incdec2_cnt.d = extract32(insn, 11, 1);
                     u.f_incdec2_cnt.u = extract32(insn, 10, 1);
                     if (trans_SINCDEC_v(ctx, &u.f_incdec2_cnt)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..11.... 1100.... ........ */
                     switch ((insn >> 11) & 0x1) {
                     case 0x0:
                         /* 00000100 ..11.... 11000... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:451 */
+                        /* ../target/arm/sve.decode:448 */
                         u.f_incdec2_cnt.d = extract32(insn, 10, 1);
                         u.f_incdec2_cnt.u = 1;
                         if (trans_INCDEC_v(ctx, &u.f_incdec2_cnt)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0xe:
                 /* 00000100 ..1..... 1110.... ........ */
                 disas_sve_extract_incdec_cnt(ctx, &u.f_incdec_cnt, insn);
@@ -2514,44 +2528,44 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 10) & 0x1) {
                     case 0x0:
                         /* 00000100 ..10.... 111000.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:440 */
+                        /* ../target/arm/sve.decode:437 */
                         u.f_incdec_cnt.d = 0;
                         u.f_incdec_cnt.u = 1;
                         if (trans_CNT_r(ctx, &u.f_incdec_cnt)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100000:
                     /* 00000100 ..11.... 11100... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:443 */
+                    /* ../target/arm/sve.decode:440 */
                     u.f_incdec_cnt.d = extract32(insn, 10, 1);
                     u.f_incdec_cnt.u = 1;
                     if (trans_INCDEC_r(ctx, &u.f_incdec_cnt)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0xf:
                 /* 00000100 ..1..... 1111.... ........ */
                 disas_sve_extract_incdec_cnt(ctx, &u.f_incdec_cnt, insn);
                 switch ((insn >> 20) & 0x1) {
                 case 0x0:
                     /* 00000100 ..10.... 1111.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:446 */
+                    /* ../target/arm/sve.decode:443 */
                     u.f_incdec_cnt.d = extract32(insn, 11, 1);
                     u.f_incdec_cnt.u = extract32(insn, 10, 1);
                     if (trans_SINCDEC_r_32(ctx, &u.f_incdec_cnt)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000100 ..11.... 1111.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:447 */
+                    /* ../target/arm/sve.decode:444 */
                     u.f_incdec_cnt.d = extract32(insn, 11, 1);
                     u.f_incdec_cnt.u = extract32(insn, 10, 1);
                     if (trans_SINCDEC_r_64(ctx, &u.f_incdec_cnt)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000000:
             /* 00000101 ..0..... ........ ........ */
             switch ((insn >> 20) & 0x1) {
@@ -2560,61 +2574,61 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x00cc0000) {
                 case 0x00000000:
                     /* 00000101 000000.. ........ ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:460 */
+                    /* ../target/arm/sve.decode:457 */
                     disas_sve_extract_rdn_dbm(ctx, &u.f_rr_dbm, insn);
                     if (trans_ORR_zzi(ctx, &u.f_rr_dbm)) return true;
-                    return false;
+                    break;
                 case 0x00400000:
                     /* 00000101 010000.. ........ ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:461 */
+                    /* ../target/arm/sve.decode:458 */
                     disas_sve_extract_rdn_dbm(ctx, &u.f_rr_dbm, insn);
                     if (trans_EOR_zzi(ctx, &u.f_rr_dbm)) return true;
-                    return false;
+                    break;
                 case 0x00800000:
                     /* 00000101 100000.. ........ ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:462 */
+                    /* ../target/arm/sve.decode:459 */
                     disas_sve_extract_rdn_dbm(ctx, &u.f_rr_dbm, insn);
                     if (trans_AND_zzi(ctx, &u.f_rr_dbm)) return true;
-                    return false;
+                    break;
                 case 0x00c00000:
                     /* 00000101 110000.. ........ ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:465 */
-                    disas_sve_extract_disas_sve_Fmt_60(ctx, &u.f_disas_sve29, insn);
+                    /* ../target/arm/sve.decode:462 */
+                    disas_sve_extract_disas_sve_Fmt_62(ctx, &u.f_disas_sve29, insn);
                     if (trans_DUPM(ctx, &u.f_disas_sve29)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 00000101 ..01.... ........ ........ */
                 disas_sve_extract_rdn_pg4(ctx, &u.f_rpri_esz, insn);
                 switch ((insn >> 14) & 0x3) {
                 case 0x0:
                     /* 00000101 ..01.... 00...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:474 */
+                    /* ../target/arm/sve.decode:471 */
                     u.f_rpri_esz.imm = expand_imm_sh8s(ctx, extract32(insn, 5, 9));
                     if (trans_CPY_z_i(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000101 ..01.... 01...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:473 */
+                    /* ../target/arm/sve.decode:470 */
                     u.f_rpri_esz.imm = expand_imm_sh8s(ctx, extract32(insn, 5, 9));
                     if (trans_CPY_m_i(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000101 ..01.... 11...... ........ */
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00000101 ..01.... 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:470 */
+                        /* ../target/arm/sve.decode:467 */
                         u.f_rpri_esz.imm = extract32(insn, 5, 8);
                         if (trans_FCPY(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01200000:
             /* 00000101 ..1..... ........ ........ */
             switch ((insn >> 14) & 0x3) {
@@ -2623,30 +2637,30 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 00000101 ..1..... 000..... ........ */
-                    disas_sve_extract_disas_sve_Fmt_61(ctx, &u.f_rrri, insn);
+                    disas_sve_extract_disas_sve_Fmt_63(ctx, &u.f_rrri, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x0:
                         /* 00000101 001..... 000..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:479 */
+                        /* ../target/arm/sve.decode:476 */
                         if (trans_EXT(ctx, &u.f_rrri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000101 ..1..... 001..... ........ */
                     switch ((insn >> 10) & 0x7) {
                     case 0x0:
                         /* 00000101 ..1..... 001000.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:488 */
-                        disas_sve_extract_disas_sve_Fmt_62(ctx, &u.f_rri, insn);
+                        /* ../target/arm/sve.decode:485 */
+                        disas_sve_extract_disas_sve_Fmt_64(ctx, &u.f_rri, insn);
                         if (trans_DUP_x(ctx, &u.f_rri)) return true;
-                        return false;
+                        break;
                     case 0x4:
                         /* 00000101 ..1..... 001100.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:501 */
+                        /* ../target/arm/sve.decode:498 */
                         disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                         if (trans_TBL(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     case 0x6:
                         /* 00000101 ..1..... 001110.. ........ */
                         switch ((insn >> 18) & 0x7) {
@@ -2656,56 +2670,56 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                             switch ((insn >> 16) & 0x3) {
                             case 0x0:
                                 /* 00000101 ..100000 001110.. ........ */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:485 */
+                                /* ../target/arm/sve.decode:482 */
                                 if (trans_DUP_s(ctx, &u.f_rr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x1:
                             /* 00000101 ..1001.. 001110.. ........ */
                             disas_sve_extract_rdn_rm(ctx, &u.f_rrr_esz, insn);
                             switch ((insn >> 16) & 0x3) {
                             case 0x0:
                                 /* 00000101 ..100100 001110.. ........ */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:495 */
+                                /* ../target/arm/sve.decode:492 */
                                 if (trans_INSR_r(ctx, &u.f_rrr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x4:
                             /* 00000101 ..1100.. 001110.. ........ */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:504 */
-                            disas_sve_extract_disas_sve_Fmt_63(ctx, &u.f_disas_sve30, insn);
+                            /* ../target/arm/sve.decode:501 */
+                            disas_sve_extract_disas_sve_Fmt_65(ctx, &u.f_disas_sve30, insn);
                             if (trans_UNPK(ctx, &u.f_disas_sve30)) return true;
-                            return false;
+                            break;
                         case 0x5:
                             /* 00000101 ..1101.. 001110.. ........ */
                             disas_sve_extract_rdn_rm(ctx, &u.f_rrr_esz, insn);
                             switch ((insn >> 16) & 0x3) {
                             case 0x0:
                                 /* 00000101 ..110100 001110.. ........ */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:492 */
+                                /* ../target/arm/sve.decode:489 */
                                 if (trans_INSR_f(ctx, &u.f_rrr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x6:
                             /* 00000101 ..1110.. 001110.. ........ */
                             disas_sve_extract_rd_rn(ctx, &u.f_rr_esz, insn);
                             switch ((insn >> 16) & 0x3) {
                             case 0x0:
                                 /* 00000101 ..111000 001110.. ........ */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:498 */
+                                /* ../target/arm/sve.decode:495 */
                                 if (trans_REV_v(ctx, &u.f_rr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 00000101 ..1..... 01...... ........ */
                 switch ((insn >> 10) & 0xf) {
@@ -2714,10 +2728,10 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x00100210) {
                     case 0x00000000:
                         /* 00000101 ..10.... 0100000. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:509 */
+                        /* ../target/arm/sve.decode:506 */
                         disas_sve_extract_pd_pn_pm(ctx, &u.f_rrr_esz, insn);
                         if (trans_ZIP1_p(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     case 0x00100000:
                         /* 00000101 ..11.... 0100000. ...0.... */
                         switch ((insn >> 16) & 0xf) {
@@ -2727,248 +2741,248 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                             switch ((insn >> 22) & 0x3) {
                             case 0x0:
                                 /* 00000101 00110000 0100000. ...0.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:520 */
+                                /* ../target/arm/sve.decode:517 */
                                 if (trans_PUNPKLO(ctx, &u.f_rr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x1:
                             /* 00000101 ..110001 0100000. ...0.... */
                             disas_sve_extract_pd_pn_e0(ctx, &u.f_rr_esz, insn);
                             switch ((insn >> 22) & 0x3) {
                             case 0x0:
                                 /* 00000101 00110001 0100000. ...0.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:521 */
+                                /* ../target/arm/sve.decode:518 */
                                 if (trans_PUNPKHI(ctx, &u.f_rr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x4:
                             /* 00000101 ..110100 0100000. ...0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:517 */
+                            /* ../target/arm/sve.decode:514 */
                             disas_sve_extract_pd_pn(ctx, &u.f_rr_esz, insn);
                             if (trans_REV_p(ctx, &u.f_rr_esz)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 00000101 ..1..... 010001.. ........ */
                     disas_sve_extract_pd_pn_pm(ctx, &u.f_rrr_esz, insn);
                     switch (insn & 0x00100210) {
                     case 0x00000000:
                         /* 00000101 ..10.... 0100010. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:510 */
+                        /* ../target/arm/sve.decode:507 */
                         if (trans_ZIP2_p(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x2:
                     /* 00000101 ..1..... 010010.. ........ */
                     disas_sve_extract_pd_pn_pm(ctx, &u.f_rrr_esz, insn);
                     switch (insn & 0x00100210) {
                     case 0x00000000:
                         /* 00000101 ..10.... 0100100. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:511 */
+                        /* ../target/arm/sve.decode:508 */
                         if (trans_UZP1_p(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* 00000101 ..1..... 010011.. ........ */
                     disas_sve_extract_pd_pn_pm(ctx, &u.f_rrr_esz, insn);
                     switch (insn & 0x00100210) {
                     case 0x00000000:
                         /* 00000101 ..10.... 0100110. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:512 */
+                        /* ../target/arm/sve.decode:509 */
                         if (trans_UZP2_p(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x4:
                     /* 00000101 ..1..... 010100.. ........ */
                     disas_sve_extract_pd_pn_pm(ctx, &u.f_rrr_esz, insn);
                     switch (insn & 0x00100210) {
                     case 0x00000000:
                         /* 00000101 ..10.... 0101000. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:513 */
+                        /* ../target/arm/sve.decode:510 */
                         if (trans_TRN1_p(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x5:
                     /* 00000101 ..1..... 010101.. ........ */
                     disas_sve_extract_pd_pn_pm(ctx, &u.f_rrr_esz, insn);
                     switch (insn & 0x00100210) {
                     case 0x00000000:
                         /* 00000101 ..10.... 0101010. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:514 */
+                        /* ../target/arm/sve.decode:511 */
                         if (trans_TRN2_p(ctx, &u.f_rrr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x8:
                     /* 00000101 ..1..... 011000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:526 */
+                    /* ../target/arm/sve.decode:523 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_ZIP1_z(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x9:
                     /* 00000101 ..1..... 011001.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:527 */
+                    /* ../target/arm/sve.decode:524 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_ZIP2_z(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0xa:
                     /* 00000101 ..1..... 011010.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:528 */
+                    /* ../target/arm/sve.decode:525 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_UZP1_z(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0xb:
                     /* 00000101 ..1..... 011011.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:529 */
+                    /* ../target/arm/sve.decode:526 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_UZP2_z(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0xc:
                     /* 00000101 ..1..... 011100.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:530 */
+                    /* ../target/arm/sve.decode:527 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_TRN1_z(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0xd:
                     /* 00000101 ..1..... 011101.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:531 */
+                    /* ../target/arm/sve.decode:528 */
                     disas_sve_extract_rd_rn_rm(ctx, &u.f_rrr_esz, insn);
                     if (trans_TRN2_z(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* 00000101 ..1..... 10...... ........ */
                 switch (insn & 0x001f2000) {
                 case 0x00000000:
                     /* 00000101 ..100000 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:560 */
+                    /* ../target/arm/sve.decode:557 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_CPY_m_v(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00002000:
                     /* 00000101 ..100000 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:556 */
+                    /* ../target/arm/sve.decode:553 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_LASTA_r(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00010000:
                     /* 00000101 ..100001 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:537 */
+                    /* ../target/arm/sve.decode:534 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_COMPACT(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00012000:
                     /* 00000101 ..100001 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:557 */
+                    /* ../target/arm/sve.decode:554 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_LASTB_r(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00020000:
                     /* 00000101 ..100010 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:552 */
+                    /* ../target/arm/sve.decode:549 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_LASTA_v(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00030000:
                     /* 00000101 ..100011 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:553 */
+                    /* ../target/arm/sve.decode:550 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_LASTB_v(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00040000:
                     /* 00000101 ..100100 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:567 */
+                    /* ../target/arm/sve.decode:564 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_REVB(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00050000:
                     /* 00000101 ..100101 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:568 */
+                    /* ../target/arm/sve.decode:565 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_REVH(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00060000:
                     /* 00000101 ..100110 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:569 */
+                    /* ../target/arm/sve.decode:566 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_REVW(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00070000:
                     /* 00000101 ..100111 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:570 */
+                    /* ../target/arm/sve.decode:567 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_RBIT(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00080000:
                     /* 00000101 ..101000 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:540 */
+                    /* ../target/arm/sve.decode:537 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_CLASTA_z(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00082000:
                     /* 00000101 ..101000 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:563 */
+                    /* ../target/arm/sve.decode:560 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_CPY_m_r(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00090000:
                     /* 00000101 ..101001 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:541 */
+                    /* ../target/arm/sve.decode:538 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_CLASTB_z(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x000a0000:
                     /* 00000101 ..101010 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:544 */
+                    /* ../target/arm/sve.decode:541 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_CLASTA_v(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x000b0000:
                     /* 00000101 ..101011 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:545 */
+                    /* ../target/arm/sve.decode:542 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_CLASTB_v(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x000c0000:
                     /* 00000101 ..101100 100..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:573 */
+                    /* ../target/arm/sve.decode:570 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_SPLICE(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00102000:
                     /* 00000101 ..110000 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:548 */
+                    /* ../target/arm/sve.decode:545 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_CLASTA_r(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x00112000:
                     /* 00000101 ..110001 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:549 */
+                    /* ../target/arm/sve.decode:546 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_CLASTB_r(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 00000101 ..1..... 11...... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:578 */
+                /* ../target/arm/sve.decode:575 */
                 disas_sve_extract_rd_pg4_rn_rm(ctx, &u.f_rprr_esz, insn);
                 if (trans_SEL_zpzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x12:
         /* 0010010. ........ ........ ........ */
         switch (insn & 0x01200000) {
@@ -2978,112 +2992,112 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
             switch (insn & 0x0000e010) {
             case 0x00000000:
                 /* 00100100 ..0..... 000..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:583 */
+                /* ../target/arm/sve.decode:580 */
                 if (trans_CMPHS_ppzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00000010:
                 /* 00100100 ..0..... 000..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:584 */
+                /* ../target/arm/sve.decode:581 */
                 if (trans_CMPHI_ppzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00002000:
                 /* 00100100 ..0..... 001..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:592 */
+                /* ../target/arm/sve.decode:589 */
                 if (trans_CMPEQ_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00002010:
                 /* 00100100 ..0..... 001..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:593 */
+                /* ../target/arm/sve.decode:590 */
                 if (trans_CMPNE_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00004000:
                 /* 00100100 ..0..... 010..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:594 */
+                /* ../target/arm/sve.decode:591 */
                 if (trans_CMPGE_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00004010:
                 /* 00100100 ..0..... 010..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:595 */
+                /* ../target/arm/sve.decode:592 */
                 if (trans_CMPGT_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00006000:
                 /* 00100100 ..0..... 011..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:596 */
+                /* ../target/arm/sve.decode:593 */
                 if (trans_CMPLT_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00006010:
                 /* 00100100 ..0..... 011..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:597 */
+                /* ../target/arm/sve.decode:594 */
                 if (trans_CMPLE_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00008000:
                 /* 00100100 ..0..... 100..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:585 */
+                /* ../target/arm/sve.decode:582 */
                 if (trans_CMPGE_ppzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x00008010:
                 /* 00100100 ..0..... 100..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:586 */
+                /* ../target/arm/sve.decode:583 */
                 if (trans_CMPGT_ppzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x0000a000:
                 /* 00100100 ..0..... 101..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:587 */
+                /* ../target/arm/sve.decode:584 */
                 if (trans_CMPEQ_ppzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x0000a010:
                 /* 00100100 ..0..... 101..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:588 */
+                /* ../target/arm/sve.decode:585 */
                 if (trans_CMPNE_ppzz(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x0000c000:
                 /* 00100100 ..0..... 110..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:598 */
+                /* ../target/arm/sve.decode:595 */
                 if (trans_CMPHS_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x0000c010:
                 /* 00100100 ..0..... 110..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:599 */
+                /* ../target/arm/sve.decode:596 */
                 if (trans_CMPHI_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x0000e000:
                 /* 00100100 ..0..... 111..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:600 */
+                /* ../target/arm/sve.decode:597 */
                 if (trans_CMPLO_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             case 0x0000e010:
                 /* 00100100 ..0..... 111..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:601 */
+                /* ../target/arm/sve.decode:598 */
                 if (trans_CMPLS_ppzw(ctx, &u.f_rprr_esz)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00200000:
             /* 00100100 ..1..... ........ ........ */
             disas_sve_extract_pd_pg_rn_i7(ctx, &u.f_rpri_esz, insn);
             switch (insn & 0x00002010) {
             case 0x00000000:
                 /* 00100100 ..1..... ..0..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:606 */
+                /* ../target/arm/sve.decode:603 */
                 if (trans_CMPHS_ppzi(ctx, &u.f_rpri_esz)) return true;
-                return false;
+                break;
             case 0x00000010:
                 /* 00100100 ..1..... ..0..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:607 */
+                /* ../target/arm/sve.decode:604 */
                 if (trans_CMPHI_ppzi(ctx, &u.f_rpri_esz)) return true;
-                return false;
+                break;
             case 0x00002000:
                 /* 00100100 ..1..... ..1..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:608 */
+                /* ../target/arm/sve.decode:605 */
                 if (trans_CMPLO_ppzi(ctx, &u.f_rpri_esz)) return true;
-                return false;
+                break;
             case 0x00002010:
                 /* 00100100 ..1..... ..1..... ...1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:609 */
+                /* ../target/arm/sve.decode:606 */
                 if (trans_CMPLS_ppzi(ctx, &u.f_rpri_esz)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000000:
             /* 00100101 ..0..... ........ ........ */
             switch (insn & 0x0000c010) {
@@ -3093,161 +3107,161 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 00100101 ..0..... 000..... ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:614 */
+                    /* ../target/arm/sve.decode:611 */
                     if (trans_CMPGE_ppzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00100101 ..0..... 001..... ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:616 */
+                    /* ../target/arm/sve.decode:613 */
                     if (trans_CMPLT_ppzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000010:
                 /* 00100101 ..0..... 00...... ...1.... */
                 disas_sve_extract_pd_pg_rn_i5(ctx, &u.f_rpri_esz, insn);
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 00100101 ..0..... 000..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:615 */
+                    /* ../target/arm/sve.decode:612 */
                     if (trans_CMPGT_ppzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00100101 ..0..... 001..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:617 */
+                    /* ../target/arm/sve.decode:614 */
                     if (trans_CMPLE_ppzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00004000:
                 /* 00100101 ..0..... 01...... ...0.... */
                 switch (insn & 0x00900200) {
                 case 0x00000000:
                     /* 00100101 0.00.... 01....0. ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:624 */
+                    /* ../target/arm/sve.decode:621 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_AND_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00000200:
                     /* 00100101 0.00.... 01....1. ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:626 */
+                    /* ../target/arm/sve.decode:623 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_EOR_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00100000:
                     /* 00100101 0.01.... 01....0. ...0.... */
                     disas_sve_extract_pd_pg_pn_s(ctx, &u.f_rpr_s, insn);
                     switch ((insn >> 16) & 0xf) {
                     case 0x0:
                         /* 00100101 0.010000 01....0. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:669 */
+                        /* ../target/arm/sve.decode:666 */
                         if (trans_BRKA_z(ctx, &u.f_rpr_s)) return true;
-                        return false;
+                        break;
                     case 0x8:
                         /* 00100101 0.011000 01....0. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:675 */
+                        /* ../target/arm/sve.decode:672 */
                         if (trans_BRKN(ctx, &u.f_rpr_s)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00800000:
                     /* 00100101 1.00.... 01....0. ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:628 */
+                    /* ../target/arm/sve.decode:625 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_ORR_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00800200:
                     /* 00100101 1.00.... 01....1. ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:630 */
+                    /* ../target/arm/sve.decode:627 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_NOR_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00900000:
                     /* 00100101 1.01.... 01....0. ...0.... */
                     disas_sve_extract_pd_pg_pn_s(ctx, &u.f_rpr_s, insn);
                     switch ((insn >> 16) & 0xf) {
                     case 0x0:
                         /* 00100101 1.010000 01....0. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:670 */
+                        /* ../target/arm/sve.decode:667 */
                         if (trans_BRKB_z(ctx, &u.f_rpr_s)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00004010:
                 /* 00100101 ..0..... 01...... ...1.... */
                 switch (insn & 0x00900200) {
                 case 0x00000000:
                     /* 00100101 0.00.... 01....0. ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:625 */
+                    /* ../target/arm/sve.decode:622 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_BIC_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00000200:
                     /* 00100101 0.00.... 01....1. ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:627 */
+                    /* ../target/arm/sve.decode:624 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_SEL_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00100000:
                     /* 00100101 0.01.... 01....0. ...1.... */
                     disas_sve_extract_pd_pg_pn_s0(ctx, &u.f_rpr_s, insn);
                     switch (insn & 0x004f0000) {
                     case 0x00000000:
                         /* 00100101 00010000 01....0. ...1.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:671 */
+                        /* ../target/arm/sve.decode:668 */
                         if (trans_BRKA_m(ctx, &u.f_rpr_s)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00800000:
                     /* 00100101 1.00.... 01....0. ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:629 */
+                    /* ../target/arm/sve.decode:626 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_ORN_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00800200:
                     /* 00100101 1.00.... 01....1. ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:631 */
+                    /* ../target/arm/sve.decode:628 */
                     disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                     if (trans_NAND_pppp(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 case 0x00900000:
                     /* 00100101 1.01.... 01....0. ...1.... */
                     disas_sve_extract_pd_pg_pn_s0(ctx, &u.f_rpr_s, insn);
                     switch (insn & 0x004f0000) {
                     case 0x00000000:
                         /* 00100101 10010000 01....0. ...1.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:672 */
+                        /* ../target/arm/sve.decode:669 */
                         if (trans_BRKB_m(ctx, &u.f_rpr_s)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00008000:
                 /* 00100101 ..0..... 10...... ...0.... */
                 disas_sve_extract_pd_pg_rn_i5(ctx, &u.f_rpri_esz, insn);
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 00100101 ..0..... 100..... ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:618 */
+                    /* ../target/arm/sve.decode:615 */
                     if (trans_CMPEQ_ppzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00008010:
                 /* 00100101 ..0..... 10...... ...1.... */
                 disas_sve_extract_pd_pg_rn_i5(ctx, &u.f_rpri_esz, insn);
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 00100101 ..0..... 100..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:619 */
+                    /* ../target/arm/sve.decode:616 */
                     if (trans_CMPNE_ppzi(ctx, &u.f_rpri_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x0000c000:
                 /* 00100101 ..0..... 11...... ...0.... */
                 switch ((insn >> 20) & 0x1) {
@@ -3257,25 +3271,25 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x00800200) {
                     case 0x00000000:
                         /* 00100101 0.00.... 11....0. ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:665 */
+                        /* ../target/arm/sve.decode:662 */
                         if (trans_BRKPA(ctx, &u.f_rprr_s)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 00100101 ..01.... 11...... ...0.... */
                     switch ((insn >> 17) & 0x7) {
                     case 0x0:
                         /* 00100101 ..01000. 11...... ...0.... */
-                        disas_sve_extract_disas_sve_Fmt_64(ctx, &u.f_disas_sve31, insn);
+                        disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve31, insn);
                         switch (insn & 0x00c1020f) {
                         case 0x00400000:
                             /* 00100101 01010000 11....0. ...00000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:636 */
+                            /* ../target/arm/sve.decode:633 */
                             if (trans_PTEST(ctx, &u.f_disas_sve31)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x4:
                         /* 00100101 ..01100. 11...... ...0.... */
                         switch ((insn >> 10) & 0xf) {
@@ -3285,80 +3299,80 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x00c10200) {
                             case 0x00400000:
                                 /* 00100101 01011000 1100000. ...0.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:657 */
+                                /* ../target/arm/sve.decode:654 */
                                 if (trans_PFIRST(ctx, &u.f_rr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x1:
                             /* 00100101 ..01100. 110001.. ...0.... */
                             disas_sve_extract_pd_pn(ctx, &u.f_rr_esz, insn);
                             switch (insn & 0x00010200) {
                             case 0x00010000:
                                 /* 00100101 ..011001 1100010. ...0.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:660 */
+                                /* ../target/arm/sve.decode:657 */
                                 if (trans_PNEXT(ctx, &u.f_rr_esz)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x8:
                             /* 00100101 ..01100. 111000.. ...0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:639 */
-                            disas_sve_extract_disas_sve_Fmt_65(ctx, &u.f_ptrue, insn);
+                            /* ../target/arm/sve.decode:636 */
+                            disas_sve_extract_disas_sve_Fmt_67(ctx, &u.f_ptrue, insn);
                             if (trans_PTRUE(ctx, &u.f_ptrue)) return true;
-                            return false;
+                            break;
                         case 0x9:
                             /* 00100101 ..01100. 111001.. ...0.... */
-                            disas_sve_extract_disas_sve_Fmt_67(ctx, &u.f_disas_sve33, insn);
+                            disas_sve_extract_disas_sve_Fmt_69(ctx, &u.f_disas_sve33, insn);
                             switch (insn & 0x00c103e0) {
                             case 0x00000000:
                                 /* 00100101 00011000 11100100 0000.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:645 */
+                                /* ../target/arm/sve.decode:642 */
                                 if (trans_PFALSE(ctx, &u.f_disas_sve33)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0xc:
                             /* 00100101 ..01100. 111100.. ...0.... */
                             switch (insn & 0x00810200) {
                             case 0x00000000:
                                 /* 00100101 0.011000 1111000. ...0.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:648 */
-                                disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve34, insn);
+                                /* ../target/arm/sve.decode:645 */
+                                disas_sve_extract_disas_sve_Fmt_70(ctx, &u.f_disas_sve34, insn);
                                 if (trans_RDFFR_p(ctx, &u.f_disas_sve34)) return true;
-                                return false;
+                                break;
                             case 0x00010000:
                                 /* 00100101 0.011001 1111000. ...0.... */
-                                disas_sve_extract_disas_sve_Fmt_67(ctx, &u.f_disas_sve33, insn);
+                                disas_sve_extract_disas_sve_Fmt_69(ctx, &u.f_disas_sve33, insn);
                                 switch (insn & 0x004001e0) {
                                 case 0x00000000:
                                     /* 00100101 00011001 11110000 0000.... */
-                                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:651 */
+                                    /* ../target/arm/sve.decode:648 */
                                     if (trans_RDFFR(ctx, &u.f_disas_sve33)) return true;
-                                    return false;
+                                    break;
                                 }
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x0000c010:
                 /* 00100101 ..0..... 11...... ...1.... */
                 disas_sve_extract_pd_pg_pn_pm_s(ctx, &u.f_rprr_s, insn);
                 switch (insn & 0x00900200) {
                 case 0x00000000:
                     /* 00100101 0.00.... 11....0. ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:666 */
+                    /* ../target/arm/sve.decode:663 */
                     if (trans_BRKPB(ctx, &u.f_rprr_s)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01200000:
             /* 00100101 ..1..... ........ ........ */
             switch ((insn >> 14) & 0x3) {
@@ -3367,23 +3381,23 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x00002400) {
                 case 0x00000400:
                     /* 00100101 ..1..... 000..1.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:701 */
-                    disas_sve_extract_disas_sve_Fmt_71(ctx, &u.f_disas_sve37, insn);
+                    /* ../target/arm/sve.decode:698 */
+                    disas_sve_extract_disas_sve_Fmt_73(ctx, &u.f_disas_sve37, insn);
                     if (trans_WHILE(ctx, &u.f_disas_sve37)) return true;
-                    return false;
+                    break;
                 case 0x00002000:
                     /* 00100101 ..1..... 001..0.. ........ */
-                    disas_sve_extract_disas_sve_Fmt_70(ctx, &u.f_disas_sve36, insn);
+                    disas_sve_extract_disas_sve_Fmt_72(ctx, &u.f_disas_sve36, insn);
                     switch (insn & 0x0080180f) {
                     case 0x00800000:
                         /* 00100101 1.1..... 001000.. ....0000 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:698 */
+                        /* ../target/arm/sve.decode:695 */
                         if (trans_CTERM(ctx, &u.f_disas_sve36)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* 00100101 ..1..... 10...... ........ */
                 switch (insn & 0x001c0200) {
@@ -3393,334 +3407,334 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 16) & 0x3) {
                     case 0x0:
                         /* 00100101 ..100000 10....0. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:680 */
+                        /* ../target/arm/sve.decode:677 */
                         if (trans_CNTP(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00080000:
                     /* 00100101 ..1010.. 10....0. ........ */
                     switch ((insn >> 10) & 0xf) {
                     case 0x0:
                         /* 00100101 ..1010.. 1000000. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:693 */
+                        /* ../target/arm/sve.decode:690 */
                         disas_sve_extract_incdec2_pred(ctx, &u.f_incdec2_pred, insn);
                         u.f_incdec2_pred.d = extract32(insn, 17, 1);
                         u.f_incdec2_pred.u = extract32(insn, 16, 1);
                         if (trans_SINCDECP_z(ctx, &u.f_incdec2_pred)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 00100101 ..1010.. 1000100. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:689 */
+                        /* ../target/arm/sve.decode:686 */
                         disas_sve_extract_incdec_pred(ctx, &u.f_incdec_pred, insn);
                         u.f_incdec_pred.d = extract32(insn, 17, 1);
                         u.f_incdec_pred.u = extract32(insn, 16, 1);
                         if (trans_SINCDECP_r_32(ctx, &u.f_incdec_pred)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 00100101 ..1010.. 1000110. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:690 */
+                        /* ../target/arm/sve.decode:687 */
                         disas_sve_extract_incdec_pred(ctx, &u.f_incdec_pred, insn);
                         u.f_incdec_pred.d = extract32(insn, 17, 1);
                         u.f_incdec_pred.u = extract32(insn, 16, 1);
                         if (trans_SINCDECP_r_64(ctx, &u.f_incdec_pred)) return true;
-                        return false;
+                        break;
                     case 0x4:
                         /* 00100101 ..1010.. 1001000. ........ */
-                        disas_sve_extract_disas_sve_Fmt_69(ctx, &u.f_disas_sve35, insn);
+                        disas_sve_extract_disas_sve_Fmt_71(ctx, &u.f_disas_sve35, insn);
                         switch (insn & 0x00c3001f) {
                         case 0x00000000:
                             /* 00100101 00101000 1001000. ...00000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:654 */
+                            /* ../target/arm/sve.decode:651 */
                             if (trans_WRFFR(ctx, &u.f_disas_sve35)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x000c0000:
                     /* 00100101 ..1011.. 10....0. ........ */
                     switch (insn & 0x00023c00) {
                     case 0x00000000:
                         /* 00100101 ..10110. 1000000. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:686 */
+                        /* ../target/arm/sve.decode:683 */
                         disas_sve_extract_incdec2_pred(ctx, &u.f_incdec2_pred, insn);
                         u.f_incdec2_pred.d = extract32(insn, 16, 1);
                         u.f_incdec2_pred.u = 1;
                         if (trans_INCDECP_z(ctx, &u.f_incdec2_pred)) return true;
-                        return false;
+                        break;
                     case 0x00000800:
                         /* 00100101 ..10110. 1000100. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:683 */
+                        /* ../target/arm/sve.decode:680 */
                         disas_sve_extract_incdec_pred(ctx, &u.f_incdec_pred, insn);
                         u.f_incdec_pred.d = extract32(insn, 16, 1);
                         u.f_incdec_pred.u = 1;
                         if (trans_INCDECP_r(ctx, &u.f_incdec_pred)) return true;
-                        return false;
+                        break;
                     case 0x00001000:
                         /* 00100101 ..10110. 1001000. ........ */
-                        disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                        disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                         switch (insn & 0x00c101ff) {
                         case 0x00000000:
                             /* 00100101 00101100 10010000 00000000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:642 */
+                            /* ../target/arm/sve.decode:639 */
                             if (trans_SETFFR(ctx, &u.f_disas_sve32)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 00100101 ..1..... 11...... ........ */
                 switch ((insn >> 16) & 0x1f) {
                 case 0x0:
                     /* 00100101 ..100000 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:712 */
+                    /* ../target/arm/sve.decode:709 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_ADD_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 00100101 ..100001 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:713 */
+                    /* ../target/arm/sve.decode:710 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_SUB_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 00100101 ..100011 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:714 */
+                    /* ../target/arm/sve.decode:711 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_SUBR_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x4:
                     /* 00100101 ..100100 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:715 */
+                    /* ../target/arm/sve.decode:712 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_SQADD_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x5:
                     /* 00100101 ..100101 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:716 */
+                    /* ../target/arm/sve.decode:713 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_UQADD_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x6:
                     /* 00100101 ..100110 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:717 */
+                    /* ../target/arm/sve.decode:714 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_SQSUB_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x7:
                     /* 00100101 ..100111 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:718 */
+                    /* ../target/arm/sve.decode:715 */
                     disas_sve_extract_rdn_sh_i8u(ctx, &u.f_rri_esz, insn);
                     if (trans_UQSUB_zzi(ctx, &u.f_rri_esz)) return true;
-                    return false;
+                    break;
                 case 0x8:
                     /* 00100101 ..101000 11...... ........ */
                     disas_sve_extract_rdn_i8s(ctx, &u.f_rri_esz, insn);
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00100101 ..101000 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:721 */
+                        /* ../target/arm/sve.decode:718 */
                         if (trans_SMAX_zzi(ctx, &u.f_rri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x9:
                     /* 00100101 ..101001 11...... ........ */
                     disas_sve_extract_rdn_i8u(ctx, &u.f_rri_esz, insn);
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00100101 ..101001 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:722 */
+                        /* ../target/arm/sve.decode:719 */
                         if (trans_UMAX_zzi(ctx, &u.f_rri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0xa:
                     /* 00100101 ..101010 11...... ........ */
                     disas_sve_extract_rdn_i8s(ctx, &u.f_rri_esz, insn);
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00100101 ..101010 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:723 */
+                        /* ../target/arm/sve.decode:720 */
                         if (trans_SMIN_zzi(ctx, &u.f_rri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0xb:
                     /* 00100101 ..101011 11...... ........ */
                     disas_sve_extract_rdn_i8u(ctx, &u.f_rri_esz, insn);
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00100101 ..101011 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:724 */
+                        /* ../target/arm/sve.decode:721 */
                         if (trans_UMIN_zzi(ctx, &u.f_rri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x10:
                     /* 00100101 ..110000 11...... ........ */
                     disas_sve_extract_rdn_i8s(ctx, &u.f_rri_esz, insn);
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00100101 ..110000 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:727 */
+                        /* ../target/arm/sve.decode:724 */
                         if (trans_MUL_zzi(ctx, &u.f_rri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x18:
                     /* 00100101 ..111000 11...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:709 */
-                    disas_sve_extract_disas_sve_Fmt_73(ctx, &u.f_disas_sve38, insn);
+                    /* ../target/arm/sve.decode:706 */
+                    disas_sve_extract_disas_sve_Fmt_75(ctx, &u.f_disas_sve38, insn);
                     if (trans_DUP_i(ctx, &u.f_disas_sve38)) return true;
-                    return false;
+                    break;
                 case 0x19:
                     /* 00100101 ..111001 11...... ........ */
-                    disas_sve_extract_disas_sve_Fmt_72(ctx, &u.f_disas_sve38, insn);
+                    disas_sve_extract_disas_sve_Fmt_74(ctx, &u.f_disas_sve38, insn);
                     switch ((insn >> 13) & 0x1) {
                     case 0x0:
                         /* 00100101 ..111001 110..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:706 */
+                        /* ../target/arm/sve.decode:703 */
                         if (trans_FDUP(ctx, &u.f_disas_sve38)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x22:
         /* 0100010. ........ ........ ........ */
         switch (insn & 0x01a0f800) {
         case 0x00800000:
             /* 01000100 1.0..... 00000... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:730 */
-            disas_sve_extract_disas_sve_Fmt_74(ctx, &u.f_disas_sve39, insn);
+            /* ../target/arm/sve.decode:727 */
+            disas_sve_extract_disas_sve_Fmt_76(ctx, &u.f_disas_sve39, insn);
             if (trans_DOT_zzz(ctx, &u.f_disas_sve39)) return true;
-            return false;
+            break;
         case 0x00a00000:
             /* 01000100 1.1..... 00000... ........ */
             switch ((insn >> 22) & 0x1) {
             case 0x0:
                 /* 01000100 101..... 00000... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:733 */
-                disas_sve_extract_disas_sve_Fmt_75(ctx, &u.f_disas_sve40, insn);
+                /* ../target/arm/sve.decode:730 */
+                disas_sve_extract_disas_sve_Fmt_77(ctx, &u.f_disas_sve40, insn);
                 if (trans_DOT_zzx(ctx, &u.f_disas_sve40)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 01000100 111..... 00000... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:735 */
-                disas_sve_extract_disas_sve_Fmt_76(ctx, &u.f_disas_sve40, insn);
+                /* ../target/arm/sve.decode:732 */
+                disas_sve_extract_disas_sve_Fmt_78(ctx, &u.f_disas_sve40, insn);
                 if (trans_DOT_zzx(ctx, &u.f_disas_sve40)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x32:
         /* 0110010. ........ ........ ........ */
         switch (insn & 0x01208000) {
         case 0x00000000:
             /* 01100100 ..0..... 0....... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:743 */
-            disas_sve_extract_disas_sve_Fmt_78(ctx, &u.f_disas_sve42, insn);
+            /* ../target/arm/sve.decode:740 */
+            disas_sve_extract_disas_sve_Fmt_80(ctx, &u.f_disas_sve42, insn);
             if (trans_FCMLA_zpzzz(ctx, &u.f_disas_sve42)) return true;
-            return false;
+            break;
         case 0x00008000:
             /* 01100100 ..0..... 1....... ........ */
-            disas_sve_extract_disas_sve_Fmt_77(ctx, &u.f_disas_sve41, insn);
+            disas_sve_extract_disas_sve_Fmt_79(ctx, &u.f_disas_sve41, insn);
             switch (insn & 0x001e6000) {
             case 0x00000000:
                 /* 01100100 ..00000. 100..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:739 */
+                /* ../target/arm/sve.decode:736 */
                 if (trans_FCADD(ctx, &u.f_disas_sve41)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00200000:
             /* 01100100 ..1..... 0....... ........ */
             switch (insn & 0x00807000) {
             case 0x00000000:
                 /* 01100100 0.1..... 0000.... ........ */
-                disas_sve_extract_disas_sve_Fmt_81(ctx, &u.f_disas_sve44, insn);
+                disas_sve_extract_disas_sve_Fmt_83(ctx, &u.f_disas_sve44, insn);
                 switch ((insn >> 11) & 0x1) {
                 case 0x0:
                     /* 01100100 0.1..... 00000... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:755 */
+                    /* ../target/arm/sve.decode:752 */
                     if (trans_FMLA_zzxz(ctx, &u.f_disas_sve44)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00002000:
                 /* 01100100 0.1..... 0010.... ........ */
-                disas_sve_extract_disas_sve_Fmt_84(ctx, &u.f_disas_sve45, insn);
+                disas_sve_extract_disas_sve_Fmt_86(ctx, &u.f_disas_sve45, insn);
                 switch ((insn >> 10) & 0x3) {
                 case 0x0:
                     /* 01100100 0.1..... 001000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:765 */
+                    /* ../target/arm/sve.decode:762 */
                     if (trans_FMUL_zzx(ctx, &u.f_disas_sve45)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800000:
                 /* 01100100 1.1..... 0000.... ........ */
                 switch (insn & 0x00400800) {
                 case 0x00000000:
                     /* 01100100 101..... 00000... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:757 */
-                    disas_sve_extract_disas_sve_Fmt_82(ctx, &u.f_disas_sve44, insn);
+                    /* ../target/arm/sve.decode:754 */
+                    disas_sve_extract_disas_sve_Fmt_84(ctx, &u.f_disas_sve44, insn);
                     if (trans_FMLA_zzxz(ctx, &u.f_disas_sve44)) return true;
-                    return false;
+                    break;
                 case 0x00400000:
                     /* 01100100 111..... 00000... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:759 */
-                    disas_sve_extract_disas_sve_Fmt_83(ctx, &u.f_disas_sve44, insn);
+                    /* ../target/arm/sve.decode:756 */
+                    disas_sve_extract_disas_sve_Fmt_85(ctx, &u.f_disas_sve44, insn);
                     if (trans_FMLA_zzxz(ctx, &u.f_disas_sve44)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00801000:
                 /* 01100100 1.1..... 0001.... ........ */
                 switch ((insn >> 22) & 0x1) {
                 case 0x0:
                     /* 01100100 101..... 0001.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:747 */
-                    disas_sve_extract_disas_sve_Fmt_79(ctx, &u.f_disas_sve43, insn);
+                    /* ../target/arm/sve.decode:744 */
+                    disas_sve_extract_disas_sve_Fmt_81(ctx, &u.f_disas_sve43, insn);
                     if (trans_FCMLA_zzxz(ctx, &u.f_disas_sve43)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100100 111..... 0001.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:749 */
-                    disas_sve_extract_disas_sve_Fmt_80(ctx, &u.f_disas_sve43, insn);
+                    /* ../target/arm/sve.decode:746 */
+                    disas_sve_extract_disas_sve_Fmt_82(ctx, &u.f_disas_sve43, insn);
                     if (trans_FCMLA_zzxz(ctx, &u.f_disas_sve43)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00802000:
                 /* 01100100 1.1..... 0010.... ........ */
                 switch (insn & 0x00400c00) {
                 case 0x00000000:
                     /* 01100100 101..... 001000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:767 */
-                    disas_sve_extract_disas_sve_Fmt_85(ctx, &u.f_disas_sve45, insn);
+                    /* ../target/arm/sve.decode:764 */
+                    disas_sve_extract_disas_sve_Fmt_87(ctx, &u.f_disas_sve45, insn);
                     if (trans_FMUL_zzx(ctx, &u.f_disas_sve45)) return true;
-                    return false;
+                    break;
                 case 0x00400000:
                     /* 01100100 111..... 001000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:768 */
-                    disas_sve_extract_disas_sve_Fmt_86(ctx, &u.f_disas_sve45, insn);
+                    /* ../target/arm/sve.decode:765 */
+                    disas_sve_extract_disas_sve_Fmt_88(ctx, &u.f_disas_sve45, insn);
                     if (trans_FMUL_zzx(ctx, &u.f_disas_sve45)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000000:
             /* 01100101 ..0..... 0....... ........ */
             switch ((insn >> 13) & 0x3) {
@@ -3730,187 +3744,187 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x7) {
                 case 0x0:
                     /* 01100101 ..0..... 000000.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:800 */
+                    /* ../target/arm/sve.decode:797 */
                     if (trans_FADD_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100101 ..0..... 000001.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:801 */
+                    /* ../target/arm/sve.decode:798 */
                     if (trans_FSUB_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 01100101 ..0..... 000010.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:802 */
+                    /* ../target/arm/sve.decode:799 */
                     if (trans_FMUL_zzz(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 01100101 ..0..... 000011.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:803 */
+                    /* ../target/arm/sve.decode:800 */
                     if (trans_FTSMUL(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x6:
                     /* 01100101 ..0..... 000110.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:804 */
+                    /* ../target/arm/sve.decode:801 */
                     if (trans_FRECPS(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 case 0x7:
                     /* 01100101 ..0..... 000111.. ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:805 */
+                    /* ../target/arm/sve.decode:802 */
                     if (trans_FRSQRTS(ctx, &u.f_rrr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 01100101 ..0..... 001..... ........ */
                 switch ((insn >> 16) & 0x1f) {
                 case 0x0:
                     /* 01100101 ..000000 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:772 */
+                    /* ../target/arm/sve.decode:769 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FADDV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x4:
                     /* 01100101 ..000100 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:773 */
+                    /* ../target/arm/sve.decode:770 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FMAXNMV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x5:
                     /* 01100101 ..000101 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:774 */
+                    /* ../target/arm/sve.decode:771 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FMINNMV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x6:
                     /* 01100101 ..000110 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:775 */
+                    /* ../target/arm/sve.decode:772 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FMAXV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x7:
                     /* 01100101 ..000111 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:776 */
+                    /* ../target/arm/sve.decode:773 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FMINV(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0xe:
                     /* 01100101 ..001110 001..... ........ */
                     disas_sve_extract_rd_rn(ctx, &u.f_rr_esz, insn);
                     switch ((insn >> 10) & 0x7) {
                     case 0x4:
                         /* 01100101 ..001110 001100.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:780 */
+                        /* ../target/arm/sve.decode:777 */
                         if (trans_FRECPE(ctx, &u.f_rr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0xf:
                     /* 01100101 ..001111 001..... ........ */
                     disas_sve_extract_rd_rn(ctx, &u.f_rr_esz, insn);
                     switch ((insn >> 10) & 0x7) {
                     case 0x4:
                         /* 01100101 ..001111 001100.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:781 */
+                        /* ../target/arm/sve.decode:778 */
                         if (trans_FRSQRTE(ctx, &u.f_rr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x10:
                     /* 01100101 ..010000 001..... ........ */
                     disas_sve_extract_pd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 01100101 ..010000 001..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:785 */
+                        /* ../target/arm/sve.decode:782 */
                         if (trans_FCMGE_ppz0(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 01100101 ..010000 001..... ...1.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:786 */
+                        /* ../target/arm/sve.decode:783 */
                         if (trans_FCMGT_ppz0(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x11:
                     /* 01100101 ..010001 001..... ........ */
                     disas_sve_extract_pd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 01100101 ..010001 001..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:787 */
+                        /* ../target/arm/sve.decode:784 */
                         if (trans_FCMLT_ppz0(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 01100101 ..010001 001..... ...1.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:788 */
+                        /* ../target/arm/sve.decode:785 */
                         if (trans_FCMLE_ppz0(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x12:
                     /* 01100101 ..010010 001..... ........ */
                     disas_sve_extract_pd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 01100101 ..010010 001..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:789 */
+                        /* ../target/arm/sve.decode:786 */
                         if (trans_FCMEQ_ppz0(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x13:
                     /* 01100101 ..010011 001..... ........ */
                     disas_sve_extract_pd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 01100101 ..010011 001..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:790 */
+                        /* ../target/arm/sve.decode:787 */
                         if (trans_FCMNE_ppz0(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x18:
                     /* 01100101 ..011000 001..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:795 */
+                    /* ../target/arm/sve.decode:792 */
                     disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                     if (trans_FADDA(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* 01100101 ..0..... 010..... ........ */
                 disas_sve_extract_pd_pg_rn_rm(ctx, &u.f_rprr_esz, insn);
                 switch ((insn >> 4) & 0x1) {
                 case 0x0:
                     /* 01100101 ..0..... 010..... ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:341 */
+                    /* ../target/arm/sve.decode:341 */
                     if (trans_FCMGE_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100101 ..0..... 010..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:342 */
+                    /* ../target/arm/sve.decode:342 */
                     if (trans_FCMGT_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 01100101 ..0..... 011..... ........ */
                 disas_sve_extract_pd_pg_rn_rm(ctx, &u.f_rprr_esz, insn);
                 switch ((insn >> 4) & 0x1) {
                 case 0x0:
                     /* 01100101 ..0..... 011..... ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:343 */
+                    /* ../target/arm/sve.decode:343 */
                     if (trans_FCMEQ_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100101 ..0..... 011..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:344 */
+                    /* ../target/arm/sve.decode:344 */
                     if (trans_FCMNE_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01008000:
             /* 01100101 ..0..... 1....... ........ */
             switch ((insn >> 13) & 0x3) {
@@ -3922,580 +3936,580 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 16) & 0x7) {
                     case 0x0:
                         /* 01100101 ..000000 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:810 */
+                        /* ../target/arm/sve.decode:807 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FADD_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 01100101 ..000001 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:811 */
+                        /* ../target/arm/sve.decode:808 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FSUB_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 01100101 ..000010 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:812 */
+                        /* ../target/arm/sve.decode:809 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FMUL_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 ..000011 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:813 */
+                        /* ../target/arm/sve.decode:810 */
                         disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                         if (trans_FSUB_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x4:
                         /* 01100101 ..000100 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:814 */
+                        /* ../target/arm/sve.decode:811 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FMAXNM_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x5:
                         /* 01100101 ..000101 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:815 */
+                        /* ../target/arm/sve.decode:812 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FMINNM_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x6:
                         /* 01100101 ..000110 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:816 */
+                        /* ../target/arm/sve.decode:813 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FMAX_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x7:
                         /* 01100101 ..000111 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:817 */
+                        /* ../target/arm/sve.decode:814 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FMIN_zpzz(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100101 ..001... 100..... ........ */
                     switch ((insn >> 16) & 0x7) {
                     case 0x0:
                         /* 01100101 ..001000 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:818 */
+                        /* ../target/arm/sve.decode:815 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FABD(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 01100101 ..001001 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:819 */
+                        /* ../target/arm/sve.decode:816 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FSCALE(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 01100101 ..001010 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:820 */
+                        /* ../target/arm/sve.decode:817 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FMULX(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x4:
                         /* 01100101 ..001100 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:821 */
+                        /* ../target/arm/sve.decode:818 */
                         disas_sve_extract_rdm_pg_rn(ctx, &u.f_rprr_esz, insn);
                         if (trans_FDIV(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     case 0x5:
                         /* 01100101 ..001101 100..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:822 */
+                        /* ../target/arm/sve.decode:819 */
                         disas_sve_extract_rdn_pg_rm(ctx, &u.f_rprr_esz, insn);
                         if (trans_FDIV(ctx, &u.f_rprr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x2:
                     /* 01100101 ..010... 100..... ........ */
-                    disas_sve_extract_disas_sve_Fmt_87(ctx, &u.f_disas_sve46, insn);
+                    disas_sve_extract_disas_sve_Fmt_89(ctx, &u.f_disas_sve46, insn);
                     switch ((insn >> 10) & 0x7) {
                     case 0x0:
                         /* 01100101 ..010... 100000.. ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:835 */
+                        /* ../target/arm/sve.decode:832 */
                         if (trans_FTMAD(ctx, &u.f_disas_sve46)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* 01100101 ..011... 100..... ........ */
                     disas_sve_extract_rdn_i1(ctx, &u.f_rpri_esz, insn);
                     switch (insn & 0x000703c0) {
                     case 0x00000000:
                         /* 01100101 ..011000 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:825 */
+                        /* ../target/arm/sve.decode:822 */
                         if (trans_FADD_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00010000:
                         /* 01100101 ..011001 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:826 */
+                        /* ../target/arm/sve.decode:823 */
                         if (trans_FSUB_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00020000:
                         /* 01100101 ..011010 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:827 */
+                        /* ../target/arm/sve.decode:824 */
                         if (trans_FMUL_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00030000:
                         /* 01100101 ..011011 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:828 */
+                        /* ../target/arm/sve.decode:825 */
                         if (trans_FSUBR_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00040000:
                         /* 01100101 ..011100 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:829 */
+                        /* ../target/arm/sve.decode:826 */
                         if (trans_FMAXNM_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00050000:
                         /* 01100101 ..011101 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:830 */
+                        /* ../target/arm/sve.decode:827 */
                         if (trans_FMINNM_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00060000:
                         /* 01100101 ..011110 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:831 */
+                        /* ../target/arm/sve.decode:828 */
                         if (trans_FMAX_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     case 0x00070000:
                         /* 01100101 ..011111 100...00 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:832 */
+                        /* ../target/arm/sve.decode:829 */
                         if (trans_FMIN_zpzi(ctx, &u.f_rpri_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 01100101 ..0..... 101..... ........ */
                 switch ((insn >> 16) & 0x1f) {
                 case 0x0:
                     /* 01100101 ..000000 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:880 */
+                    /* ../target/arm/sve.decode:877 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTN(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100101 ..000001 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:881 */
+                    /* ../target/arm/sve.decode:878 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTP(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 01100101 ..000010 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:882 */
+                    /* ../target/arm/sve.decode:879 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTM(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 01100101 ..000011 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:883 */
+                    /* ../target/arm/sve.decode:880 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTZ(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x4:
                     /* 01100101 ..000100 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:884 */
+                    /* ../target/arm/sve.decode:881 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTA(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x6:
                     /* 01100101 ..000110 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:885 */
+                    /* ../target/arm/sve.decode:882 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTX(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x7:
                     /* 01100101 ..000111 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:886 */
+                    /* ../target/arm/sve.decode:883 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRINTI(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x8:
                     /* 01100101 ..001000 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x2:
                         /* 01100101 10001000 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:856 */
+                        /* ../target/arm/sve.decode:853 */
                         if (trans_FCVT_sh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11001000 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:858 */
+                        /* ../target/arm/sve.decode:855 */
                         if (trans_FCVT_dh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x9:
                     /* 01100101 ..001001 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x2:
                         /* 01100101 10001001 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:857 */
+                        /* ../target/arm/sve.decode:854 */
                         if (trans_FCVT_hs(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11001001 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:859 */
+                        /* ../target/arm/sve.decode:856 */
                         if (trans_FCVT_hd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0xa:
                     /* 01100101 ..001010 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x3:
                         /* 01100101 11001010 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:860 */
+                        /* ../target/arm/sve.decode:857 */
                         if (trans_FCVT_ds(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0xb:
                     /* 01100101 ..001011 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x3:
                         /* 01100101 11001011 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:861 */
+                        /* ../target/arm/sve.decode:858 */
                         if (trans_FCVT_sd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0xc:
                     /* 01100101 ..001100 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:889 */
+                    /* ../target/arm/sve.decode:886 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FRECPX(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0xd:
                     /* 01100101 ..001101 101..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:890 */
+                    /* ../target/arm/sve.decode:887 */
                     disas_sve_extract_rd_pg_rn(ctx, &u.f_rpr_esz, insn);
                     if (trans_FSQRT(ctx, &u.f_rpr_esz)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* 01100101 ..010000 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x3:
                         /* 01100101 11010000 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:897 */
+                        /* ../target/arm/sve.decode:894 */
                         if (trans_SCVTF_sd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x11:
                     /* 01100101 ..010001 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x3:
                         /* 01100101 11010001 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:905 */
+                        /* ../target/arm/sve.decode:902 */
                         if (trans_UCVTF_sd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x12:
                     /* 01100101 ..010010 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01010010 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:893 */
+                        /* ../target/arm/sve.decode:890 */
                         if (trans_SCVTF_hh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x13:
                     /* 01100101 ..010011 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01010011 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:901 */
+                        /* ../target/arm/sve.decode:898 */
                         if (trans_UCVTF_hh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x14:
                     /* 01100101 ..010100 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01010100 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:894 */
+                        /* ../target/arm/sve.decode:891 */
                         if (trans_SCVTF_sh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 01100101 10010100 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:896 */
+                        /* ../target/arm/sve.decode:893 */
                         if (trans_SCVTF_ss(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11010100 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:898 */
+                        /* ../target/arm/sve.decode:895 */
                         if (trans_SCVTF_ds(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x15:
                     /* 01100101 ..010101 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01010101 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:902 */
+                        /* ../target/arm/sve.decode:899 */
                         if (trans_UCVTF_sh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 01100101 10010101 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:904 */
+                        /* ../target/arm/sve.decode:901 */
                         if (trans_UCVTF_ss(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11010101 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:906 */
+                        /* ../target/arm/sve.decode:903 */
                         if (trans_UCVTF_ds(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x16:
                     /* 01100101 ..010110 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01010110 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:895 */
+                        /* ../target/arm/sve.decode:892 */
                         if (trans_SCVTF_dh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11010110 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:899 */
+                        /* ../target/arm/sve.decode:896 */
                         if (trans_SCVTF_dd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x17:
                     /* 01100101 ..010111 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01010111 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:903 */
+                        /* ../target/arm/sve.decode:900 */
                         if (trans_UCVTF_dh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11010111 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:907 */
+                        /* ../target/arm/sve.decode:904 */
                         if (trans_UCVTF_dd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x18:
                     /* 01100101 ..011000 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x3:
                         /* 01100101 11011000 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:872 */
+                        /* ../target/arm/sve.decode:869 */
                         if (trans_FCVTZS_ds(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x19:
                     /* 01100101 ..011001 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x3:
                         /* 01100101 11011001 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:873 */
+                        /* ../target/arm/sve.decode:870 */
                         if (trans_FCVTZU_ds(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1a:
                     /* 01100101 ..011010 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01011010 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:864 */
+                        /* ../target/arm/sve.decode:861 */
                         if (trans_FCVTZS_hh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1b:
                     /* 01100101 ..011011 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01011011 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:865 */
+                        /* ../target/arm/sve.decode:862 */
                         if (trans_FCVTZU_hh(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1c:
                     /* 01100101 ..011100 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01011100 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:866 */
+                        /* ../target/arm/sve.decode:863 */
                         if (trans_FCVTZS_hs(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 01100101 10011100 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:870 */
+                        /* ../target/arm/sve.decode:867 */
                         if (trans_FCVTZS_ss(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11011100 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:874 */
+                        /* ../target/arm/sve.decode:871 */
                         if (trans_FCVTZS_sd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1d:
                     /* 01100101 ..011101 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01011101 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:867 */
+                        /* ../target/arm/sve.decode:864 */
                         if (trans_FCVTZU_hs(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 01100101 10011101 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:871 */
+                        /* ../target/arm/sve.decode:868 */
                         if (trans_FCVTZU_ss(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11011101 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:875 */
+                        /* ../target/arm/sve.decode:872 */
                         if (trans_FCVTZU_sd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1e:
                     /* 01100101 ..011110 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01011110 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:868 */
+                        /* ../target/arm/sve.decode:865 */
                         if (trans_FCVTZS_hd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11011110 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:876 */
+                        /* ../target/arm/sve.decode:873 */
                         if (trans_FCVTZS_dd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1f:
                     /* 01100101 ..011111 101..... ........ */
                     disas_sve_extract_rd_pg_rn_e0(ctx, &u.f_rpr_esz, insn);
                     switch ((insn >> 22) & 0x3) {
                     case 0x1:
                         /* 01100101 01011111 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:869 */
+                        /* ../target/arm/sve.decode:866 */
                         if (trans_FCVTZU_hd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 01100101 11011111 101..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:877 */
+                        /* ../target/arm/sve.decode:874 */
                         if (trans_FCVTZU_dd(ctx, &u.f_rpr_esz)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* 01100101 ..0..... 110..... ........ */
                 disas_sve_extract_pd_pg_rn_rm(ctx, &u.f_rprr_esz, insn);
                 switch ((insn >> 4) & 0x1) {
                 case 0x0:
                     /* 01100101 ..0..... 110..... ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:345 */
+                    /* ../target/arm/sve.decode:345 */
                     if (trans_FCMUO_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01100101 ..0..... 110..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:346 */
+                    /* ../target/arm/sve.decode:346 */
                     if (trans_FACGE_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 01100101 ..0..... 111..... ........ */
                 disas_sve_extract_pd_pg_rn_rm(ctx, &u.f_rprr_esz, insn);
                 switch ((insn >> 4) & 0x1) {
                 case 0x1:
                     /* 01100101 ..0..... 111..... ...1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:347 */
+                    /* ../target/arm/sve.decode:347 */
                     if (trans_FACGT_ppzz(ctx, &u.f_rprr_esz)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01200000:
             /* 01100101 ..1..... 0....... ........ */
             disas_sve_extract_rda_pg_rn_rm(ctx, &u.f_rprrr_esz, insn);
             switch ((insn >> 13) & 0x3) {
             case 0x0:
                 /* 01100101 ..1..... 000..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:840 */
+                /* ../target/arm/sve.decode:837 */
                 if (trans_FMLA_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 01100101 ..1..... 001..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:841 */
+                /* ../target/arm/sve.decode:838 */
                 if (trans_FMLS_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 01100101 ..1..... 010..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:842 */
+                /* ../target/arm/sve.decode:839 */
                 if (trans_FNMLA_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 01100101 ..1..... 011..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:843 */
+                /* ../target/arm/sve.decode:840 */
                 if (trans_FNMLS_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01208000:
             /* 01100101 ..1..... 1....... ........ */
             disas_sve_extract_rdn_pg_rm_ra(ctx, &u.f_rprrr_esz, insn);
             switch ((insn >> 13) & 0x3) {
             case 0x0:
                 /* 01100101 ..1..... 100..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:848 */
+                /* ../target/arm/sve.decode:845 */
                 if (trans_FMLA_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 01100101 ..1..... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:849 */
+                /* ../target/arm/sve.decode:846 */
                 if (trans_FMLS_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 01100101 ..1..... 110..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:850 */
+                /* ../target/arm/sve.decode:847 */
                 if (trans_FNMLA_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 01100101 ..1..... 111..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:851 */
+                /* ../target/arm/sve.decode:848 */
                 if (trans_FNMLS_zpzzz(ctx, &u.f_rprrr_esz)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x42:
         /* 1000010. ........ ........ ........ */
         switch ((insn >> 15) & 0x1) {
@@ -4507,48 +4521,48 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 21) & 0x1) {
                 case 0x0:
                     /* 10000100 0.0..... 0....... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:923 */
+                    /* ../target/arm/sve.decode:920 */
                     disas_sve_extract_rprr_g_load_xs_u(ctx, &u.f_rprr_gather_load, insn);
                     u.f_rprr_gather_load.esz = 2;
                     u.f_rprr_gather_load.msz = 0;
                     u.f_rprr_gather_load.scale = 0;
                     if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 10000100 0.1..... 0....... ........ */
-                    disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                    disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 10000100 0.1..... 0....... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:970 */
+                        /* ../target/arm/sve.decode:967 */
                         if (trans_PRF(ctx, &u.f_disas_sve32)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 10000100 1....... 0....... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:925 */
+                /* ../target/arm/sve.decode:922 */
                 disas_sve_extract_rprr_g_load_xs_u_sc(ctx, &u.f_rprr_gather_load, insn);
                 u.f_rprr_gather_load.esz = 2;
                 u.f_rprr_gather_load.msz = 1;
                 if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 10000101 0....... 0....... ........ */
                 disas_sve_extract_rprr_g_load_xs_sc(ctx, &u.f_rprr_gather_load, insn);
                 switch ((insn >> 14) & 0x1) {
                 case 0x1:
                     /* 10000101 0....... 01...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:927 */
+                    /* ../target/arm/sve.decode:924 */
                     u.f_rprr_gather_load.esz = 2;
                     u.f_rprr_gather_load.msz = 2;
                     u.f_rprr_gather_load.u = 1;
                     if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 10000101 1....... 0....... ........ */
                 switch ((insn >> 22) & 0x1) {
@@ -4561,34 +4575,34 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 4) & 0x1) {
                         case 0x0:
                             /* 10000101 10...... 000..... ...0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:912 */
+                            /* ../target/arm/sve.decode:909 */
                             if (trans_LDR_pri(ctx, &u.f_rri)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x2:
                         /* 10000101 10...... 010..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:915 */
+                        /* ../target/arm/sve.decode:912 */
                         disas_sve_extract_rd_rn_i9(ctx, &u.f_rri, insn);
                         if (trans_LDR_zri(ctx, &u.f_rri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 10000101 11...... 0....... ........ */
-                    disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                    disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 10000101 11...... 0....... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:976 */
+                        /* ../target/arm/sve.decode:973 */
                         if (trans_PRF(ctx, &u.f_disas_sve32)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* 1000010. ........ 1....... ........ */
             switch ((insn >> 22) & 0x1) {
@@ -4600,37 +4614,37 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x00006010) {
                     case 0x00004000:
                         /* 1000010. .00..... 110..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:979 */
-                        disas_sve_extract_disas_sve_Fmt_89(ctx, &u.f_disas_sve47, insn);
+                        /* ../target/arm/sve.decode:976 */
+                        disas_sve_extract_disas_sve_Fmt_91(ctx, &u.f_disas_sve47, insn);
                         if (trans_PRF_rr(ctx, &u.f_disas_sve47)) return true;
-                        return false;
+                        break;
                     case 0x00006000:
                         /* 1000010. .00..... 111..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:973 */
-                        disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                        /* ../target/arm/sve.decode:970 */
+                        disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                         if (trans_PRF(ctx, &u.f_disas_sve32)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 1000010. .01..... 1....... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:931 */
+                    /* ../target/arm/sve.decode:928 */
                     disas_sve_extract_rpri_g_load(ctx, &u.f_rpri_gather_load, insn);
                     u.f_rpri_gather_load.esz = 2;
                     if (trans_LD1_zpiz(ctx, &u.f_rpri_gather_load)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 1000010. .1...... 1....... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:918 */
-                disas_sve_extract_disas_sve_Fmt_88(ctx, &u.f_rpri_load, insn);
+                /* ../target/arm/sve.decode:915 */
+                disas_sve_extract_disas_sve_Fmt_90(ctx, &u.f_rpri_load, insn);
                 if (trans_LD1R_zpri(ctx, &u.f_rpri_load)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x52:
         /* 1010010. ........ ........ ........ */
         switch ((insn >> 13) & 0x7) {
@@ -4640,77 +4654,77 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 21) & 0x3) {
             case 0x0:
                 /* 1010010. .00..... 000..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:961 */
+                /* ../target/arm/sve.decode:958 */
                 u.f_rprr_load.nreg = 0;
                 if (trans_LD1RQ_zprr(ctx, &u.f_rprr_load)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* 1010010. ........ 001..... ........ */
             disas_sve_extract_rpri_load_msz(ctx, &u.f_rpri_load, insn);
             switch ((insn >> 20) & 0x7) {
             case 0x0:
                 /* 1010010. .000.... 001..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:966 */
+                /* ../target/arm/sve.decode:963 */
                 u.f_rpri_load.nreg = 0;
                 if (trans_LD1RQ_zpri(ctx, &u.f_rpri_load)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2:
             /* 1010010. ........ 010..... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:937 */
+            /* ../target/arm/sve.decode:934 */
             disas_sve_extract_rprr_load_dt(ctx, &u.f_rprr_load, insn);
             u.f_rprr_load.nreg = 0;
             if (trans_LD_zprr(ctx, &u.f_rprr_load)) return true;
-            return false;
+            break;
         case 0x3:
             /* 1010010. ........ 011..... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:940 */
+            /* ../target/arm/sve.decode:937 */
             disas_sve_extract_rprr_load_dt(ctx, &u.f_rprr_load, insn);
             u.f_rprr_load.nreg = 0;
             if (trans_LDFF1_zprr(ctx, &u.f_rprr_load)) return true;
-            return false;
+            break;
         case 0x5:
             /* 1010010. ........ 101..... ........ */
             disas_sve_extract_rpri_load_dt(ctx, &u.f_rpri_load, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* 1010010. ...0.... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:943 */
+                /* ../target/arm/sve.decode:940 */
                 u.f_rpri_load.nreg = 0;
                 if (trans_LD_zpri(ctx, &u.f_rpri_load)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1010010. ...1.... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:946 */
+                /* ../target/arm/sve.decode:943 */
                 u.f_rpri_load.nreg = 0;
                 if (trans_LDNF1_zpri(ctx, &u.f_rpri_load)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x6:
             /* 1010010. ........ 110..... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:952 */
+            /* ../target/arm/sve.decode:949 */
             disas_sve_extract_rprr_load_msz(ctx, &u.f_rprr_load, insn);
             u.f_rprr_load.nreg = extract32(insn, 21, 2);
             if (trans_LD_zprr(ctx, &u.f_rprr_load)) return true;
-            return false;
+            break;
         case 0x7:
             /* 1010010. ........ 111..... ........ */
             disas_sve_extract_rpri_load_msz(ctx, &u.f_rpri_load, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* 1010010. ...0.... 111..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:958 */
+                /* ../target/arm/sve.decode:955 */
                 u.f_rpri_load.nreg = extract32(insn, 21, 2);
                 if (trans_LD_zpri(ctx, &u.f_rpri_load)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x62:
         /* 1100010. ........ ........ ........ */
         switch ((insn >> 15) & 0x1) {
@@ -4722,58 +4736,58 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 21) & 0x1) {
                 case 0x0:
                     /* 11000100 0.0..... 0....... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:985 */
+                    /* ../target/arm/sve.decode:982 */
                     disas_sve_extract_rprr_g_load_xs_u(ctx, &u.f_rprr_gather_load, insn);
                     u.f_rprr_gather_load.esz = 3;
                     u.f_rprr_gather_load.msz = 0;
                     u.f_rprr_gather_load.scale = 0;
                     if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 11000100 0.1..... 0....... ........ */
-                    disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                    disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                     switch ((insn >> 4) & 0x1) {
                     case 0x0:
                         /* 11000100 0.1..... 0....... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1013 */
+                        /* ../target/arm/sve.decode:1010 */
                         if (trans_PRF(ctx, &u.f_disas_sve32)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 11000100 1....... 0....... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:987 */
+                /* ../target/arm/sve.decode:984 */
                 disas_sve_extract_rprr_g_load_xs_u_sc(ctx, &u.f_rprr_gather_load, insn);
                 u.f_rprr_gather_load.esz = 3;
                 u.f_rprr_gather_load.msz = 1;
                 if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 11000101 0....... 0....... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:989 */
+                /* ../target/arm/sve.decode:986 */
                 disas_sve_extract_rprr_g_load_xs_u_sc(ctx, &u.f_rprr_gather_load, insn);
                 u.f_rprr_gather_load.esz = 3;
                 u.f_rprr_gather_load.msz = 2;
                 if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 11000101 1....... 0....... ........ */
                 disas_sve_extract_rprr_g_load_xs_sc(ctx, &u.f_rprr_gather_load, insn);
                 switch ((insn >> 14) & 0x1) {
                 case 0x1:
                     /* 11000101 1....... 01...... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:991 */
+                    /* ../target/arm/sve.decode:988 */
                     u.f_rprr_gather_load.esz = 3;
                     u.f_rprr_gather_load.msz = 3;
                     u.f_rprr_gather_load.u = 1;
                     if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* 1100010. ........ 1....... ........ */
             switch ((insn >> 22) & 0x1) {
@@ -4782,24 +4796,24 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 21) & 0x1) {
                 case 0x0:
                     /* 1100010. .00..... 1....... ........ */
-                    disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                    disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                     switch (insn & 0x00006010) {
                     case 0x00006000:
                         /* 1100010. .00..... 111..... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1016 */
+                        /* ../target/arm/sve.decode:1013 */
                         if (trans_PRF(ctx, &u.f_disas_sve32)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 1100010. .01..... 1....... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1006 */
+                    /* ../target/arm/sve.decode:1003 */
                     disas_sve_extract_rpri_g_load(ctx, &u.f_rpri_gather_load, insn);
                     u.f_rpri_gather_load.esz = 3;
                     if (trans_LD1_zpiz(ctx, &u.f_rpri_gather_load)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 1100010. .1...... 1....... ........ */
                 switch ((insn >> 23) & 0x3) {
@@ -4808,62 +4822,62 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 21) & 0x1) {
                     case 0x0:
                         /* 11000100 010..... 1....... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:996 */
+                        /* ../target/arm/sve.decode:993 */
                         disas_sve_extract_rprr_g_load_u(ctx, &u.f_rprr_gather_load, insn);
                         u.f_rprr_gather_load.esz = 3;
                         u.f_rprr_gather_load.msz = 0;
                         u.f_rprr_gather_load.scale = 0;
                         if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 11000100 011..... 1....... ........ */
-                        disas_sve_extract_disas_sve_Fmt_66(ctx, &u.f_disas_sve32, insn);
+                        disas_sve_extract_disas_sve_Fmt_68(ctx, &u.f_disas_sve32, insn);
                         switch ((insn >> 4) & 0x1) {
                         case 0x0:
                             /* 11000100 011..... 1....... ...0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1010 */
+                            /* ../target/arm/sve.decode:1007 */
                             if (trans_PRF(ctx, &u.f_disas_sve32)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* 11000100 11...... 1....... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:998 */
+                    /* ../target/arm/sve.decode:995 */
                     disas_sve_extract_rprr_g_load_u_sc(ctx, &u.f_rprr_gather_load, insn);
                     u.f_rprr_gather_load.esz = 3;
                     u.f_rprr_gather_load.msz = 1;
                     if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 11000101 01...... 1....... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1000 */
+                    /* ../target/arm/sve.decode:997 */
                     disas_sve_extract_rprr_g_load_u_sc(ctx, &u.f_rprr_gather_load, insn);
                     u.f_rprr_gather_load.esz = 3;
                     u.f_rprr_gather_load.msz = 2;
                     if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 11000101 11...... 1....... ........ */
                     disas_sve_extract_rprr_g_load_sc(ctx, &u.f_rprr_gather_load, insn);
                     switch ((insn >> 14) & 0x1) {
                     case 0x1:
                         /* 11000101 11...... 11...... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1002 */
+                        /* ../target/arm/sve.decode:999 */
                         u.f_rprr_gather_load.esz = 3;
                         u.f_rprr_gather_load.msz = 3;
                         u.f_rprr_gather_load.u = 1;
                         if (trans_LD1_zprz(ctx, &u.f_rprr_gather_load)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x72:
         /* 1110010. ........ ........ ........ */
         switch ((insn >> 13) & 0x7) {
@@ -4873,206 +4887,207 @@ bool disas_sve(DisasContext *ctx, uint32_t insn)
             switch (insn & 0x01c00010) {
             case 0x01800000:
                 /* 11100101 10...... 000..... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1021 */
+                /* ../target/arm/sve.decode:1018 */
                 if (trans_STR_pri(ctx, &u.f_rri)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2:
             /* 1110010. ........ 010..... ........ */
             switch ((insn >> 23) & 0x3) {
             case 0x0:
                 /* 11100100 0....... 010..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1034 */
+                /* ../target/arm/sve.decode:1031 */
                 disas_sve_extract_rprr_store_esz_n0(ctx, &u.f_rprr_store, insn);
                 u.f_rprr_store.msz = 0;
                 if (trans_ST_zprr(ctx, &u.f_rprr_store)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 11100100 1....... 010..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1036 */
+                /* ../target/arm/sve.decode:1033 */
                 disas_sve_extract_rprr_store_esz_n0(ctx, &u.f_rprr_store, insn);
                 u.f_rprr_store.msz = 1;
                 if (trans_ST_zprr(ctx, &u.f_rprr_store)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 11100101 0....... 010..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1038 */
+                /* ../target/arm/sve.decode:1035 */
                 disas_sve_extract_rprr_store_esz_n0(ctx, &u.f_rprr_store, insn);
                 u.f_rprr_store.msz = 2;
                 if (trans_ST_zprr(ctx, &u.f_rprr_store)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 11100101 1....... 010..... ........ */
                 switch ((insn >> 22) & 0x1) {
                 case 0x0:
                     /* 11100101 10...... 010..... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1024 */
+                    /* ../target/arm/sve.decode:1021 */
                     disas_sve_extract_rd_rn_i9(ctx, &u.f_rri, insn);
                     if (trans_STR_zri(ctx, &u.f_rri)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 11100101 11...... 010..... ........ */
                     disas_sve_extract_rprr_store(ctx, &u.f_rprr_store, insn);
                     switch ((insn >> 21) & 0x1) {
                     case 0x1:
                         /* 11100101 111..... 010..... ........ */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1040 */
+                        /* ../target/arm/sve.decode:1037 */
                         u.f_rprr_store.msz = 3;
                         u.f_rprr_store.esz = 3;
                         u.f_rprr_store.nreg = 0;
                         if (trans_ST_zprr(ctx, &u.f_rprr_store)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x3:
             /* 1110010. ........ 011..... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1050 */
+            /* ../target/arm/sve.decode:1047 */
             disas_sve_extract_rprr_store(ctx, &u.f_rprr_store, insn);
             u.f_rprr_store.msz = extract32(insn, 23, 2);
             u.f_rprr_store.nreg = extract32(insn, 21, 2);
             u.f_rprr_store.esz = extract32(insn, 23, 2);
             if (trans_ST_zprr(ctx, &u.f_rprr_store)) return true;
-            return false;
+            break;
         case 0x4:
             /* 1110010. ........ 100..... ........ */
             disas_sve_extract_rprr_scatter_store(ctx, &u.f_rprr_scatter_store, insn);
             switch ((insn >> 21) & 0x3) {
             case 0x0:
                 /* 1110010. .00..... 100..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1092 */
+                /* ../target/arm/sve.decode:1089 */
                 u.f_rprr_scatter_store.xs = 0;
                 u.f_rprr_scatter_store.esz = 3;
                 u.f_rprr_scatter_store.scale = 0;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1110010. .01..... 100..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1086 */
+                /* ../target/arm/sve.decode:1083 */
                 u.f_rprr_scatter_store.xs = 0;
                 u.f_rprr_scatter_store.esz = 3;
                 u.f_rprr_scatter_store.scale = 1;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 1110010. .10..... 100..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1062 */
+                /* ../target/arm/sve.decode:1059 */
                 u.f_rprr_scatter_store.xs = 0;
                 u.f_rprr_scatter_store.esz = 2;
                 u.f_rprr_scatter_store.scale = 0;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 1110010. .11..... 100..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1055 */
+                /* ../target/arm/sve.decode:1052 */
                 u.f_rprr_scatter_store.xs = 0;
                 u.f_rprr_scatter_store.esz = 2;
                 u.f_rprr_scatter_store.scale = 1;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x5:
             /* 1110010. ........ 101..... ........ */
             switch ((insn >> 21) & 0x3) {
             case 0x0:
                 /* 1110010. .00..... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1073 */
+                /* ../target/arm/sve.decode:1070 */
                 disas_sve_extract_rprr_scatter_store(ctx, &u.f_rprr_scatter_store, insn);
                 u.f_rprr_scatter_store.xs = 2;
                 u.f_rprr_scatter_store.esz = 3;
                 u.f_rprr_scatter_store.scale = 0;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1110010. .01..... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1069 */
+                /* ../target/arm/sve.decode:1066 */
                 disas_sve_extract_rprr_scatter_store(ctx, &u.f_rprr_scatter_store, insn);
                 u.f_rprr_scatter_store.xs = 2;
                 u.f_rprr_scatter_store.esz = 3;
                 u.f_rprr_scatter_store.scale = 1;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 1110010. .10..... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1077 */
+                /* ../target/arm/sve.decode:1074 */
                 disas_sve_extract_rpri_scatter_store(ctx, &u.f_rpri_scatter_store, insn);
                 u.f_rpri_scatter_store.esz = 3;
                 if (trans_ST1_zpiz(ctx, &u.f_rpri_scatter_store)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 1110010. .11..... 101..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1081 */
+                /* ../target/arm/sve.decode:1078 */
                 disas_sve_extract_rpri_scatter_store(ctx, &u.f_rpri_scatter_store, insn);
                 u.f_rpri_scatter_store.esz = 2;
                 if (trans_ST1_zpiz(ctx, &u.f_rpri_scatter_store)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x6:
             /* 1110010. ........ 110..... ........ */
             disas_sve_extract_rprr_scatter_store(ctx, &u.f_rprr_scatter_store, insn);
             switch ((insn >> 21) & 0x3) {
             case 0x0:
                 /* 1110010. .00..... 110..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1094 */
+                /* ../target/arm/sve.decode:1091 */
                 u.f_rprr_scatter_store.xs = 1;
                 u.f_rprr_scatter_store.esz = 3;
                 u.f_rprr_scatter_store.scale = 0;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1110010. .01..... 110..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1088 */
+                /* ../target/arm/sve.decode:1085 */
                 u.f_rprr_scatter_store.xs = 1;
                 u.f_rprr_scatter_store.esz = 3;
                 u.f_rprr_scatter_store.scale = 1;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 1110010. .10..... 110..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1064 */
+                /* ../target/arm/sve.decode:1061 */
                 u.f_rprr_scatter_store.xs = 1;
                 u.f_rprr_scatter_store.esz = 2;
                 u.f_rprr_scatter_store.scale = 0;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 1110010. .11..... 110..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1057 */
+                /* ../target/arm/sve.decode:1054 */
                 u.f_rprr_scatter_store.xs = 1;
                 u.f_rprr_scatter_store.esz = 2;
                 u.f_rprr_scatter_store.scale = 1;
                 if (trans_ST1_zprz(ctx, &u.f_rprr_scatter_store)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x7:
             /* 1110010. ........ 111..... ........ */
             disas_sve_extract_rpri_store_msz(ctx, &u.f_rpri_store, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* 1110010. ...0.... 111..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1028 */
+                /* ../target/arm/sve.decode:1025 */
                 u.f_rpri_store.esz = extract32(insn, 21, 2);
                 u.f_rpri_store.nreg = 0;
                 if (trans_ST_zpri(ctx, &u.f_rpri_store)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1110010. ...1.... 111..... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/sve.decode:1045 */
+                /* ../target/arm/sve.decode:1042 */
                 u.f_rpri_store.nreg = extract32(insn, 21, 2);
                 u.f_rpri_store.esz = extract32(insn, 23, 2);
                 if (trans_ST_zpri(ctx, &u.f_rpri_store)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }
+

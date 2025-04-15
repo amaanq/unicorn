@@ -7,7 +7,7 @@
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+   version 2.1 of the License, or (at your option) any later version.
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -3021,14 +3021,14 @@ static inline void gen_load_trap_state_at_tl(TCGContext *tcg_ctx, TCGv_ptr r_tsp
     TCGv_i32 r_tl = tcg_temp_new_i32(tcg_ctx);
 
     /* load env->tl into r_tl */
-    tcg_gen_ld_i32(tcg_ctx, r_tl, cpu_env, offsetof(CPUSPARCState, tl));
+    tcg_gen_ld_i32(tcg_ctx, r_tl, tcg_ctx->cpu_env, offsetof(CPUSPARCState, tl));
 
     /* tl = [0 ... MAXTL_MASK] where MAXTL_MASK must be power of 2 */
     tcg_gen_andi_i32(tcg_ctx, r_tl, r_tl, MAXTL_MASK);
 
     /* calculate offset to current trap state from env->ts, reuse r_tl */
     tcg_gen_muli_i32(tcg_ctx, r_tl, r_tl, sizeof (trap_state));
-    tcg_gen_addi_ptr(tcg_ctx, r_tsptr, cpu_env, offsetof(CPUSPARCState, ts));
+    tcg_gen_addi_ptr(tcg_ctx, r_tsptr, tcg_ctx->cpu_env, offsetof(CPUSPARCState, ts));
 
     /* tsptr = env->ts[env->tl & MAXTL_MASK] */
     {

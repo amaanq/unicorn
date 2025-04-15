@@ -78,9 +78,9 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
     ret = atomic16_cmpxchg(haddr, cmpv, newv);
 #else
 #ifdef _MSC_VER
-    ret = atomic_cmpxchg__nocheck((long *)haddr, cmpv, newv);
+    ret = qatomic_cmpxchg__nocheck((long *)haddr, cmpv, newv);
 #else
-    ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
+    ret = qatomic_cmpxchg__nocheck(haddr, cmpv, newv);
 #endif
 #endif
     ATOMIC_MMU_CLEANUP;
@@ -132,7 +132,7 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
     ATOMIC_MMU_DECLS;                                               \
     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
     DATA_TYPE ret;                                                  \
-    ret = atomic_##X((long *)haddr, val);                           \
+    ret = qatomic_##X((long *)haddr, val);                          \
     ATOMIC_MMU_CLEANUP;                                             \
     return ret;                                                     \
 }
@@ -144,7 +144,7 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
     ATOMIC_MMU_DECLS;                                               \
     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
     DATA_TYPE ret;                                                  \
-    ret = atomic_##X(haddr, val);                                   \
+    ret = qatomic_##X(haddr, val);                                  \
     ATOMIC_MMU_CLEANUP;                                             \
     return ret;                                                     \
 }
@@ -179,7 +179,7 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
     do {                                                            \
         old = cmp; new = FN(old, val);                              \
         cmp = *haddr;                                               \
-        if (cmp == old)                                          \
+        if (cmp == old)                                             \
             *haddr = new;                                           \
     } while (cmp != old);                                           \
     ATOMIC_MMU_CLEANUP;                                             \
@@ -221,9 +221,9 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
     ret = atomic16_cmpxchg(haddr, BSWAP(cmpv), BSWAP(newv));
 #else
 #ifdef _MSC_VER
-    ret = atomic_cmpxchg__nocheck((long *)haddr, BSWAP(cmpv), BSWAP(newv));
+    ret = qatomic_cmpxchg__nocheck((long *)haddr, BSWAP(cmpv), BSWAP(newv));
 #else
-    ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
+    ret = qatomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
 #endif
 #endif
     ATOMIC_MMU_CLEANUP;
@@ -274,7 +274,7 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
     ATOMIC_MMU_DECLS;                                               \
     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
     DATA_TYPE ret;                                                  \
-    ret = atomic_##X((long *)haddr, BSWAP(val));                    \
+    ret = qatomic_##X((long *)haddr, BSWAP(val));                   \
     ATOMIC_MMU_CLEANUP;                                             \
     return BSWAP(ret);                                              \
 }
@@ -286,7 +286,7 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
     ATOMIC_MMU_DECLS;                                               \
     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
     DATA_TYPE ret;                                                  \
-    ret = atomic_##X(haddr, BSWAP(val));                            \
+    ret = qatomic_##X(haddr, BSWAP(val));                           \
     ATOMIC_MMU_CLEANUP;                                             \
     return BSWAP(ret);                                              \
 }

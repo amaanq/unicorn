@@ -13,7 +13,6 @@
 #include "cpu.h"
 #include "fpu/softfloat.h"
 
-#ifndef CONFIG_USER_ONLY
 QEMU_PACK(typedef struct LowCore {
     /* prefix area: defined by architecture */
     uint32_t        ccw1[2];                  /* 0x000 */
@@ -94,7 +93,6 @@ QEMU_PACK(typedef struct LowCore {
     uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
 }) LowCore;
 QEMU_BUILD_BUG_ON(sizeof(LowCore) != 8192);
-#endif /* CONFIG_USER_ONLY */
 
 #define MAX_ILEN 6
 
@@ -176,6 +174,7 @@ enum cc_op {
     CC_OP_SUBB_64,              /* overflow on unsigned sub-borrow (64bit) */
     CC_OP_ABS_64,               /* sign eval on abs (64bit) */
     CC_OP_NABS_64,              /* sign eval on nabs (64bit) */
+    CC_OP_MULS_64,              /* overflow on signed multiply (64bit) */
 
     CC_OP_ADD_32,               /* overflow on add (32bit) */
     CC_OP_ADDU_32,              /* overflow on unsigned add (32bit) */
@@ -185,6 +184,7 @@ enum cc_op {
     CC_OP_SUBB_32,              /* overflow on unsigned sub-borrow (32bit) */
     CC_OP_ABS_32,               /* sign eval on abs (64bit) */
     CC_OP_NABS_32,              /* sign eval on nabs (64bit) */
+    CC_OP_MULS_32,              /* overflow on signed multiply (32bit) */
 
     CC_OP_COMP_32,              /* complement */
     CC_OP_COMP_64,              /* complement */
@@ -197,7 +197,8 @@ enum cc_op {
     CC_OP_NZ_F128,              /* FP dst != 0 (128bit) */
 
     CC_OP_ICM,                  /* insert characters under mask */
-    CC_OP_SLA,                  /* Calculate shift left signed */
+    CC_OP_SLA_32,               /* Calculate shift left signed (32bit) */
+    CC_OP_SLA_64,               /* Calculate shift left signed (64bit) */
     CC_OP_FLOGR,                /* find leftmost one */
     CC_OP_LCBB,                 /* load count to block boundary */
     CC_OP_VC,                   /* vector compare result */
@@ -294,10 +295,8 @@ void s390_handle_wait(S390CPU *cpu);
 #define S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
 int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch);
 int s390_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len);
-#ifndef CONFIG_USER_ONLY
 LowCore *cpu_map_lowcore(CPUS390XState *env);
 void cpu_unmap_lowcore(CPUS390XState *env, LowCore *lowcore);
-#endif /* CONFIG_USER_ONLY */
 
 
 /* interrupt.c */

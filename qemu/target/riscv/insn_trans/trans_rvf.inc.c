@@ -23,21 +23,6 @@
         return false;                       \
 } while (0)
 
-/*
- * RISC-V requires NaN-boxing of narrower width floating
- * point values.  This applies when a 32-bit value is
- * assigned to a 64-bit FP register.  Thus this does not
- * apply when the RVD extension is not present.
- */
-static void gen_nanbox_fpr(DisasContext *ctx, int regno)
-{
-    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
-    if (has_ext(ctx, RVD)) {
-        tcg_gen_ori_i64(tcg_ctx, tcg_ctx->cpu_fpr[regno], tcg_ctx->cpu_fpr[regno],
-                        MAKE_64BIT_MASK(32, 32));
-    }
-}
-
 static bool trans_flw(DisasContext *ctx, arg_flw *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
@@ -48,7 +33,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
     tcg_gen_addi_tl(tcg_ctx, t0, t0, a->imm);
 
     tcg_gen_qemu_ld_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
-    gen_nanbox_fpr(ctx, a->rd);
+    gen_nanbox_s(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rd]);
 
     tcg_temp_free(tcg_ctx, t0);
     mark_fs_dirty(ctx);
@@ -190,10 +175,18 @@ static bool trans_fsgnj_s(DisasContext *ctx, arg_fsgnj_s *a)
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
 
     if (a->rs1 == a->rs2) { /* FMOV */
-        tcg_gen_mov_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rs1]);
+        gen_check_nanbox_s(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rs1]);
     } else { /* FSGNJ */
-        tcg_gen_deposit_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rs2], tcg_ctx->cpu_fpr[a->rs1],
-                            0, 31);
+        TCGv_i64 rs1 = tcg_temp_new_i64(tcg_ctx);
+        TCGv_i64 rs2 = tcg_temp_new_i64(tcg_ctx);
+
+        gen_check_nanbox_s(tcg_ctx, rs1, tcg_ctx->cpu_fpr[a->rs1]);
+        gen_check_nanbox_s(tcg_ctx, rs2, tcg_ctx->cpu_fpr[a->rs2]);
+
+        /* This formulation retains the nanboxing of rs2. */
+        tcg_gen_deposit_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], rs2, rs1, 0, 31);
+        tcg_temp_free_i64(tcg_ctx, rs1);
+        tcg_temp_free_i64(tcg_ctx, rs2);
     }
     mark_fs_dirty(ctx);
     return true;
@@ -201,36 +194,67 @@ static bool trans_fsgnj_s(DisasContext *ctx, arg_fsgnj_s *a)
 
 static bool trans_fsgnjn_s(DisasContext *ctx, arg_fsgnjn_s *a)
 {
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    TCGv_i64 rs1, rs2, mask;
+
     REQUIRE_FPU;
     REQUIRE_EXT(ctx, RVF);
-    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+
+    rs1 = tcg_temp_new_i64(tcg_ctx);
+    gen_check_nanbox_s(tcg_ctx, rs1, tcg_ctx->cpu_fpr[a->rs1]);
 
     if (a->rs1 == a->rs2) { /* FNEG */
-        tcg_gen_xori_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rs1], INT32_MIN);
+        tcg_gen_xori_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], rs1, MAKE_64BIT_MASK(31, 1));
     } else {
-        TCGv_i64 t0 = tcg_temp_new_i64(tcg_ctx);
-        tcg_gen_not_i64(tcg_ctx, t0, tcg_ctx->cpu_fpr[a->rs2]);
-        tcg_gen_deposit_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], t0, tcg_ctx->cpu_fpr[a->rs1], 0, 31);
-        tcg_temp_free_i64(tcg_ctx, t0);
+        rs2 = tcg_temp_new_i64(tcg_ctx);
+        gen_check_nanbox_s(tcg_ctx, rs2, tcg_ctx->cpu_fpr[a->rs2]);
+
+        /*
+         * Replace bit 31 in rs1 with inverse in rs2.
+         * This formulation retains the nanboxing of rs1.
+         */
+        mask = tcg_const_i64(tcg_ctx, ~MAKE_64BIT_MASK(31, 1));
+        tcg_gen_nor_i64(tcg_ctx, rs2, rs2, mask);
+        tcg_gen_and_i64(tcg_ctx, rs1, mask, rs1);
+        tcg_gen_or_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], rs1, rs2);
+
+        tcg_temp_free_i64(tcg_ctx, mask);
+        tcg_temp_free_i64(tcg_ctx, rs2);
     }
+    tcg_temp_free_i64(tcg_ctx, rs1);
+
     mark_fs_dirty(ctx);
     return true;
 }
 
 static bool trans_fsgnjx_s(DisasContext *ctx, arg_fsgnjx_s *a)
 {
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    TCGv_i64 rs1, rs2;
+
     REQUIRE_FPU;
     REQUIRE_EXT(ctx, RVF);
-    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+
+    rs1 = tcg_temp_new_i64(tcg_ctx);
+    gen_check_nanbox_s(tcg_ctx, rs1, tcg_ctx->cpu_fpr[a->rs1]);
 
     if (a->rs1 == a->rs2) { /* FABS */
-        tcg_gen_andi_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rs1], ~INT32_MIN);
+        tcg_gen_andi_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], rs1, ~MAKE_64BIT_MASK(31, 1));
     } else {
-        TCGv_i64 t0 = tcg_temp_new_i64(tcg_ctx);
-        tcg_gen_andi_i64(tcg_ctx, t0, tcg_ctx->cpu_fpr[a->rs2], INT32_MIN);
-        tcg_gen_xor_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rs1], t0);
-        tcg_temp_free_i64(tcg_ctx, t0);
+        rs2 = tcg_temp_new_i64(tcg_ctx);
+        gen_check_nanbox_s(tcg_ctx, rs2, tcg_ctx->cpu_fpr[a->rs2]);
+
+        /*
+         * Xor bit 31 in rs1 with that in rs2.
+         * This formulation retains the nanboxing of rs1.
+         */
+        tcg_gen_andi_i64(tcg_ctx, rs2, rs2, MAKE_64BIT_MASK(31, 1));
+        tcg_gen_xor_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], rs1, rs2);
+
+        tcg_temp_free_i64(tcg_ctx, rs2);
     }
+    tcg_temp_free_i64(tcg_ctx, rs1);
+
     mark_fs_dirty(ctx);
     return true;
 }
@@ -411,11 +435,8 @@ static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
     TCGv t0 = tcg_temp_new(tcg_ctx);
     gen_get_gpr(tcg_ctx, t0, a->rs1);
 
-#if defined(TARGET_RISCV64)
-    tcg_gen_mov_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], t0);
-#else
-    tcg_gen_extu_i32_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], t0);
-#endif
+    tcg_gen_extu_tl_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], t0);
+    gen_nanbox_s(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], tcg_ctx->cpu_fpr[a->rd]);
 
     mark_fs_dirty(ctx);
     tcg_temp_free(tcg_ctx, t0);

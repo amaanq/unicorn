@@ -35,5 +35,3 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
 {
     cpu->interrupt_request |= mask;
 }
-
-CPUInterruptHandler cpu_interrupt_handler = tcg_handle_interrupt;

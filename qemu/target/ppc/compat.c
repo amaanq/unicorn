@@ -6,7 +6,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -152,7 +152,7 @@ bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
     return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
 }
 
-void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr)
+int ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr)
 {
     const CompatInfo *compat = compat_by_pvr(compat_pvr);
     CPUPPCState *env = &cpu->env;
@@ -163,11 +163,11 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr)
         pcr = 0;
     } else if (!compat) {
         error_setg(errp, "Unknown compatibility PVR 0x%08"PRIx32, compat_pvr);
-        return;
+        return -EINVAL;
     } else if (!ppc_check_compat(cpu, compat_pvr, 0, 0)) {
         error_setg(errp, "Compatibility PVR 0x%08"PRIx32" not valid for CPU",
                    compat_pvr);
-        return;
+        return -EINVAL;
     } else {
         pcr = compat->pcr;
     }
@@ -179,16 +179,18 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr)
         if (ret < 0) {
             error_setg_errno(errp, -ret,
                              "Unable to set CPU compatibility mode in KVM");
-            return;
+            return ret;
         }
     }
 
     cpu->compat_pvr = compat_pvr;
     env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
+    return 0;
 }
 
 typedef struct {
     uint32_t compat_pvr;
+    int ret;
 } SetCompatState;
 
 static void do_set_compat(CPUState *cs, run_on_cpu_data arg)
@@ -196,28 +198,28 @@ static void do_set_compat(CPUState *cs, run_on_cpu_data arg)
     PowerPCCPU *cpu = POWERPC_CPU(cs);
     SetCompatState *s = arg.host_ptr;
 
-    ppc_set_compat(cpu, s->compat_pvr, &s->err);
+    s->ret = ppc_set_compat(cpu, s->compat_pvr, s->errp);
 }
 
-void ppc_set_compat_all(uint32_t compat_pvr)
+int ppc_set_compat_all(uint32_t compat_pvr)
 {
     CPUState *cs;
 
     CPU_FOREACH(cs) {
         SetCompatState s = {
             .compat_pvr = compat_pvr,
-            .err = NULL,
+            .errp = errp,
+            .ret = 0,
         };
 
         run_on_cpu(cs, do_set_compat, RUN_ON_CPU_HOST_PTR(&s));
 
-        if (s.err) {
-#if 0
-            error_propagate(errp, s.err);
-#endif
-            return;
+        if (s.ret < 0) {
+            return s.ret;
         }
     }
+
+    return 0;
 }
 
 int ppc_compat_max_vthreads(PowerPCCPU *cpu)

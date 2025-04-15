@@ -367,12 +367,21 @@ void tlb_flush_all_cpus_synced(CPUState *src_cpu)
     tlb_flush_by_mmuidx_all_cpus_synced(src_cpu, ALL_MMUIDX_BITS);
 }
 
+static bool tlb_hit_page_mask_anyprot(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
+                                      target_ulong page, target_ulong mask)
+{
+    page &= mask;
+    mask &= TARGET_PAGE_MASK | TLB_INVALID_MASK;
+
+    return (page == (tlb_entry->addr_read & mask) ||
+            page == (tlb_addr_write(tlb_entry) & mask) ||
+            page == (tlb_entry->addr_code & mask));
+}
+
 static inline bool tlb_hit_page_anyprot(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
                                         target_ulong page)
 {
-    return tlb_hit_page(uc, tlb_entry->addr_read, page) ||
-           tlb_hit_page(uc, tlb_addr_write(tlb_entry), page) ||
-           tlb_hit_page(uc, tlb_entry->addr_code, page);
+    return tlb_hit_page_mask_anyprot(uc, tlb_entry, page, -1);
 }
 
 /**
@@ -385,29 +394,44 @@ static inline bool tlb_entry_is_empty(const CPUTLBEntry *te)
 }
 
 /* Called with tlb_c.lock held */
-static inline bool tlb_flush_entry_locked(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
-                                          target_ulong page)
+static bool tlb_flush_entry_mask_locked(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
+                                        target_ulong page,
+                                        target_ulong mask)
 {
-    if (tlb_hit_page_anyprot(uc, tlb_entry, page)) {
+    if (tlb_hit_page_mask_anyprot(uc, tlb_entry, page, mask)) {
         memset(tlb_entry, -1, sizeof(*tlb_entry));
         return true;
     }
     return false;
 }
 
-/* Called with tlb_c.lock held */
-static inline void tlb_flush_vtlb_page_locked(CPUArchState *env, int mmu_idx,
-                                              target_ulong page)
+static inline bool tlb_flush_entry_locked(struct uc_struct *uc, CPUTLBEntry *tlb_entry,
+                                          target_ulong page)
 {
+    return tlb_flush_entry_mask_locked(uc, tlb_entry, page, -1);
+}
+
+/* Called with tlb_c.lock held */
+static void tlb_flush_vtlb_page_mask_locked(CPUArchState *env, int mmu_idx,
+                                            target_ulong page,
+                                            target_ulong mask)
+{
+    UNICORN_UNUSED struct uc_struct *uc = env->uc;
     CPUTLBDesc *d = &env_tlb(env)->d[mmu_idx];
     int k;
 
     // assert_cpu_is_self(env_cpu(env));
     for (k = 0; k < CPU_VTLB_SIZE; k++) {
-        if (tlb_flush_entry_locked(env->uc, &d->vtable[k], page)) {
+        if (tlb_flush_entry_mask_locked(uc, &d->vtable[k], page, mask)) {
             tlb_n_used_entries_dec(env, mmu_idx);
         }
     }
+}
+
+static inline void tlb_flush_vtlb_page_locked(CPUArchState *env, int mmu_idx,
+                                              target_ulong page)
+{
+    tlb_flush_vtlb_page_mask_locked(env, mmu_idx, page, -1);
 }
 
 static void tlb_flush_page_locked(CPUArchState *env, int midx,
@@ -586,8 +610,8 @@ void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
      * See tlb_flush_page_by_mmuidx for details.
      */
     if (idxmap < TARGET_PAGE_SIZE) {
-        flush_all_helper(src_cpu, tlb_flush_page_by_mmuidx_async_1,
-                         RUN_ON_CPU_TARGET_PTR(addr | idxmap));
+        // flush_all_helper(src_cpu, tlb_flush_page_by_mmuidx_async_1,
+        //                  RUN_ON_CPU_TARGET_PTR(addr | idxmap));
         tlb_flush_page_by_mmuidx_async_1(src_cpu, RUN_ON_CPU_TARGET_PTR(addr | idxmap));
     } else {
         //CPUState *dst_cpu;
@@ -617,6 +641,223 @@ void tlb_flush_page_all_cpus_synced(CPUState *src, target_ulong addr)
     tlb_flush_page_by_mmuidx_all_cpus_synced(src, addr, ALL_MMUIDX_BITS);
 }
 
+static void tlb_flush_page_bits_locked(CPUArchState *env, int midx,
+                                       target_ulong page, unsigned bits)
+{
+    UNICORN_UNUSED struct uc_struct *uc = env->uc;
+    CPUTLBDesc *d = &env_tlb(env)->d[midx];
+    CPUTLBDescFast *f = &env_tlb(env)->f[midx];
+    target_ulong mask = MAKE_64BIT_MASK(0, bits);
+
+    /*
+     * If @bits is smaller than the tlb size, there may be multiple entries
+     * within the TLB; otherwise all addresses that match under @mask hit
+     * the same TLB entry.
+     *
+     * TODO: Perhaps allow bits to be a few bits less than the size.
+     * For now, just flush the entire TLB.
+     */
+    if (mask < f->mask) {
+        tlb_flush_one_mmuidx_locked(env, midx, get_clock_realtime());
+        return;
+    }
+
+    /* Check if we need to flush due to large pages.  */
+    if ((page & d->large_page_mask) == d->large_page_addr) {
+        tlb_flush_one_mmuidx_locked(env, midx, get_clock_realtime());
+        return;
+    }
+
+    if (tlb_flush_entry_mask_locked(uc, tlb_entry(env, midx, page), page, mask)) {
+        tlb_n_used_entries_dec(env, midx);
+    }
+    tlb_flush_vtlb_page_mask_locked(env, midx, page, mask);
+}
+
+typedef struct {
+    target_ulong addr;
+    uint16_t idxmap;
+    uint16_t bits;
+} TLBFlushPageBitsByMMUIdxData;
+
+static void
+tlb_flush_page_bits_by_mmuidx_async_0(CPUState *cpu,
+                                      TLBFlushPageBitsByMMUIdxData d)
+{
+    CPUArchState *env = cpu->env_ptr;
+    int mmu_idx;
+
+    // assert_cpu_is_self(cpu);
+
+    // tlb_debug("page addr:" TARGET_FMT_lx "/%u mmu_map:0x%x\n",
+    //           d.addr, d.bits, d.idxmap);
+
+    // qemu_spin_lock(&env_tlb(env)->c.lock);
+    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+        if ((d.idxmap >> mmu_idx) & 1) {
+            tlb_flush_page_bits_locked(env, mmu_idx, d.addr, d.bits);
+        }
+    }
+    // qemu_spin_unlock(&env_tlb(env)->c.lock);
+
+    tb_flush_jmp_cache(cpu, d.addr);
+}
+
+static bool encode_pbm_to_runon(struct uc_struct *uc, run_on_cpu_data *out,
+                                TLBFlushPageBitsByMMUIdxData d)
+{
+    /* We need 6 bits to hold to hold @bits up to 63. */
+    if (d.idxmap <= MAKE_64BIT_MASK(0, TARGET_PAGE_BITS - 6)) {
+        *out = RUN_ON_CPU_TARGET_PTR(d.addr | (d.idxmap << 6) | d.bits);
+        return true;
+    }
+    return false;
+}
+
+static TLBFlushPageBitsByMMUIdxData
+decode_runon_to_pbm(struct uc_struct *uc, run_on_cpu_data data)
+{
+    target_ulong addr_map_bits = (target_ulong) data.target_ptr;
+    return (TLBFlushPageBitsByMMUIdxData){
+        .addr = addr_map_bits & TARGET_PAGE_MASK,
+        .idxmap = (addr_map_bits & ~TARGET_PAGE_MASK) >> 6,
+        .bits = addr_map_bits & 0x3f
+    };
+}
+
+static void tlb_flush_page_bits_by_mmuidx_async_1(struct uc_struct *uc, CPUState *cpu,
+                                                  run_on_cpu_data runon)
+{
+    tlb_flush_page_bits_by_mmuidx_async_0(cpu, decode_runon_to_pbm(uc, runon));
+}
+
+static void tlb_flush_page_bits_by_mmuidx_async_2(CPUState *cpu,
+                                                  run_on_cpu_data data)
+{
+    TLBFlushPageBitsByMMUIdxData *d = data.host_ptr;
+    tlb_flush_page_bits_by_mmuidx_async_0(cpu, *d);
+    g_free(d);
+}
+
+void tlb_flush_page_bits_by_mmuidx(CPUState *cpu, target_ulong addr,
+                                   uint16_t idxmap, unsigned bits)
+{
+    struct uc_struct *uc = cpu->uc;
+    TLBFlushPageBitsByMMUIdxData d;
+
+    /* If all bits are significant, this devolves to tlb_flush_page. */
+    if (bits >= TARGET_LONG_BITS) {
+        tlb_flush_page_by_mmuidx(cpu, addr, idxmap);
+        return;
+    }
+    /* If no page bits are significant, this devolves to tlb_flush. */
+    if (bits < TARGET_PAGE_BITS) {
+        tlb_flush_by_mmuidx(cpu, idxmap);
+        return;
+    }
+
+    /* This should already be page aligned */
+    d.addr = addr & TARGET_PAGE_MASK;
+    d.idxmap = idxmap;
+    d.bits = bits;
+
+    tlb_flush_page_bits_by_mmuidx_async_0(cpu, d);
+}
+
+// void tlb_flush_page_bits_by_mmuidx_all_cpus(CPUState *src_cpu,
+//                                             target_ulong addr,
+//                                             uint16_t idxmap,
+//                                             unsigned bits)
+// {
+//     TLBFlushPageBitsByMMUIdxData d;
+//     run_on_cpu_data runon;
+//
+//     /* If all bits are significant, this devolves to tlb_flush_page. */
+//     if (bits >= TARGET_LONG_BITS) {
+//         tlb_flush_page_by_mmuidx_all_cpus(src_cpu, addr, idxmap);
+//         return;
+//     }
+//     /* If no page bits are significant, this devolves to tlb_flush. */
+//     if (bits < TARGET_PAGE_BITS) {
+//         tlb_flush_by_mmuidx_all_cpus(src_cpu, idxmap);
+//         return;
+//     }
+//
+//     /* This should already be page aligned */
+//     d.addr = addr & TARGET_PAGE_MASK;
+//     d.idxmap = idxmap;
+//     d.bits = bits;
+//
+//     if (encode_pbm_to_runon(&runon, d)) {
+//         flush_all_helper(src_cpu, tlb_flush_page_bits_by_mmuidx_async_1, runon);
+//     } else {
+//         // CPUState *dst_cpu;
+//         // TLBFlushPageBitsByMMUIdxData *p;
+//         //
+//         // /* Allocate a separate data block for each destination cpu.  */
+//         // CPU_FOREACH(dst_cpu) {
+//         //     if (dst_cpu != src_cpu) {
+//         //         p = g_new(TLBFlushPageBitsByMMUIdxData, 1);
+//         //         *p = d;
+//         //         async_run_on_cpu(dst_cpu,
+//         //                          tlb_flush_page_bits_by_mmuidx_async_2,
+//         //                          RUN_ON_CPU_HOST_PTR(p));
+//         //     }
+//         // }
+//     }
+//
+//     tlb_flush_page_bits_by_mmuidx_async_0(src_cpu, d);
+// }
+
+void tlb_flush_page_bits_by_mmuidx_all_cpus_synced(struct uc_struct *uc, CPUState *src_cpu,
+                                                   target_ulong addr,
+                                                   uint16_t idxmap,
+                                                   unsigned bits)
+{
+    TLBFlushPageBitsByMMUIdxData d;
+    run_on_cpu_data runon;
+
+    /* If all bits are significant, this devolves to tlb_flush_page. */
+    if (bits >= TARGET_LONG_BITS) {
+        tlb_flush_page_by_mmuidx_all_cpus_synced(src_cpu, addr, idxmap);
+        return;
+    }
+    /* If no page bits are significant, this devolves to tlb_flush. */
+    if (bits < TARGET_PAGE_BITS) {
+        tlb_flush_by_mmuidx_all_cpus_synced(src_cpu, idxmap);
+        return;
+    }
+
+    /* This should already be page aligned */
+    d.addr = addr & TARGET_PAGE_MASK;
+    d.idxmap = idxmap;
+    d.bits = bits;
+
+    if (encode_pbm_to_runon(uc, &runon, d)) {
+        // flush_all_helper(src_cpu, tlb_flush_page_bits_by_mmuidx_async_1, runon);
+        tlb_flush_page_bits_by_mmuidx_async_1(uc, src_cpu, runon);
+    } else {
+        // CPUState *dst_cpu;
+        TLBFlushPageBitsByMMUIdxData *p;
+
+        // /* Allocate a separate data block for each destination cpu.  */
+        // CPU_FOREACH(dst_cpu) {
+        //     if (dst_cpu != src_cpu) {
+        //         p = g_new(TLBFlushPageBitsByMMUIdxData, 1);
+        //         *p = d;
+        //         async_run_on_cpu(dst_cpu, tlb_flush_page_bits_by_mmuidx_async_2,
+        //                          RUN_ON_CPU_HOST_PTR(p));
+        //     }
+        // }
+
+        p = g_new(TLBFlushPageBitsByMMUIdxData, 1);
+        *p = d;
+        // async_safe_run_on_cpu(src_cpu, tlb_flush_page_bits_by_mmuidx_async_2,
+        //                       RUN_ON_CPU_HOST_PTR(p));
+        tlb_flush_page_bits_by_mmuidx_async_2(src_cpu, RUN_ON_CPU_HOST_PTR(p));
+    }
+}
+
 /* update the TLBs so that writes to code in the virtual page 'addr'
    can be detected */
 void tlb_protect_code(struct uc_struct *uc, ram_addr_t ram_addr)
@@ -644,7 +885,7 @@ void tlb_unprotect_code(struct uc_struct *uc, ram_addr_t ram_addr)
  * generated code.
  *
  * Other vCPUs might be reading their TLBs during guest execution, so we update
- * te->addr_write with atomic_set. We don't need to worry about this for
+ * te->addr_write with qatomic_set. We don't need to worry about this for
  * oversized guests as MTTCG is disabled for them.
  *
  * Called with tlb_c.lock held.
@@ -2245,7 +2486,85 @@ store_memop(void *haddr, uint64_t val, MemOp op)
     }
 }
 
-static inline void
+static void __attribute__((noinline))
+store_helper_unaligned(CPUArchState *env, target_ulong addr, uint64_t val,
+                       uintptr_t retaddr, size_t size, uintptr_t mmu_idx,
+                       bool big_endian)
+{
+    struct uc_struct *uc = env->uc;
+    const size_t tlb_off = offsetof(CPUTLBEntry, addr_write);
+    uintptr_t index, index2;
+    CPUTLBEntry *entry, *entry2;
+    target_ulong page2, tlb_addr, tlb_addr2;
+    TCGMemOpIdx oi;
+    size_t size2;
+    int i;
+
+    /*
+     * Ensure the second page is in the TLB.  Note that the first page
+     * is already guaranteed to be filled, and that the second page
+     * cannot evict the first.
+     */
+    page2 = (addr + size) & TARGET_PAGE_MASK;
+    size2 = (addr + size) & ~TARGET_PAGE_MASK;
+    index2 = tlb_index(env, mmu_idx, page2);
+    entry2 = tlb_entry(env, mmu_idx, page2);
+
+    tlb_addr2 = tlb_addr_write(entry2);
+    if (!tlb_hit_page(uc, tlb_addr2, page2)) {
+        if (!victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2)) {
+            tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
+                     mmu_idx, retaddr);
+            index2 = tlb_index(env, mmu_idx, page2);
+            entry2 = tlb_entry(env, mmu_idx, page2);
+        }
+        tlb_addr2 = tlb_addr_write(entry2);
+    }
+
+    index = tlb_index(env, mmu_idx, addr);
+    entry = tlb_entry(env, mmu_idx, addr);
+    tlb_addr = tlb_addr_write(entry);
+
+    /*
+     * Handle watchpoints.  Since this may trap, all checks
+     * must happen before any store.
+     */
+    if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
+        cpu_check_watchpoint(env_cpu(env), addr, size - size2,
+                             env_tlb(env)->d[mmu_idx].iotlb[index].attrs,
+                             BP_MEM_WRITE, retaddr);
+    }
+    if (unlikely(tlb_addr2 & TLB_WATCHPOINT)) {
+        cpu_check_watchpoint(env_cpu(env), page2, size2,
+                             env_tlb(env)->d[mmu_idx].iotlb[index2].attrs,
+                             BP_MEM_WRITE, retaddr);
+    }
+
+    /*
+     * XXX: not efficient, but simple.
+     * This loop must go in the forward direction to avoid issues
+     * with self-modifying code in Windows 64-bit.
+     */
+    int old_size = uc->size_recur_mem;
+    uc->size_recur_mem = size;
+    oi = make_memop_idx(MO_UB, mmu_idx);
+    if (big_endian) {
+        for (i = 0; i < size; ++i) {
+            /* Big-endian extract.  */
+            uint8_t val8 = val >> (((size - 1) * 8) - (i * 8));
+            helper_ret_stb_mmu(env, addr + i, val8, oi, retaddr);
+        }
+    } else {
+        for (i = 0; i < size; ++i) {
+            /* Little-endian extract.  */
+            uint8_t val8 = val >> (i * 8);
+            helper_ret_stb_mmu(env, addr + i, val8, oi, retaddr);
+        }
+    }
+    uc->size_recur_mem = old_size;
+}
+
+static inline void QEMU_ALWAYS_INLINE
 store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
              TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
 {
@@ -2475,68 +2794,9 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
     if (size > 1
         && unlikely((addr & ~TARGET_PAGE_MASK) + size - 1
                      >= TARGET_PAGE_SIZE)) {
-        int i;
-        uintptr_t index2;
-        CPUTLBEntry *entry2;
-        target_ulong page2, tlb_addr2;
-        size_t size2;
-        int old_size;
-
     do_unaligned_access:
-        /*
-         * Ensure the second page is in the TLB.  Note that the first page
-         * is already guaranteed to be filled, and that the second page
-         * cannot evict the first.
-         */
-        page2 = (addr + size) & TARGET_PAGE_MASK;
-        size2 = (addr + size) & ~TARGET_PAGE_MASK;
-        index2 = tlb_index(env, mmu_idx, page2);
-        entry2 = tlb_entry(env, mmu_idx, page2);
-        tlb_addr2 = tlb_addr_write(entry2);
-        if (!tlb_hit_page(uc, tlb_addr2, page2)) {
-            if (!victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2)) {
-                tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
-                         mmu_idx, retaddr);
-                index2 = tlb_index(env, mmu_idx, page2);
-                entry2 = tlb_entry(env, mmu_idx, page2);
-            }
-            tlb_addr2 = tlb_addr_write(entry2);
-        }
-
-        /*
-         * Handle watchpoints.  Since this may trap, all checks
-         * must happen before any store.
-         */
-        if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
-            cpu_check_watchpoint(env_cpu(env), addr, size - size2,
-                                 env_tlb(env)->d[mmu_idx].iotlb[index].attrs,
-                                 BP_MEM_WRITE, retaddr);
-        }
-        if (unlikely(tlb_addr2 & TLB_WATCHPOINT)) {
-            cpu_check_watchpoint(env_cpu(env), page2, size2,
-                                 env_tlb(env)->d[mmu_idx].iotlb[index2].attrs,
-                                 BP_MEM_WRITE, retaddr);
-        }
-
-        /*
-         * XXX: not efficient, but simple.
-         * This loop must go in the forward direction to avoid issues
-         * with self-modifying code in Windows 64-bit.
-         */
-        old_size = uc->size_recur_mem;
-        uc->size_recur_mem = size;
-        for (i = 0; i < size; ++i) {
-            uint8_t val8;
-            if (memop_big_endian(op)) {
-                /* Big-endian extract.  */
-                val8 = val >> (((size - 1) * 8) - (i * 8));
-            } else {
-                /* Little-endian extract.  */
-                val8 = val >> (i * 8);
-            }
-            helper_ret_stb_mmu(env, addr + i, val8, oi, retaddr);
-        }
-        uc->size_recur_mem = old_size;
+        store_helper_unaligned(env, addr, val, retaddr, size,
+                               mmu_idx, memop_big_endian(op));
         return;
     }
 
@@ -2544,8 +2804,9 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
     store_memop(haddr, val, op);
 }
 
-void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
-                        TCGMemOpIdx oi, uintptr_t retaddr)
+void __attribute__((noinline))
+helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
+                   TCGMemOpIdx oi, uintptr_t retaddr)
 {
     store_helper(env, addr, val, oi, retaddr, MO_UB);
 }

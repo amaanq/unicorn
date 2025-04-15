@@ -227,125 +227,148 @@ static bool decode_insn16(DisasContext *ctx, uint16_t insn)
         /* 000..... ......00 */
         if ((insn & 0x00001fe0) == 0x00000000) {
             /* 00000000 000...00 */
+            /* ../target/riscv/insn16.decode:87 */
             decode_insn16_extract_decode_insn16_Fmt_22(ctx, &u.f_empty, insn);
             if (trans_illegal(ctx, &u.f_empty)) return true;
         }
+        /* ../target/riscv/insn16.decode:88 */
         decode_insn16_extract_c_addi4spn(ctx, &u.f_i, insn);
         if (trans_addi(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00000001:
         /* 000..... ......01 */
+        /* ../target/riscv/insn16.decode:96 */
         decode_insn16_extract_ci(ctx, &u.f_i, insn);
         if (trans_addi(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00000002:
         /* 000..... ......10 */
+        /* ../target/riscv/insn16.decode:115 */
         decode_insn16_extract_c_shift2(ctx, &u.f_shift, insn);
         if (trans_slli(ctx, &u.f_shift)) return true;
-        return false;
+        break;
     case 0x00002000:
         /* 001..... ......00 */
+        /* ../target/riscv/insn16.decode:90 */
         decode_insn16_extract_cl_d(ctx, &u.f_i, insn);
         if (trans_fld(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00002001:
         /* 001..... ......01 */
+        /* /home/amaanq/projects/qemu/target/riscv/insn16-32.decode:24 */
         decode_insn16_extract_cj(ctx, &u.f_j, insn);
         u.f_j.rd = 1;
         if (trans_jal(ctx, &u.f_j)) return true;
-        return false;
+        break;
     case 0x00002002:
         /* 001..... ......10 */
+        /* ../target/riscv/insn16.decode:116 */
         decode_insn16_extract_c_ldsp(ctx, &u.f_i, insn);
         if (trans_fld(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00004000:
         /* 010..... ......00 */
+        /* ../target/riscv/insn16.decode:91 */
         decode_insn16_extract_cl_w(ctx, &u.f_i, insn);
         if (trans_lw(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00004001:
         /* 010..... ......01 */
+        /* ../target/riscv/insn16.decode:97 */
         decode_insn16_extract_c_li(ctx, &u.f_i, insn);
         if (trans_addi(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00004002:
         /* 010..... ......10 */
         if ((insn & 0x00000f80) == 0x00000000) {
             /* 010.0000 0.....10 */
+            /* ../target/riscv/insn16.decode:118 */
             decode_insn16_extract_decode_insn16_Fmt_22(ctx, &u.f_empty, insn);
             if (trans_illegal(ctx, &u.f_empty)) return true;
         }
+        /* ../target/riscv/insn16.decode:119 */
         decode_insn16_extract_c_lwsp(ctx, &u.f_i, insn);
         if (trans_lw(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00006000:
         /* 011..... ......00 */
+        /* /home/amaanq/projects/qemu/target/riscv/insn16-32.decode:20 */
         decode_insn16_extract_cl_w(ctx, &u.f_i, insn);
         if (trans_flw(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00006001:
         /* 011..... ......01 */
         if ((insn & 0x0000107c) == 0x00000000) {
             /* 0110.... .0000001 */
+            /* ../target/riscv/insn16.decode:99 */
             decode_insn16_extract_decode_insn16_Fmt_22(ctx, &u.f_empty, insn);
             if (trans_illegal(ctx, &u.f_empty)) return true;
         }
         if ((insn & 0x00000f80) == 0x00000100) {
             /* 011.0001 0.....01 */
+            /* ../target/riscv/insn16.decode:100 */
             decode_insn16_extract_c_addi16sp(ctx, &u.f_i, insn);
             if (trans_addi(ctx, &u.f_i)) return true;
         }
+        /* ../target/riscv/insn16.decode:101 */
         decode_insn16_extract_c_lui(ctx, &u.f_u, insn);
         if (trans_lui(ctx, &u.f_u)) return true;
-        return false;
+        break;
     case 0x00006002:
         /* 011..... ......10 */
+        /* /home/amaanq/projects/qemu/target/riscv/insn16-32.decode:27 */
         decode_insn16_extract_c_lwsp(ctx, &u.f_i, insn);
         if (trans_flw(ctx, &u.f_i)) return true;
-        return false;
+        break;
     case 0x00008001:
         /* 100..... ......01 */
         switch ((insn >> 10) & 0x3) {
         case 0x0:
             /* 100.00.. ......01 */
+            /* ../target/riscv/insn16.decode:103 */
             decode_insn16_extract_c_shift(ctx, &u.f_shift, insn);
             if (trans_srli(ctx, &u.f_shift)) return true;
-            return false;
+            break;
         case 0x1:
             /* 100.01.. ......01 */
+            /* ../target/riscv/insn16.decode:104 */
             decode_insn16_extract_c_shift(ctx, &u.f_shift, insn);
             if (trans_srai(ctx, &u.f_shift)) return true;
-            return false;
+            break;
         case 0x2:
             /* 100.10.. ......01 */
+            /* ../target/riscv/insn16.decode:105 */
             decode_insn16_extract_c_andi(ctx, &u.f_i, insn);
             if (trans_andi(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x3:
             /* 100.11.. ......01 */
             decode_insn16_extract_cs_2(ctx, &u.f_r, insn);
             switch (insn & 0x00001060) {
             case 0x00000000:
                 /* 100011.. .00...01 */
+                /* ../target/riscv/insn16.decode:106 */
                 if (trans_sub(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x00000020:
                 /* 100011.. .01...01 */
+                /* ../target/riscv/insn16.decode:107 */
                 if (trans_xor(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x00000040:
                 /* 100011.. .10...01 */
+                /* ../target/riscv/insn16.decode:108 */
                 if (trans_or(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x00000060:
                 /* 100011.. .11...01 */
+                /* ../target/riscv/insn16.decode:109 */
                 if (trans_and(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00008002:
         /* 100..... ......10 */
         switch ((insn >> 12) & 0x1) {
@@ -353,82 +376,97 @@ static bool decode_insn16(DisasContext *ctx, uint16_t insn)
             /* 1000.... ......10 */
             if ((insn & 0x00000ffc) == 0x00000000) {
                 /* 10000000 00000010 */
+                /* ../target/riscv/insn16.decode:122 */
                 decode_insn16_extract_decode_insn16_Fmt_22(ctx, &u.f_empty, insn);
                 if (trans_illegal(ctx, &u.f_empty)) return true;
             }
             if ((insn & 0x0000007c) == 0x00000000) {
                 /* 1000.... .0000010 */
+                /* ../target/riscv/insn16.decode:123 */
                 decode_insn16_extract_c_jalr(ctx, &u.f_i, insn);
                 u.f_i.rd = 0;
                 if (trans_jalr(ctx, &u.f_i)) return true;
             }
+            /* ../target/riscv/insn16.decode:124 */
             decode_insn16_extract_c_mv(ctx, &u.f_i, insn);
             if (trans_addi(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x1:
             /* 1001.... ......10 */
             if ((insn & 0x00000ffc) == 0x00000000) {
                 /* 10010000 00000010 */
+                /* ../target/riscv/insn16.decode:127 */
                 decode_insn16_extract_decode_insn16_Fmt_22(ctx, &u.f_empty, insn);
                 if (trans_ebreak(ctx, &u.f_empty)) return true;
             }
             if ((insn & 0x0000007c) == 0x00000000) {
                 /* 1001.... .0000010 */
+                /* ../target/riscv/insn16.decode:128 */
                 decode_insn16_extract_c_jalr(ctx, &u.f_i, insn);
                 u.f_i.rd = 1;
                 if (trans_jalr(ctx, &u.f_i)) return true;
             }
+            /* ../target/riscv/insn16.decode:129 */
             decode_insn16_extract_cr(ctx, &u.f_r, insn);
             if (trans_add(ctx, &u.f_r)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0000a000:
         /* 101..... ......00 */
+        /* ../target/riscv/insn16.decode:92 */
         decode_insn16_extract_cs_d(ctx, &u.f_s, insn);
         if (trans_fsd(ctx, &u.f_s)) return true;
-        return false;
+        break;
     case 0x0000a001:
         /* 101..... ......01 */
+        /* ../target/riscv/insn16.decode:110 */
         decode_insn16_extract_cj(ctx, &u.f_j, insn);
         u.f_j.rd = 0;
         if (trans_jal(ctx, &u.f_j)) return true;
-        return false;
+        break;
     case 0x0000a002:
         /* 101..... ......10 */
+        /* ../target/riscv/insn16.decode:131 */
         decode_insn16_extract_c_sdsp(ctx, &u.f_s, insn);
         if (trans_fsd(ctx, &u.f_s)) return true;
-        return false;
+        break;
     case 0x0000c000:
         /* 110..... ......00 */
+        /* ../target/riscv/insn16.decode:93 */
         decode_insn16_extract_cs_w(ctx, &u.f_s, insn);
         if (trans_sw(ctx, &u.f_s)) return true;
-        return false;
+        break;
     case 0x0000c001:
         /* 110..... ......01 */
+        /* ../target/riscv/insn16.decode:111 */
         decode_insn16_extract_cb_z(ctx, &u.f_b, insn);
         if (trans_beq(ctx, &u.f_b)) return true;
-        return false;
+        break;
     case 0x0000c002:
         /* 110..... ......10 */
+        /* ../target/riscv/insn16.decode:132 */
         decode_insn16_extract_c_swsp(ctx, &u.f_s, insn);
         if (trans_sw(ctx, &u.f_s)) return true;
-        return false;
+        break;
     case 0x0000e000:
         /* 111..... ......00 */
+        /* /home/amaanq/projects/qemu/target/riscv/insn16-32.decode:21 */
         decode_insn16_extract_cs_w(ctx, &u.f_s, insn);
         if (trans_fsw(ctx, &u.f_s)) return true;
-        return false;
+        break;
     case 0x0000e001:
         /* 111..... ......01 */
+        /* ../target/riscv/insn16.decode:112 */
         decode_insn16_extract_cb_z(ctx, &u.f_b, insn);
         if (trans_bne(ctx, &u.f_b)) return true;
-        return false;
+        break;
     case 0x0000e002:
         /* 111..... ......10 */
+        /* /home/amaanq/projects/qemu/target/riscv/insn16-32.decode:28 */
         decode_insn16_extract_c_swsp(ctx, &u.f_s, insn);
         if (trans_fsw(ctx, &u.f_s)) return true;
-        return false;
+        break;
     }
     return false;
 }

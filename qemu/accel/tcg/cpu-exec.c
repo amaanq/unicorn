@@ -223,9 +223,9 @@ static inline void tb_add_jump(TranslationBlock *tb, int n,
     }
     /* Atomically claim the jump destination slot only if it was NULL */
 #ifdef _MSC_VER
-    old = atomic_cmpxchg((long *)&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
+    old = qatomic_cmpxchg((long *)&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
 #else
-    old = atomic_cmpxchg(&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
+    old = qatomic_cmpxchg(&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
 #endif
     if (old) {
         goto out_unlock_next;
@@ -300,9 +300,8 @@ static inline bool cpu_handle_halt(CPUState *cpu)
 {
     if (cpu->halted) {
 #if 0
-#if defined(TARGET_I386)
-        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
-            && replay_interrupt()) {
+#if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
+        if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
             X86CPU *x86_cpu = X86_CPU(cpu);
             apic_poll_irq(x86_cpu->apic_state);
             cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
@@ -473,7 +472,14 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
            and via longjmp via cpu_loop_exit.  */
         else {
             if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-                //replay_interrupt();
+                // if (need_replay_interrupt(interrupt_request)) {
+                //     replay_interrupt();
+                // }
+                /*
+                 * After processing the interrupt, ensure an EXCP_DEBUG is
+                 * raised when single-stepping so that GDB doesn't miss the
+                 * next instruction.
+                 */
                 cpu->exception_index = -1;
                 *last_tb = NULL;
             }
@@ -490,7 +496,8 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
     }
 
     /* Finally, check if we need to exit to the main loop.  */
-    if (unlikely(cpu->exit_request)) {
+    if (unlikely(cpu->exit_request)
+            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0) {
         cpu->exit_request = 0;
         if (cpu->exception_index == -1) {
             cpu->exception_index = EXCP_INTERRUPT;

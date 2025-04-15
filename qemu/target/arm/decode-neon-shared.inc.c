@@ -72,21 +72,21 @@ static bool trans_VFML_scalar(DisasContext *ctx, arg_VFML_scalar *a);
 static void disas_neon_shared_extract_disas_neon_shared_Fmt_0(DisasContext *ctx, arg_disas_neon_shared0 *a, uint32_t insn)
 {
     a->rot = extract32(insn, 23, 2);
-    a->size = extract32(insn, 20, 1);
     a->q = extract32(insn, 6, 1);
     a->vm = deposit32(extract32(insn, 0, 4), 4, 28, extract32(insn, 5, 1));
     a->vn = deposit32(extract32(insn, 16, 4), 4, 28, extract32(insn, 7, 1));
     a->vd = deposit32(extract32(insn, 12, 4), 4, 28, extract32(insn, 22, 1));
+    a->size = plus1(ctx, extract32(insn, 20, 1));
 }
 
 static void disas_neon_shared_extract_disas_neon_shared_Fmt_1(DisasContext *ctx, arg_disas_neon_shared0 *a, uint32_t insn)
 {
     a->rot = extract32(insn, 24, 1);
-    a->size = extract32(insn, 20, 1);
     a->q = extract32(insn, 6, 1);
     a->vm = deposit32(extract32(insn, 0, 4), 4, 28, extract32(insn, 5, 1));
     a->vn = deposit32(extract32(insn, 16, 4), 4, 28, extract32(insn, 7, 1));
     a->vd = deposit32(extract32(insn, 12, 4), 4, 28, extract32(insn, 22, 1));
+    a->size = plus1(ctx, extract32(insn, 20, 1));
 }
 
 static void disas_neon_shared_extract_disas_neon_shared_Fmt_2(DisasContext *ctx, arg_disas_neon_shared1 *a, uint32_t insn)
@@ -124,7 +124,7 @@ static void disas_neon_shared_extract_disas_neon_shared_Fmt_5(DisasContext *ctx,
     a->vm = extract32(insn, 0, 4);
     a->vn = deposit32(extract32(insn, 16, 4), 4, 28, extract32(insn, 7, 1));
     a->vd = deposit32(extract32(insn, 12, 4), 4, 28, extract32(insn, 22, 1));
-    a->size = 0;
+    a->size = 1;
 }
 
 static void disas_neon_shared_extract_disas_neon_shared_Fmt_6(DisasContext *ctx, arg_disas_neon_shared3 *a, uint32_t insn)
@@ -134,7 +134,7 @@ static void disas_neon_shared_extract_disas_neon_shared_Fmt_6(DisasContext *ctx,
     a->vm = deposit32(extract32(insn, 0, 4), 4, 28, extract32(insn, 5, 1));
     a->vn = deposit32(extract32(insn, 16, 4), 4, 28, extract32(insn, 7, 1));
     a->vd = deposit32(extract32(insn, 12, 4), 4, 28, extract32(insn, 22, 1));
-    a->size = 1;
+    a->size = 2;
     a->index = 0;
 }
 
@@ -190,82 +190,92 @@ static bool disas_neon_shared(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 23) & 0x1) {
             case 0x1:
                 /* 1111110. 1.0..... ....1000 ...0.... */
+                /* ../target/arm/neon-shared.decode:46 */
                 if (trans_VCADD(ctx, &u.f_disas_neon_shared0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00200000:
             /* 1111110. ..1..... ....1000 ...0.... */
+            /* ../target/arm/neon-shared.decode:43 */
             disas_neon_shared_extract_disas_neon_shared_Fmt_0(ctx, &u.f_disas_neon_shared0, insn);
             if (trans_VCMLA(ctx, &u.f_disas_neon_shared0)) return true;
-            return false;
+            break;
         case 0x00200010:
             /* 1111110. ..1..... ....1000 ...1.... */
             switch (insn & 0x01100040) {
             case 0x00000000:
                 /* 11111100 ..10.... ....1000 .0.1.... */
+                /* ../target/arm/neon-shared.decode:54 */
                 disas_neon_shared_extract_disas_neon_shared_Fmt_3(ctx, &u.f_disas_neon_shared2, insn);
                 if (trans_VFML(ctx, &u.f_disas_neon_shared2)) return true;
-                return false;
+                break;
             case 0x00000040:
                 /* 11111100 ..10.... ....1000 .1.1.... */
+                /* ../target/arm/neon-shared.decode:56 */
                 disas_neon_shared_extract_disas_neon_shared_Fmt_4(ctx, &u.f_disas_neon_shared2, insn);
                 if (trans_VFML(ctx, &u.f_disas_neon_shared2)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xfc000d00:
         /* 1111110. ........ ....1101 ........ */
         disas_neon_shared_extract_disas_neon_shared_Fmt_2(ctx, &u.f_disas_neon_shared1, insn);
         switch (insn & 0x01b00000) {
         case 0x00200000:
             /* 11111100 0.10.... ....1101 ........ */
+            /* ../target/arm/neon-shared.decode:50 */
             if (trans_VDOT(ctx, &u.f_disas_neon_shared1)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xfe000800:
         /* 1111111. ........ ....1000 ........ */
         switch (insn & 0x01800010) {
         case 0x00000000:
             /* 11111110 0....... ....1000 ...0.... */
+            /* ../target/arm/neon-shared.decode:59 */
             disas_neon_shared_extract_disas_neon_shared_Fmt_5(ctx, &u.f_disas_neon_shared3, insn);
             if (trans_VCMLA_scalar(ctx, &u.f_disas_neon_shared3)) return true;
-            return false;
+            break;
         case 0x00000010:
             /* 11111110 0....... ....1000 ...1.... */
             switch (insn & 0x00200040) {
             case 0x00000000:
                 /* 11111110 0.0..... ....1000 .0.1.... */
+                /* ../target/arm/neon-shared.decode:69 */
                 disas_neon_shared_extract_disas_neon_shared_Fmt_8(ctx, &u.f_disas_neon_shared5, insn);
                 if (trans_VFML_scalar(ctx, &u.f_disas_neon_shared5)) return true;
-                return false;
+                break;
             case 0x00000040:
                 /* 11111110 0.0..... ....1000 .1.1.... */
+                /* ../target/arm/neon-shared.decode:71 */
                 disas_neon_shared_extract_disas_neon_shared_Fmt_9(ctx, &u.f_disas_neon_shared5, insn);
                 if (trans_VFML_scalar(ctx, &u.f_disas_neon_shared5)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00800000:
             /* 11111110 1....... ....1000 ...0.... */
+            /* ../target/arm/neon-shared.decode:61 */
             disas_neon_shared_extract_disas_neon_shared_Fmt_6(ctx, &u.f_disas_neon_shared3, insn);
             if (trans_VCMLA_scalar(ctx, &u.f_disas_neon_shared3)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xfe000d00:
         /* 1111111. ........ ....1101 ........ */
         disas_neon_shared_extract_disas_neon_shared_Fmt_7(ctx, &u.f_disas_neon_shared4, insn);
         switch (insn & 0x01b00000) {
         case 0x00200000:
             /* 11111110 0.10.... ....1101 ........ */
+            /* ../target/arm/neon-shared.decode:64 */
             if (trans_VDOT_scalar(ctx, &u.f_disas_neon_shared4)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }

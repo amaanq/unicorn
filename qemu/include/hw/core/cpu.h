@@ -98,6 +98,8 @@ struct TranslationBlock;
  * @cpu_exec_interrupt: Callback for processing interrupts in cpu_exec.
  * @adjust_watchpoint_address: Perform a target-specific adjustment to an
  * address before attempting to match it against watchpoints.
+ * @deprecation_note: If this CPUClass is deprecated, this field provides
+ *                    related information.
  *
  * Represents a CPU family or model.
  */
@@ -261,6 +263,10 @@ struct CPUState {
     bool created;
     bool stop;
     bool stopped;
+
+    /* Should CPU start in powered-off state? */
+    bool start_powered_off;
+
     bool unplug;
     bool crash_occurred;
     bool exit_request;
@@ -456,10 +462,6 @@ static inline bool cpu_has_work(CPUState *cpu)
  */
 bool cpu_is_stopped(CPUState *cpu);
 
-typedef void (*CPUInterruptHandler)(CPUState *, int);
-
-extern CPUInterruptHandler cpu_interrupt_handler;
-
 /**
  * cpu_interrupt:
  * @cpu: The CPU to set an interrupt on.
@@ -467,10 +469,7 @@ extern CPUInterruptHandler cpu_interrupt_handler;
  *
  * Invokes the interrupt handler.
  */
-static inline void cpu_interrupt(CPUState *cpu, int mask)
-{
-    cpu_interrupt_handler(cpu, mask);
-}
+void cpu_interrupt(CPUState *cpu, int mask);
 
 #ifdef NEED_CPU_H
 

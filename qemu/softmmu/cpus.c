@@ -32,7 +32,7 @@
 #include "uc_priv.h"
 
 
-int64_t cpu_icount_to_ns(int64_t icount)
+int64_t icount_to_ns(int64_t icount)
 {
     // return icount << atomic_read(&timers_state.icount_time_shift);
     // from configure_icount(QemuOpts *opts, Error **errp)

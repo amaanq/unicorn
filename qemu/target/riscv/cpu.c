@@ -21,6 +21,7 @@
 #include "qemu/ctype.h"
 #include "qemu/log.h"
 #include "cpu.h"
+#include "internals.h"
 #include "exec/exec-all.h"
 #include "fpu/softfloat-helpers.h"
 
@@ -44,6 +45,63 @@ const char *const riscv_fpr_regnames[] = {
     "f18/fs2",  "f19/fs3", "f20/fs4",  "f21/fs5",  "f22/fs6", "f23/fs7",
     "f24/fs8",  "f25/fs9", "f26/fs10", "f27/fs11", "f28/ft8", "f29/ft9",
     "f30/ft10", "f31/ft11"};
+
+const char * const riscv_excp_names[] = {
+    "misaligned_fetch",
+    "fault_fetch",
+    "illegal_instruction",
+    "breakpoint",
+    "misaligned_load",
+    "fault_load",
+    "misaligned_store",
+    "fault_store",
+    "user_ecall",
+    "supervisor_ecall",
+    "hypervisor_ecall",
+    "machine_ecall",
+    "exec_page_fault",
+    "load_page_fault",
+    "reserved",
+    "store_page_fault",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "guest_exec_page_fault",
+    "guest_load_page_fault",
+    "reserved",
+    "guest_store_page_fault",
+};
+
+const char * const riscv_intr_names[] = {
+    "u_software",
+    "s_software",
+    "vs_software",
+    "m_software",
+    "u_timer",
+    "s_timer",
+    "vs_timer",
+    "m_timer",
+    "u_external",
+    "vs_external",
+    "h_external",
+    "m_external",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved"
+};
+
+const char *riscv_cpu_get_trap_name(target_ulong cause, bool async)
+{
+    if (async) {
+        return (cause < ARRAY_SIZE(riscv_intr_names)) ?
+               riscv_intr_names[cause] : "(unknown)";
+    } else {
+        return (cause < ARRAY_SIZE(riscv_excp_names)) ?
+               riscv_excp_names[cause] : "(unknown)";
+    }
+}
 
 static void set_misa(CPURISCVState *env, target_ulong misa)
 {
@@ -75,7 +133,6 @@ static void riscv_any_cpu_init(CPUState *obj)
     CPURISCVState *env = &RISCV_CPU(obj)->env;
     set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
     set_priv_version(env, PRIV_VERSION_1_11_0);
-    set_resetvec(env, DEFAULT_RSTVEC);
 }
 
 static void riscv_base_cpu_init(CPUState *obj)
@@ -83,7 +140,6 @@ static void riscv_base_cpu_init(CPUState *obj)
     CPURISCVState *env = &RISCV_CPU(obj)->env;
     /* We set this in the realise function */
     set_misa(env, 0);
-    set_resetvec(env, DEFAULT_RSTVEC);
 }
 
 static void rvxx_sifive_u_cpu_init(CPUState *obj)
@@ -91,7 +147,6 @@ static void rvxx_sifive_u_cpu_init(CPUState *obj)
     CPURISCVState *env = &RISCV_CPU(obj)->env;
     set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
     set_priv_version(env, PRIV_VERSION_1_10_0);
-    set_resetvec(env, 0x1004);
 }
 
 static void rvxx_sifive_e_cpu_init(CPUState *obj)
@@ -99,7 +154,6 @@ static void rvxx_sifive_e_cpu_init(CPUState *obj)
     CPURISCVState *env = &RISCV_CPU(obj)->env;
     set_misa(env, RVXLEN | RVI | RVM | RVA | RVC | RVU);
     set_priv_version(env, PRIV_VERSION_1_10_0);
-    set_resetvec(env, 0x1004);
 }
 
 #if defined(TARGET_RISCV32)
@@ -109,7 +163,6 @@ static void rv32_ibex_cpu_init(CPUState *obj)
     CPURISCVState *env = &RISCV_CPU(obj)->env;
     set_misa(env, RV32 | RVI | RVM | RVC | RVU);
     set_priv_version(env, PRIV_VERSION_1_10_0);
-    set_resetvec(env, 0x8090);
 }
 
 static void rv32_imafcu_nommu_cpu_init(CPUState *obj)
@@ -205,6 +258,8 @@ static void riscv_cpu_realize(struct uc_struct *uc, CPUState *dev)
     if (cpu->cfg.pmp) {
         set_feature(env, RISCV_FEATURE_PMP);
     }
+
+    set_resetvec(env, cpu->cfg.resetvec);
 
     /* If misa isn't set (rv32 and rv64 machines) set it here */
     if (!env->misa) {

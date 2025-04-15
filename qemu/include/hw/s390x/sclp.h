@@ -110,6 +110,7 @@ QEMU_PACK(typedef struct CPUEntry {
     uint8_t reserved1;
 }) CPUEntry;
 
+#define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
 QEMU_PACK(typedef struct ReadInfo {
     SCCBHeader h;
     uint16_t rnmax;
@@ -132,7 +133,15 @@ QEMU_PACK(typedef struct ReadInfo {
     uint16_t highest_cpu;
     uint8_t  _reserved5[124 - 122];     /* 122-123 */
     uint32_t hmfai;
+    uint8_t  _reserved7[134 - 128];     /* 128-133 */
+    uint8_t  fac134;
+    uint8_t  _reserved8[144 - 135];     /* 135-143 */
     struct CPUEntry entries[];
+    /*
+     * When the Extended-Length SCCB (ELS) feature is enabled the
+     * start of the entries field begins at an offset denoted by the
+     * offset_cpu field, otherwise it's at an offset of 128.
+     */
 }) ReadInfo;
 
 QEMU_PACK(typedef struct ReadCpuInfo {
@@ -177,7 +186,7 @@ QEMU_PACK(typedef struct IoaCfgSccb {
 
 QEMU_PACK(typedef struct SCCB {
     SCCBHeader h;
-    char data[SCCB_DATA_LEN];
+    char data[];
 }) SCCB;
 
 #define TYPE_SCLP "sclp"
@@ -185,18 +194,18 @@ QEMU_PACK(typedef struct SCCB {
 #define SCLP_CLASS(oc) OBJECT_CLASS_CHECK(SCLPDeviceClass, (oc), TYPE_SCLP)
 #define SCLP_GET_CLASS(obj) OBJECT_GET_CLASS(SCLPDeviceClass, (obj), TYPE_SCLP)
 
-typedef struct SCLPEventFacility SCLPEventFacility;
+struct SCLPEventFacility;
 
-typedef struct SCLPDevice {
+struct SCLPDevice {
     /* private */
     CPUState parent_obj;
-    SCLPEventFacility *event_facility;
+    struct SCLPEventFacility *event_facility;
     int increment_size;
 
     /* public */
-} SCLPDevice;
+};
 
-typedef struct SCLPDeviceClass {
+struct SCLPDeviceClass {
     /* private */
     DeviceClass parent_class;
     void (*read_SCP_info)(SCLPDevice *sclp, SCCB *sccb);
@@ -205,7 +214,7 @@ typedef struct SCLPDeviceClass {
     /* public */
     void (*execute)(SCLPDevice *sclp, SCCB *sccb, uint32_t code);
     void (*service_interrupt)(SCLPDevice *sclp, uint32_t sccb);
-} SCLPDeviceClass;
+};
 
 static inline int sccb_data_len(SCCB *sccb)
 {

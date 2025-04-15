@@ -6,7 +6,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -198,7 +198,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
     }
 
     /*
-     * Exception targetting modifiers
+     * Exception targeting modifiers
      *
      * LPES0 is supported on POWER7/8/9
      * LPES1 is not supported (old iSeries mode)
@@ -495,10 +495,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
     case POWERPC_EXCP_ISEG:      /* Instruction segment exception            */
     case POWERPC_EXCP_TRACE:     /* Trace exception                          */
         break;
-    case POWERPC_EXCP_HDECR:     /* Hypervisor decrementer exception         */
-    case POWERPC_EXCP_HDSI:      /* Hypervisor data storage exception        */
     case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage exception */
         msr |= env->error_code;
+    case POWERPC_EXCP_HDECR:     /* Hypervisor decrementer exception         */
+    case POWERPC_EXCP_HDSI:      /* Hypervisor data storage exception        */
     case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception        */
     case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment exception */
     case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt            */
@@ -985,7 +985,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
          * This means we will incorrectly execute past the power management
          * instruction instead of triggering a reset.
          *
-         * It generally means a discrepancy between the wakup conditions in the
+         * It generally means a discrepancy between the wakeup conditions in the
          * processor has_work implementation and the logic in this function.
          */
         cpu_abort(env_cpu(env),
@@ -1163,7 +1163,7 @@ void helper_rfi(CPUPPCState *env)
 void helper_rfid(CPUPPCState *env)
 {
     /*
-     * The architeture defines a number of rules for which bits can
+     * The architecture defines a number of rules for which bits can
      * change but in practice, we handle this in hreg_store_msr()
      * which will be called by do_rfi(), so there is no need to filter
      * here

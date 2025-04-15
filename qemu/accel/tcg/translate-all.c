@@ -1421,7 +1421,7 @@ static inline void tb_remove_from_jmp_list(TranslationBlock *orig, int n_orig)
     int n;
 
     /* mark the LSB of jmp_dest[] so that no further jumps can be inserted */
-    ptr = atomic_or_fetch(&orig->jmp_dest[n_orig], 1);
+    ptr = qatomic_or_fetch(&orig->jmp_dest[n_orig], 1);
     dest = (TranslationBlock *)(ptr & ~1);
     if (dest == NULL) {
         return;
@@ -1470,9 +1470,9 @@ static inline void tb_jmp_unlink(TranslationBlock *dest)
     TB_FOR_EACH_JMP(dest, tb, n) {
         tb_reset_jump(tb, n);
 #ifdef _MSC_VER
-        atomic_and((long *)&tb->jmp_dest[n], (uintptr_t)NULL | 1);
+        qatomic_and((long *)&tb->jmp_dest[n], (uintptr_t)NULL | 1);
 #else
-        atomic_and(&tb->jmp_dest[n], (uintptr_t)NULL | 1);
+        qatomic_and(&tb->jmp_dest[n], (uintptr_t)NULL | 1);
 #endif
         /* No need to clear the list entry; setting the dest ptr is enough */
     }
@@ -2201,4 +2201,10 @@ void tb_exec_lock(struct uc_struct *uc)
 void tb_exec_unlock(struct uc_struct *uc)
 {
     tb_exec_change(uc, false);
+}
+
+void cpu_interrupt(CPUState *cpu, int mask)
+{
+    cpu->interrupt_request |= mask;
+    cpu_neg(cpu)->icount_decr.u16.high = -1;
 }

@@ -16,6 +16,7 @@
 #include "qemu/crc32c.h"
 #include "exec/exec-all.h"
 #include "sysemu/cpus.h"
+#include "sysemu/cpu-timers.h"
 #include "sysemu/tcg.h"
 #include "qemu/range.h"
 #include "qemu/guest-random.h"
@@ -29,7 +30,7 @@
 
 #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
 
-static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+static bool get_phys_addr_lpae(CPUARMState *env, uint64_t address,
                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
                                bool s1_is_el0,
                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
@@ -38,6 +39,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
     UNICORN_NONNULL;
 
 static void switch_mode(CPUARMState *env, int mode);
+static int aa64_va_parameter_tbi(uint64_t tcr, ARMMMUIdx mmu_idx);
 
 static uint64_t raw_read(CPUARMState *env, const ARMCPRegInfo *ri)
 {
@@ -307,13 +309,12 @@ static void tlbimvaa_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
 
 /*
  * Non-IS variants of TLB operations are upgraded to
- * IS versions if we are at NS EL1 and HCR_EL2.FB is set to
+ * IS versions if we are at EL1 and HCR_EL2.FB is effectively set to
  * force broadcast of these operations.
  */
 static bool tlb_force_broadcast(CPUARMState *env)
 {
-    return (env->cp15.hcr_el2 & HCR_FB) &&
-        arm_current_el(env) == 1 && arm_is_secure_below_el3(env);
+    return arm_current_el(env) == 1 && (arm_hcr_el2_eff(env) & HCR_FB);
 }
 
 static void tlbiall_write(CPUARMState *env, const ARMCPRegInfo *ri,
@@ -790,7 +791,7 @@ static uint64_t instructions_get_count(CPUARMState *env)
 
 static int64_t instructions_ns_per(uint64_t icount)
 {
-    return cpu_icount_to_ns((int64_t)icount);
+    return icount_to_ns((int64_t)icount);
 }
 
 static bool pmu_8_1_events_supported(CPUARMState *env)
@@ -1023,7 +1024,7 @@ static bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
         }
     } else {
         prohibited = arm_feature(env, ARM_FEATURE_EL3) &&
-           (env->cp15.mdcr_el3 & MDCR_SPME);
+           !(env->cp15.mdcr_el3 & MDCR_SPME);
     }
 
     if (prohibited && counter == 31) {
@@ -3967,6 +3968,33 @@ static int vae1_tlbmask(CPUARMState *env)
     }
 }
 
+/* Return 56 if TBI is enabled, 64 otherwise. */
+static int tlbbits_for_regime(CPUARMState *env, ARMMMUIdx mmu_idx,
+                              uint64_t addr)
+{
+    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
+    int tbi = aa64_va_parameter_tbi(tcr, mmu_idx);
+    int select = extract64(addr, 55, 1);
+
+    return (tbi >> select) & 1 ? 56 : 64;
+}
+
+static int vae1_tlbbits(CPUARMState *env, uint64_t addr)
+{
+    ARMMMUIdx mmu_idx;
+
+    /* Only the regime of the mmu_idx below is significant. */
+    if (arm_is_secure_below_el3(env)) {
+        mmu_idx = ARMMMUIdx_SE10_0;
+    } else if ((env->cp15.hcr_el2 & (HCR_E2H | HCR_TGE))
+               == (HCR_E2H | HCR_TGE)) {
+        mmu_idx = ARMMMUIdx_E20_0;
+    } else {
+        mmu_idx = ARMMMUIdx_E10_0;
+    }
+    return tlbbits_for_regime(env, mmu_idx, addr);
+}
+
 static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
                                       uint64_t value)
 {
@@ -4101,10 +4129,12 @@ static void tlbi_aa64_vae1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
                                    uint64_t value)
 {
     CPUState *cs = env_cpu(env);
+    struct uc_struct *uc = cs->uc;
     int mask = vae1_tlbmask(env);
     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+    int bits = vae1_tlbbits(env, pageaddr);
 
-    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr, mask);
+    tlb_flush_page_bits_by_mmuidx_all_cpus_synced(uc, cs, pageaddr, mask, bits);
 }
 
 static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
@@ -4116,13 +4146,15 @@ static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
      * flush-last-level-only.
      */
     CPUState *cs = env_cpu(env);
+    struct uc_struct *uc = cs->uc;
     int mask = vae1_tlbmask(env);
     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+    int bits = vae1_tlbbits(env, pageaddr);
 
     if (tlb_force_broadcast(env)) {
-        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr, mask);
+        tlb_flush_page_bits_by_mmuidx_all_cpus_synced(uc, cs, pageaddr, mask, bits);
     } else {
-        tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+        tlb_flush_page_bits_by_mmuidx(cs, pageaddr, mask, bits);
     }
 }
 
@@ -4130,20 +4162,24 @@ static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
                                    uint64_t value)
 {
     CPUState *cs = env_cpu(env);
+    struct uc_struct *uc = cs->uc;
     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+    int bits = tlbbits_for_regime(env, ARMMMUIdx_E2, pageaddr);
 
-    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-                                             ARMMMUIdxBit_E2);
+    tlb_flush_page_bits_by_mmuidx_all_cpus_synced(uc, cs, pageaddr,
+                                                  ARMMMUIdxBit_E2, bits);
 }
 
 static void tlbi_aa64_vae3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
                                    uint64_t value)
 {
     CPUState *cs = env_cpu(env);
+    struct uc_struct *uc = cs->uc;
     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+    int bits = tlbbits_for_regime(env, ARMMMUIdx_SE3, pageaddr);
 
-    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-                                             ARMMMUIdxBit_SE3);
+    tlb_flush_page_bits_by_mmuidx_all_cpus_synced(uc, cs, pageaddr,
+                                                  ARMMMUIdxBit_SE3, bits);
 }
 
 static CPAccessResult aa64_zva_access(CPUARMState *env, const ARMCPRegInfo *ri,
@@ -6091,7 +6127,7 @@ static void define_pmu_regs(ARMCPU *cpu)
 static uint64_t id_pfr1_read(CPUARMState *env, const ARMCPRegInfo *ri)
 {
     ARMCPU *cpu = env_archcpu(env);
-    uint64_t pfr1 = cpu->id_pfr1;
+    uint64_t pfr1 = cpu->isar.id_pfr1;
 
     if (env->gicv3state) {
         pfr1 |= 1 << 28;
@@ -6111,9 +6147,10 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
 }
 
 /* Shared logic between LORID and the rest of the LOR* registers.
- * Secure state has already been delt with.
+ * Secure state exclusion has already been dealt with.
  */
-static CPAccessResult access_lor_ns(CPUARMState *env)
+static CPAccessResult access_lor_ns(CPUARMState *env,
+                                    const ARMCPRegInfo *ri, bool isread)
 {
     int el = arm_current_el(env);
 
@@ -6126,16 +6163,6 @@ static CPAccessResult access_lor_ns(CPUARMState *env)
     return CP_ACCESS_OK;
 }
 
-static CPAccessResult access_lorid(CPUARMState *env, const ARMCPRegInfo *ri,
-                                   bool isread)
-{
-    if (arm_is_secure_below_el3(env)) {
-        /* Access ok in secure mode.  */
-        return CP_ACCESS_OK;
-    }
-    return access_lor_ns(env);
-}
-
 static CPAccessResult access_lor_other(CPUARMState *env,
                                        const ARMCPRegInfo *ri, bool isread)
 {
@@ -6143,7 +6170,7 @@ static CPAccessResult access_lor_other(CPUARMState *env,
         /* Access denied in secure mode.  */
         return CP_ACCESS_TRAP;
     }
-    return access_lor_ns(env);
+    return access_lor_ns(env, ri, isread);
 }
 
 /*
@@ -6170,7 +6197,7 @@ static const ARMCPRegInfo lor_reginfo[] = {
       .type = ARM_CP_CONST, .resetvalue = 0 },
     { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
       .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
-      .access = PL1_R, .accessfn = access_lorid,
+      .access = PL1_R, .accessfn = access_lor_ns,
       .type = ARM_CP_CONST, .resetvalue = 0 },
     REGINFO_SENTINEL
 };
@@ -6335,10 +6362,11 @@ static CPAccessResult access_mte(CPUARMState *env, const ARMCPRegInfo *ri,
 {
     int el = arm_current_el(env);
 
-    if (el < 2 &&
-        arm_feature(env, ARM_FEATURE_EL2) &&
-        !(arm_hcr_el2_eff(env) & HCR_ATA)) {
-        return CP_ACCESS_TRAP_EL2;
+    if (el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
+        uint64_t hcr = arm_hcr_el2_eff(env);
+        if (!(hcr & HCR_ATA) && (!(hcr & HCR_E2H) || !(hcr & HCR_TGE))) {
+            return CP_ACCESS_TRAP_EL2;
+        }
     }
     if (el < 3 &&
         arm_feature(env, ARM_FEATURE_EL3) &&
@@ -6708,7 +6736,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 0,
               .access = PL1_R, .type = ARM_CP_CONST,
               .accessfn = access_aa32_tid3,
-              .resetvalue = cpu->id_pfr0 },
+              .resetvalue = cpu->isar.id_pfr0 },
             /* ID_PFR1 is not a plain ARM_CP_CONST because we don't know
              * the value of the GIC field until after we define these regs.
              */
@@ -7740,6 +7768,35 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
     assert((r->state != ARM_CP_STATE_AA32) || (r->opc0 == 0));
     /* AArch64 regs are all 64 bit so ARM_CP_64BIT is meaningless */
     assert((r->state != ARM_CP_STATE_AA64) || !(r->type & ARM_CP_64BIT));
+    /*
+     * This API is only for Arm's system coprocessors (14 and 15) or
+     * (M-profile or v7A-and-earlier only) for implementation defined
+     * coprocessors in the range 0..7.  Our decode assumes this, since
+     * 8..13 can be used for other insns including VFP and Neon. See
+     * valid_cp() in translate.c.  Assert here that we haven't tried
+     * to use an invalid coprocessor number.
+     */
+    switch (r->state) {
+    case ARM_CP_STATE_BOTH:
+        /* 0 has a special meaning, but otherwise the same rules as AA32. */
+        if (r->cp == 0) {
+            break;
+        }
+        /* fall through */
+    case ARM_CP_STATE_AA32:
+        if (arm_feature(&cpu->env, ARM_FEATURE_V8) &&
+            !arm_feature(&cpu->env, ARM_FEATURE_M)) {
+            assert(r->cp >= 14 && r->cp <= 15);
+        } else {
+            assert(r->cp < 8 || (r->cp >= 14 && r->cp <= 15));
+        }
+        break;
+    case ARM_CP_STATE_AA64:
+        assert(r->cp == 0 || r->cp == CP_REG_ARM64_SYSREG_CP);
+        break;
+    default:
+        g_assert_not_reached();
+    }
     /* The AArch64 pseudocode CheckSystemAccess() specifies that op1
      * encodes a minimum access level for the register. We roll this
      * runtime check into our general permission check code, so check
@@ -9718,6 +9775,7 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
                              target_ulong *page_size, ARMMMUFaultInfo *fi)
 {
     CPUState *cs = env_cpu(env);
+    ARMCPU *cpu = env_archcpu(env);
     int level = 1;
     uint32_t table;
     uint32_t desc;
@@ -9744,7 +9802,7 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
         goto do_fault;
     }
     type = (desc & 3);
-    if (type == 0 || (type == 3 && !arm_feature(env, ARM_FEATURE_PXN))) {
+    if (type == 0 || (type == 3 && !cpu_isar_feature(aa32_pxn, cpu))) {
         /* Section translation fault, or attempt to use the encoding
          * which is Reserved on implementations without PXN.
          */
@@ -9786,7 +9844,7 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
         pxn = desc & 1;
         ns = extract32(desc, 19, 1);
     } else {
-        if (arm_feature(env, ARM_FEATURE_PXN)) {
+        if (cpu_isar_feature(aa32_pxn, cpu)) {
             pxn = (desc >> 2) & 1;
         }
         ns = extract32(desc, 3, 1);
@@ -10143,7 +10201,7 @@ static ARMVAParameters aa32_va_parameters(CPUARMState *env, uint32_t va,
  * @fi: set to fault info if the translation fails
  * @cacheattrs: (if non-NULL) set to the cacheability/shareability attributes
  */
-static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+static bool get_phys_addr_lpae(CPUARMState *env, uint64_t address,
                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
                                bool s1_is_el0,
                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
@@ -11651,7 +11709,7 @@ uint32_t HELPER(usad8)(uint32_t a, uint32_t b)
     uint32_t sum;
     sum = do_usad(a, b);
     sum += do_usad(a >> 8, b >> 8);
-    sum += do_usad(a >> 16, b >>16);
+    sum += do_usad(a >> 16, b >> 16);
     sum += do_usad(a >> 24, b >> 24);
     return sum;
 }

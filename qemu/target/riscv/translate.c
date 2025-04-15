@@ -56,6 +56,7 @@ typedef struct DisasContext {
        to reset this known value.  */
     int frm;
     bool ext_ifencei;
+    bool hlsx;
     /* vector extension */
     bool vill;
     uint8_t lmul;
@@ -93,6 +94,35 @@ static const int tcg_memop_lookup[8] = {
 static inline bool has_ext(DisasContext *ctx, uint32_t ext)
 {
     return ctx->misa & ext;
+}
+
+/*
+ * RISC-V requires NaN-boxing of narrower width floating point values.
+ * This applies when a 32-bit value is assigned to a 64-bit FP register.
+ * For consistency and simplicity, we nanbox results even when the RVD
+ * extension is not present.
+ */
+static void gen_nanbox_s(TCGContext *tcg_ctx, TCGv_i64 out, TCGv_i64 in)
+{
+    tcg_gen_ori_i64(tcg_ctx, out, in, MAKE_64BIT_MASK(32, 32));
+}
+
+/*
+ * A narrow n-bit operation, where n < FLEN, checks that input operands
+ * are correctly Nan-boxed, i.e., all upper FLEN - n bits are 1.
+ * If so, the least-significant bits of the input are used, otherwise the
+ * input value is treated as an n-bit canonical NaN (v2.2 section 9.2).
+ *
+ * Here, the result is always nan-boxed, even the canonical nan.
+ */
+static void gen_check_nanbox_s(TCGContext *tcg_ctx, TCGv_i64 out, TCGv_i64 in)
+{
+    TCGv_i64 t_max = tcg_const_i64(tcg_ctx, 0xffffffff00000000ull);
+    TCGv_i64 t_nan = tcg_const_i64(tcg_ctx, 0xffffffff7fc00000ull);
+
+    tcg_gen_movcond_i64(tcg_ctx, TCG_COND_GEU, out, in, t_max, in, t_nan);
+    tcg_temp_free_i64(tcg_ctx, t_max);
+    tcg_temp_free_i64(tcg_ctx, t_nan);
 }
 
 static void generate_exception(DisasContext *ctx, int excp)
@@ -599,9 +629,9 @@ static int ex_rvc_shifti(DisasContext *ctx, int imm)
 
 /* Include the auto-generated decoder for 32 bit insn */
 #ifdef TARGET_RISCV32
-#include "riscv32/decode_insn32.inc.c"
+#include "riscv32/decode-insn32.inc.c"
 #else
-#include "riscv64/decode_insn32.inc.c"
+#include "riscv64/decode-insn32.inc.c"
 #endif
 
 static bool gen_arith_imm_fn(DisasContext *ctx, arg_i *a,
@@ -751,9 +781,9 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
 
 /* Include the auto-generated decoder for 16 bit insn */
 #ifdef TARGET_RISCV32
-#include "riscv32/decode_insn16.inc.c"
+#include "riscv32/decode-insn16.inc.c"
 #else
-#include "riscv64/decode_insn16.inc.c"
+#include "riscv64/decode-insn16.inc.c"
 #endif
 
 static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
@@ -805,16 +835,6 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
 
     if (riscv_has_ext(env, RVH)) {
         ctx->virt_enabled = riscv_cpu_virt_enabled(env);
-        if (env->priv_ver == PRV_M &&
-            get_field(env->mstatus, MSTATUS_MPRV) &&
-            MSTATUS_MPV_ISSET(env)) {
-            ctx->virt_enabled = true;
-        } else if (env->priv == PRV_S &&
-                   !riscv_cpu_virt_enabled(env) &&
-                   get_field(env->hstatus, HSTATUS_SPRV) &&
-                   get_field(env->hstatus, HSTATUS_SPV)) {
-            ctx->virt_enabled = true;
-        }
     } else {
         ctx->virt_enabled = false;
     }
@@ -823,6 +843,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
     ctx->frm = -1;  /* unknown rounding mode */
     ctx->ext_ifencei = cpu->cfg.ext_ifencei;
     ctx->vlen = cpu->cfg.vlen;
+    ctx->hlsx = FIELD_EX32(tb_flags, TB_FLAGS, HLSX);
     ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
     ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
     ctx->lmul = FIELD_EX32(tb_flags, TB_FLAGS, LMUL);

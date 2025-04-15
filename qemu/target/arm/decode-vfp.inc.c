@@ -49,11 +49,6 @@ typedef struct {
 } arg_disas_vfp15;
 
 typedef struct {
-    int l;
-    int rn;
-} arg_disas_vfp16;
-
-typedef struct {
     int index;
     int rt;
     int size;
@@ -121,12 +116,16 @@ typedef arg_disas_vfp4 arg_VDUP;
 static bool trans_VDUP(DisasContext *ctx, arg_VDUP *a);
 typedef arg_disas_vfp5 arg_VMSR_VMRS;
 static bool trans_VMSR_VMRS(DisasContext *ctx, arg_VMSR_VMRS *a);
+typedef arg_disas_vfp6 arg_VMOV_half;
+static bool trans_VMOV_half(DisasContext *ctx, arg_VMOV_half *a);
 typedef arg_disas_vfp6 arg_VMOV_single;
 static bool trans_VMOV_single(DisasContext *ctx, arg_VMOV_single *a);
 typedef arg_disas_vfp7 arg_VMOV_64_sp;
 static bool trans_VMOV_64_sp(DisasContext *ctx, arg_VMOV_64_sp *a);
 typedef arg_disas_vfp7 arg_VMOV_64_dp;
 static bool trans_VMOV_64_dp(DisasContext *ctx, arg_VMOV_64_dp *a);
+typedef arg_disas_vfp8 arg_VLDR_VSTR_hp;
+static bool trans_VLDR_VSTR_hp(DisasContext *ctx, arg_VLDR_VSTR_hp *a);
 typedef arg_disas_vfp8 arg_VLDR_VSTR_sp;
 static bool trans_VLDR_VSTR_sp(DisasContext *ctx, arg_VLDR_VSTR_sp *a);
 typedef arg_disas_vfp8 arg_VLDR_VSTR_dp;
@@ -135,42 +134,68 @@ typedef arg_disas_vfp9 arg_VLDM_VSTM_sp;
 static bool trans_VLDM_VSTM_sp(DisasContext *ctx, arg_VLDM_VSTM_sp *a);
 typedef arg_disas_vfp9 arg_VLDM_VSTM_dp;
 static bool trans_VLDM_VSTM_dp(DisasContext *ctx, arg_VLDM_VSTM_dp *a);
+typedef arg_disas_vfp0 arg_VMLA_hp;
+static bool trans_VMLA_hp(DisasContext *ctx, arg_VMLA_hp *a);
 typedef arg_disas_vfp0 arg_VMLA_sp;
 static bool trans_VMLA_sp(DisasContext *ctx, arg_VMLA_sp *a);
 typedef arg_disas_vfp0 arg_VMLA_dp;
 static bool trans_VMLA_dp(DisasContext *ctx, arg_VMLA_dp *a);
+typedef arg_disas_vfp0 arg_VMLS_hp;
+static bool trans_VMLS_hp(DisasContext *ctx, arg_VMLS_hp *a);
 typedef arg_disas_vfp0 arg_VMLS_sp;
 static bool trans_VMLS_sp(DisasContext *ctx, arg_VMLS_sp *a);
 typedef arg_disas_vfp0 arg_VMLS_dp;
 static bool trans_VMLS_dp(DisasContext *ctx, arg_VMLS_dp *a);
+typedef arg_disas_vfp0 arg_VNMLS_hp;
+static bool trans_VNMLS_hp(DisasContext *ctx, arg_VNMLS_hp *a);
 typedef arg_disas_vfp0 arg_VNMLS_sp;
 static bool trans_VNMLS_sp(DisasContext *ctx, arg_VNMLS_sp *a);
 typedef arg_disas_vfp0 arg_VNMLS_dp;
 static bool trans_VNMLS_dp(DisasContext *ctx, arg_VNMLS_dp *a);
+typedef arg_disas_vfp0 arg_VNMLA_hp;
+static bool trans_VNMLA_hp(DisasContext *ctx, arg_VNMLA_hp *a);
 typedef arg_disas_vfp0 arg_VNMLA_sp;
 static bool trans_VNMLA_sp(DisasContext *ctx, arg_VNMLA_sp *a);
 typedef arg_disas_vfp0 arg_VNMLA_dp;
 static bool trans_VNMLA_dp(DisasContext *ctx, arg_VNMLA_dp *a);
+typedef arg_disas_vfp0 arg_VMUL_hp;
+static bool trans_VMUL_hp(DisasContext *ctx, arg_VMUL_hp *a);
 typedef arg_disas_vfp0 arg_VMUL_sp;
 static bool trans_VMUL_sp(DisasContext *ctx, arg_VMUL_sp *a);
 typedef arg_disas_vfp0 arg_VMUL_dp;
 static bool trans_VMUL_dp(DisasContext *ctx, arg_VMUL_dp *a);
+typedef arg_disas_vfp0 arg_VNMUL_hp;
+static bool trans_VNMUL_hp(DisasContext *ctx, arg_VNMUL_hp *a);
 typedef arg_disas_vfp0 arg_VNMUL_sp;
 static bool trans_VNMUL_sp(DisasContext *ctx, arg_VNMUL_sp *a);
 typedef arg_disas_vfp0 arg_VNMUL_dp;
 static bool trans_VNMUL_dp(DisasContext *ctx, arg_VNMUL_dp *a);
+typedef arg_disas_vfp0 arg_VADD_hp;
+static bool trans_VADD_hp(DisasContext *ctx, arg_VADD_hp *a);
 typedef arg_disas_vfp0 arg_VADD_sp;
 static bool trans_VADD_sp(DisasContext *ctx, arg_VADD_sp *a);
 typedef arg_disas_vfp0 arg_VADD_dp;
 static bool trans_VADD_dp(DisasContext *ctx, arg_VADD_dp *a);
+typedef arg_disas_vfp0 arg_VSUB_hp;
+static bool trans_VSUB_hp(DisasContext *ctx, arg_VSUB_hp *a);
 typedef arg_disas_vfp0 arg_VSUB_sp;
 static bool trans_VSUB_sp(DisasContext *ctx, arg_VSUB_sp *a);
 typedef arg_disas_vfp0 arg_VSUB_dp;
 static bool trans_VSUB_dp(DisasContext *ctx, arg_VSUB_dp *a);
+typedef arg_disas_vfp0 arg_VDIV_hp;
+static bool trans_VDIV_hp(DisasContext *ctx, arg_VDIV_hp *a);
 typedef arg_disas_vfp0 arg_VDIV_sp;
 static bool trans_VDIV_sp(DisasContext *ctx, arg_VDIV_sp *a);
 typedef arg_disas_vfp0 arg_VDIV_dp;
 static bool trans_VDIV_dp(DisasContext *ctx, arg_VDIV_dp *a);
+typedef arg_disas_vfp0 arg_VFMA_hp;
+static bool trans_VFMA_hp(DisasContext *ctx, arg_VFMA_hp *a);
+typedef arg_disas_vfp0 arg_VFMS_hp;
+static bool trans_VFMS_hp(DisasContext *ctx, arg_VFMS_hp *a);
+typedef arg_disas_vfp0 arg_VFNMA_hp;
+static bool trans_VFNMA_hp(DisasContext *ctx, arg_VFNMA_hp *a);
+typedef arg_disas_vfp0 arg_VFNMS_hp;
+static bool trans_VFNMS_hp(DisasContext *ctx, arg_VFNMS_hp *a);
 typedef arg_disas_vfp0 arg_VFMA_sp;
 static bool trans_VFMA_sp(DisasContext *ctx, arg_VFMA_sp *a);
 typedef arg_disas_vfp0 arg_VFMS_sp;
@@ -187,6 +212,8 @@ typedef arg_disas_vfp0 arg_VFNMA_dp;
 static bool trans_VFNMA_dp(DisasContext *ctx, arg_VFNMA_dp *a);
 typedef arg_disas_vfp0 arg_VFNMS_dp;
 static bool trans_VFNMS_dp(DisasContext *ctx, arg_VFNMS_dp *a);
+typedef arg_disas_vfp10 arg_VMOV_imm_hp;
+static bool trans_VMOV_imm_hp(DisasContext *ctx, arg_VMOV_imm_hp *a);
 typedef arg_disas_vfp10 arg_VMOV_imm_sp;
 static bool trans_VMOV_imm_sp(DisasContext *ctx, arg_VMOV_imm_sp *a);
 typedef arg_disas_vfp10 arg_VMOV_imm_dp;
@@ -195,18 +222,26 @@ typedef arg_disas_vfp1 arg_VMOV_reg_sp;
 static bool trans_VMOV_reg_sp(DisasContext *ctx, arg_VMOV_reg_sp *a);
 typedef arg_disas_vfp1 arg_VMOV_reg_dp;
 static bool trans_VMOV_reg_dp(DisasContext *ctx, arg_VMOV_reg_dp *a);
+typedef arg_disas_vfp1 arg_VABS_hp;
+static bool trans_VABS_hp(DisasContext *ctx, arg_VABS_hp *a);
 typedef arg_disas_vfp1 arg_VABS_sp;
 static bool trans_VABS_sp(DisasContext *ctx, arg_VABS_sp *a);
 typedef arg_disas_vfp1 arg_VABS_dp;
 static bool trans_VABS_dp(DisasContext *ctx, arg_VABS_dp *a);
+typedef arg_disas_vfp1 arg_VNEG_hp;
+static bool trans_VNEG_hp(DisasContext *ctx, arg_VNEG_hp *a);
 typedef arg_disas_vfp1 arg_VNEG_sp;
 static bool trans_VNEG_sp(DisasContext *ctx, arg_VNEG_sp *a);
 typedef arg_disas_vfp1 arg_VNEG_dp;
 static bool trans_VNEG_dp(DisasContext *ctx, arg_VNEG_dp *a);
+typedef arg_disas_vfp1 arg_VSQRT_hp;
+static bool trans_VSQRT_hp(DisasContext *ctx, arg_VSQRT_hp *a);
 typedef arg_disas_vfp1 arg_VSQRT_sp;
 static bool trans_VSQRT_sp(DisasContext *ctx, arg_VSQRT_sp *a);
 typedef arg_disas_vfp1 arg_VSQRT_dp;
 static bool trans_VSQRT_dp(DisasContext *ctx, arg_VSQRT_dp *a);
+typedef arg_disas_vfp11 arg_VCMP_hp;
+static bool trans_VCMP_hp(DisasContext *ctx, arg_VCMP_hp *a);
 typedef arg_disas_vfp11 arg_VCMP_sp;
 static bool trans_VCMP_sp(DisasContext *ctx, arg_VCMP_sp *a);
 typedef arg_disas_vfp11 arg_VCMP_dp;
@@ -219,14 +254,20 @@ typedef arg_disas_vfp12 arg_VCVT_f16_f32;
 static bool trans_VCVT_f16_f32(DisasContext *ctx, arg_VCVT_f16_f32 *a);
 typedef arg_disas_vfp12 arg_VCVT_f16_f64;
 static bool trans_VCVT_f16_f64(DisasContext *ctx, arg_VCVT_f16_f64 *a);
+typedef arg_disas_vfp1 arg_VRINTR_hp;
+static bool trans_VRINTR_hp(DisasContext *ctx, arg_VRINTR_hp *a);
 typedef arg_disas_vfp1 arg_VRINTR_sp;
 static bool trans_VRINTR_sp(DisasContext *ctx, arg_VRINTR_sp *a);
 typedef arg_disas_vfp1 arg_VRINTR_dp;
 static bool trans_VRINTR_dp(DisasContext *ctx, arg_VRINTR_dp *a);
+typedef arg_disas_vfp1 arg_VRINTZ_hp;
+static bool trans_VRINTZ_hp(DisasContext *ctx, arg_VRINTZ_hp *a);
 typedef arg_disas_vfp1 arg_VRINTZ_sp;
 static bool trans_VRINTZ_sp(DisasContext *ctx, arg_VRINTZ_sp *a);
 typedef arg_disas_vfp1 arg_VRINTZ_dp;
 static bool trans_VRINTZ_dp(DisasContext *ctx, arg_VRINTZ_dp *a);
+typedef arg_disas_vfp1 arg_VRINTX_hp;
+static bool trans_VRINTX_hp(DisasContext *ctx, arg_VRINTX_hp *a);
 typedef arg_disas_vfp1 arg_VRINTX_sp;
 static bool trans_VRINTX_sp(DisasContext *ctx, arg_VRINTX_sp *a);
 typedef arg_disas_vfp1 arg_VRINTX_dp;
@@ -235,22 +276,26 @@ typedef arg_disas_vfp1 arg_VCVT_sp;
 static bool trans_VCVT_sp(DisasContext *ctx, arg_VCVT_sp *a);
 typedef arg_disas_vfp1 arg_VCVT_dp;
 static bool trans_VCVT_dp(DisasContext *ctx, arg_VCVT_dp *a);
+typedef arg_disas_vfp13 arg_VCVT_int_hp;
+static bool trans_VCVT_int_hp(DisasContext *ctx, arg_VCVT_int_hp *a);
 typedef arg_disas_vfp13 arg_VCVT_int_sp;
 static bool trans_VCVT_int_sp(DisasContext *ctx, arg_VCVT_int_sp *a);
 typedef arg_disas_vfp13 arg_VCVT_int_dp;
 static bool trans_VCVT_int_dp(DisasContext *ctx, arg_VCVT_int_dp *a);
 typedef arg_disas_vfp1 arg_VJCVT;
 static bool trans_VJCVT(DisasContext *ctx, arg_VJCVT *a);
+typedef arg_disas_vfp14 arg_VCVT_fix_hp;
+static bool trans_VCVT_fix_hp(DisasContext *ctx, arg_VCVT_fix_hp *a);
 typedef arg_disas_vfp14 arg_VCVT_fix_sp;
 static bool trans_VCVT_fix_sp(DisasContext *ctx, arg_VCVT_fix_sp *a);
 typedef arg_disas_vfp14 arg_VCVT_fix_dp;
 static bool trans_VCVT_fix_dp(DisasContext *ctx, arg_VCVT_fix_dp *a);
+typedef arg_disas_vfp15 arg_VCVT_hp_int;
+static bool trans_VCVT_hp_int(DisasContext *ctx, arg_VCVT_hp_int *a);
 typedef arg_disas_vfp15 arg_VCVT_sp_int;
 static bool trans_VCVT_sp_int(DisasContext *ctx, arg_VCVT_sp_int *a);
 typedef arg_disas_vfp15 arg_VCVT_dp_int;
 static bool trans_VCVT_dp_int(DisasContext *ctx, arg_VCVT_dp_int *a);
-typedef arg_disas_vfp16 arg_VLLDM_VLSTM;
-static bool trans_VLLDM_VLSTM(DisasContext *ctx, arg_VLLDM_VLSTM *a);
 
 static void disas_vfp_extract_disas_vfp_Fmt_10(DisasContext *ctx, arg_disas_vfp3 *a, uint32_t insn)
 {
@@ -462,12 +507,6 @@ static void disas_vfp_extract_disas_vfp_Fmt_35(DisasContext *ctx, arg_disas_vfp1
     a->vm = deposit32(extract32(insn, 0, 4), 4, 28, extract32(insn, 5, 1));
 }
 
-static void disas_vfp_extract_disas_vfp_Fmt_36(DisasContext *ctx, arg_disas_vfp16 *a, uint32_t insn)
-{
-    a->l = extract32(insn, 20, 1);
-    a->rn = extract32(insn, 16, 4);
-}
-
 static void disas_vfp_extract_disas_vfp_Fmt_6(DisasContext *ctx, arg_disas_vfp2 *a, uint32_t insn)
 {
     a->u = extract32(insn, 23, 1);
@@ -552,7 +591,6 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
         arg_disas_vfp13 f_disas_vfp13;
         arg_disas_vfp14 f_disas_vfp14;
         arg_disas_vfp15 f_disas_vfp15;
-        arg_disas_vfp16 f_disas_vfp16;
         arg_disas_vfp2 f_disas_vfp2;
         arg_disas_vfp3 f_disas_vfp3;
         arg_disas_vfp4 f_disas_vfp4;
@@ -569,34 +607,23 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 23) & 0x1) {
         case 0x0:
             /* ....1100 0....... ....1010 ........ */
+            disas_vfp_extract_disas_vfp_Fmt_15(ctx, &u.f_disas_vfp7, insn);
             switch (insn & 0x006000d0) {
-            case 0x00200000:
-                /* ....1100 001..... ....1010 00.0.... */
-                disas_vfp_extract_disas_vfp_Fmt_36(ctx, &u.f_disas_vfp16, insn);
-                switch (insn & 0xf000f02f) {
-                case 0xe0000000:
-                    /* 11101100 001..... 00001010 00000000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:217 */
-                    if (trans_VLLDM_VLSTM(ctx, &u.f_disas_vfp16)) return true;
-                    return false;
-                }
-                return false;
             case 0x00400010:
                 /* ....1100 010..... ....1010 00.1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:79 */
-                disas_vfp_extract_disas_vfp_Fmt_15(ctx, &u.f_disas_vfp7, insn);
+                /* ../target/arm/vfp.decode:80 */
                 if (trans_VMOV_64_sp(ctx, &u.f_disas_vfp7)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* ....1100 1....... ....1010 ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:95 */
+            /* ../target/arm/vfp.decode:95 */
             disas_vfp_extract_disas_vfp_Fmt_19(ctx, &u.f_disas_vfp9, insn);
             if (trans_VLDM_VSTM_sp(ctx, &u.f_disas_vfp9)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0c000b00:
         /* ....1100 ........ ....1011 ........ */
         switch ((insn >> 23) & 0x1) {
@@ -606,63 +633,300 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
             switch (insn & 0x006000d0) {
             case 0x00400010:
                 /* ....1100 010..... ....1011 00.1.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:80 */
+                /* ../target/arm/vfp.decode:81 */
                 if (trans_VMOV_64_dp(ctx, &u.f_disas_vfp7)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* ....1100 1....... ....1011 ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:97 */
+            /* ../target/arm/vfp.decode:97 */
             disas_vfp_extract_disas_vfp_Fmt_20(ctx, &u.f_disas_vfp9, insn);
             if (trans_VLDM_VSTM_dp(ctx, &u.f_disas_vfp9)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
+    case 0x0d000900:
+        /* ....1101 ........ ....1001 ........ */
+        disas_vfp_extract_disas_vfp_Fmt_17(ctx, &u.f_disas_vfp8, insn);
+        switch ((insn >> 21) & 0x1) {
+        case 0x0:
+            /* ....1101 ..0..... ....1001 ........ */
+            /* ../target/arm/vfp.decode:83 */
+            if (trans_VLDR_VSTR_hp(ctx, &u.f_disas_vfp8)) return true;
+            break;
+        }
+        break;
     case 0x0d000a00:
         /* ....1101 ........ ....1010 ........ */
         switch ((insn >> 21) & 0x1) {
         case 0x0:
             /* ....1101 ..0..... ....1010 ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:84 */
+            /* ../target/arm/vfp.decode:84 */
             disas_vfp_extract_disas_vfp_Fmt_17(ctx, &u.f_disas_vfp8, insn);
             if (trans_VLDR_VSTR_sp(ctx, &u.f_disas_vfp8)) return true;
-            return false;
+            break;
         case 0x1:
             /* ....1101 ..1..... ....1010 ........ */
             disas_vfp_extract_disas_vfp_Fmt_21(ctx, &u.f_disas_vfp9, insn);
             switch ((insn >> 23) & 0x1) {
             case 0x0:
                 /* ....1101 0.1..... ....1010 ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:100 */
+                /* ../target/arm/vfp.decode:100 */
                 if (trans_VLDM_VSTM_sp(ctx, &u.f_disas_vfp9)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0d000b00:
         /* ....1101 ........ ....1011 ........ */
         switch ((insn >> 21) & 0x1) {
         case 0x0:
             /* ....1101 ..0..... ....1011 ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:85 */
+            /* ../target/arm/vfp.decode:85 */
             disas_vfp_extract_disas_vfp_Fmt_18(ctx, &u.f_disas_vfp8, insn);
             if (trans_VLDR_VSTR_dp(ctx, &u.f_disas_vfp8)) return true;
-            return false;
+            break;
         case 0x1:
             /* ....1101 ..1..... ....1011 ........ */
             disas_vfp_extract_disas_vfp_Fmt_22(ctx, &u.f_disas_vfp9, insn);
             switch ((insn >> 23) & 0x1) {
             case 0x0:
                 /* ....1101 0.1..... ....1011 ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:102 */
+                /* ../target/arm/vfp.decode:102 */
                 if (trans_VLDM_VSTM_dp(ctx, &u.f_disas_vfp9)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
+    case 0x0e000900:
+        /* ....1110 ........ ....1001 ........ */
+        switch (insn & 0x00a00050) {
+        case 0x00000000:
+            /* ....1110 0.0..... ....1001 .0.0.... */
+            disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 0.00.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:106 */
+                if (trans_VMLA_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 0.01.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:114 */
+                if (trans_VNMLS_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            }
+            break;
+        case 0x00000010:
+            /* ....1110 0.0..... ....1001 .0.1.... */
+            disas_vfp_extract_disas_vfp_Fmt_14(ctx, &u.f_disas_vfp6, insn);
+            switch (insn & 0x0040002f) {
+            case 0x00000000:
+                /* ....1110 000..... ....1001 .0010000 */
+                /* ../target/arm/vfp.decode:77 */
+                if (trans_VMOV_half(ctx, &u.f_disas_vfp6)) return true;
+                break;
+            }
+            break;
+        case 0x00000040:
+            /* ....1110 0.0..... ....1001 .1.0.... */
+            disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 0.00.... ....1001 .1.0.... */
+                /* ../target/arm/vfp.decode:110 */
+                if (trans_VMLS_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 0.01.... ....1001 .1.0.... */
+                /* ../target/arm/vfp.decode:118 */
+                if (trans_VNMLA_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            }
+            break;
+        case 0x00200000:
+            /* ....1110 0.1..... ....1001 .0.0.... */
+            disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 0.10.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:122 */
+                if (trans_VMUL_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 0.11.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:130 */
+                if (trans_VADD_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            }
+            break;
+        case 0x00200040:
+            /* ....1110 0.1..... ....1001 .1.0.... */
+            disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 0.10.... ....1001 .1.0.... */
+                /* ../target/arm/vfp.decode:126 */
+                if (trans_VNMUL_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 0.11.... ....1001 .1.0.... */
+                /* ../target/arm/vfp.decode:134 */
+                if (trans_VSUB_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            }
+            break;
+        case 0x00800000:
+            /* ....1110 1.0..... ....1001 .0.0.... */
+            disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 1.00.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:138 */
+                if (trans_VDIV_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 1.01.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:144 */
+                if (trans_VFNMA_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            }
+            break;
+        case 0x00800040:
+            /* ....1110 1.0..... ....1001 .1.0.... */
+            disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+            switch ((insn >> 20) & 0x1) {
+            case 0x1:
+                /* ....1110 1.01.... ....1001 .1.0.... */
+                /* ../target/arm/vfp.decode:145 */
+                if (trans_VFNMS_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            }
+            break;
+        case 0x00a00000:
+            /* ....1110 1.1..... ....1001 .0.0.... */
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 1.10.... ....1001 .0.0.... */
+                /* ../target/arm/vfp.decode:142 */
+                disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+                if (trans_VFMA_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 1.11.... ....1001 .0.0.... */
+                disas_vfp_extract_disas_vfp_Fmt_23(ctx, &u.f_disas_vfp10, insn);
+                switch (insn & 0x000000a0) {
+                case 0x00000000:
+                    /* ....1110 1.11.... ....1001 0000.... */
+                    /* ../target/arm/vfp.decode:157 */
+                    if (trans_VMOV_imm_hp(ctx, &u.f_disas_vfp10)) return true;
+                    break;
+                }
+                break;
+            }
+            break;
+        case 0x00a00040:
+            /* ....1110 1.1..... ....1001 .1.0.... */
+            switch ((insn >> 20) & 0x1) {
+            case 0x0:
+                /* ....1110 1.10.... ....1001 .1.0.... */
+                /* ../target/arm/vfp.decode:143 */
+                disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
+                if (trans_VFMS_hp(ctx, &u.f_disas_vfp0)) return true;
+                break;
+            case 0x1:
+                /* ....1110 1.11.... ....1001 .1.0.... */
+                switch (insn & 0x000a0000) {
+                case 0x00000000:
+                    /* ....1110 1.110.0. ....1001 .1.0.... */
+                    switch ((insn >> 18) & 0x1) {
+                    case 0x0:
+                        /* ....1110 1.11000. ....1001 .1.0.... */
+                        disas_vfp_extract_vfp_dm_ss(ctx, &u.f_disas_vfp1, insn);
+                        switch (insn & 0x00010080) {
+                        case 0x00000080:
+                            /* ....1110 1.110000 ....1001 11.0.... */
+                            /* ../target/arm/vfp.decode:167 */
+                            if (trans_VABS_hp(ctx, &u.f_disas_vfp1)) return true;
+                            break;
+                        case 0x00010000:
+                            /* ....1110 1.110001 ....1001 01.0.... */
+                            /* ../target/arm/vfp.decode:171 */
+                            if (trans_VNEG_hp(ctx, &u.f_disas_vfp1)) return true;
+                            break;
+                        case 0x00010080:
+                            /* ....1110 1.110001 ....1001 11.0.... */
+                            /* ../target/arm/vfp.decode:175 */
+                            if (trans_VSQRT_hp(ctx, &u.f_disas_vfp1)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1:
+                        /* ....1110 1.11010. ....1001 .1.0.... */
+                        /* ../target/arm/vfp.decode:179 */
+                        disas_vfp_extract_disas_vfp_Fmt_25(ctx, &u.f_disas_vfp11, insn);
+                        if (trans_VCMP_hp(ctx, &u.f_disas_vfp11)) return true;
+                        break;
+                    }
+                    break;
+                case 0x00020000:
+                    /* ....1110 1.110.1. ....1001 .1.0.... */
+                    disas_vfp_extract_vfp_dm_ss(ctx, &u.f_disas_vfp1, insn);
+                    switch (insn & 0x00050080) {
+                    case 0x00040000:
+                        /* ....1110 1.110110 ....1001 01.0.... */
+                        /* ../target/arm/vfp.decode:199 */
+                        if (trans_VRINTR_hp(ctx, &u.f_disas_vfp1)) return true;
+                        break;
+                    case 0x00040080:
+                        /* ....1110 1.110110 ....1001 11.0.... */
+                        /* ../target/arm/vfp.decode:203 */
+                        if (trans_VRINTZ_hp(ctx, &u.f_disas_vfp1)) return true;
+                        break;
+                    case 0x00050000:
+                        /* ....1110 1.110111 ....1001 01.0.... */
+                        /* ../target/arm/vfp.decode:207 */
+                        if (trans_VRINTX_hp(ctx, &u.f_disas_vfp1)) return true;
+                        break;
+                    }
+                    break;
+                case 0x00080000:
+                    /* ....1110 1.111.0. ....1001 .1.0.... */
+                    switch ((insn >> 18) & 0x1) {
+                    case 0x0:
+                        /* ....1110 1.11100. ....1001 .1.0.... */
+                        disas_vfp_extract_disas_vfp_Fmt_30(ctx, &u.f_disas_vfp13, insn);
+                        switch ((insn >> 16) & 0x1) {
+                        case 0x0:
+                            /* ....1110 1.111000 ....1001 .1.0.... */
+                            /* ../target/arm/vfp.decode:217 */
+                            if (trans_VCVT_int_hp(ctx, &u.f_disas_vfp13)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1:
+                        /* ....1110 1.11110. ....1001 .1.0.... */
+                        /* ../target/arm/vfp.decode:240 */
+                        disas_vfp_extract_disas_vfp_Fmt_34(ctx, &u.f_disas_vfp15, insn);
+                        if (trans_VCVT_hp_int(ctx, &u.f_disas_vfp15)) return true;
+                        break;
+                    }
+                    break;
+                case 0x000a0000:
+                    /* ....1110 1.111.1. ....1001 .1.0.... */
+                    /* ../target/arm/vfp.decode:232 */
+                    disas_vfp_extract_disas_vfp_Fmt_32(ctx, &u.f_disas_vfp14, insn);
+                    if (trans_VCVT_fix_hp(ctx, &u.f_disas_vfp14)) return true;
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+        break;
     case 0x0e000a00:
         /* ....1110 ........ ....1010 ........ */
         switch (insn & 0x00a00050) {
@@ -672,144 +936,144 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 0.00.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:106 */
+                /* ../target/arm/vfp.decode:107 */
                 if (trans_VMLA_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 0.01.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:112 */
+                /* ../target/arm/vfp.decode:115 */
                 if (trans_VNMLS_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00000010:
             /* ....1110 0.0..... ....1010 .0.1.... */
             disas_vfp_extract_disas_vfp_Fmt_14(ctx, &u.f_disas_vfp6, insn);
             switch (insn & 0x0040002f) {
             case 0x00000000:
                 /* ....1110 000..... ....1010 .0010000 */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:77 */
+                /* ../target/arm/vfp.decode:78 */
                 if (trans_VMOV_single(ctx, &u.f_disas_vfp6)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00000040:
             /* ....1110 0.0..... ....1010 .1.0.... */
             disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 0.00.... ....1010 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:109 */
+                /* ../target/arm/vfp.decode:111 */
                 if (trans_VMLS_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 0.01.... ....1010 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:115 */
+                /* ../target/arm/vfp.decode:119 */
                 if (trans_VNMLA_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00200000:
             /* ....1110 0.1..... ....1010 .0.0.... */
             disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 0.10.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:118 */
+                /* ../target/arm/vfp.decode:123 */
                 if (trans_VMUL_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 0.11.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:124 */
+                /* ../target/arm/vfp.decode:131 */
                 if (trans_VADD_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00200040:
             /* ....1110 0.1..... ....1010 .1.0.... */
             disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 0.10.... ....1010 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:121 */
+                /* ../target/arm/vfp.decode:127 */
                 if (trans_VNMUL_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 0.11.... ....1010 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:127 */
+                /* ../target/arm/vfp.decode:135 */
                 if (trans_VSUB_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00800000:
             /* ....1110 1.0..... ....1010 .0.0.... */
             disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 1.00.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:130 */
+                /* ../target/arm/vfp.decode:139 */
                 if (trans_VDIV_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 1.01.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:135 */
+                /* ../target/arm/vfp.decode:149 */
                 if (trans_VFNMA_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00800040:
             /* ....1110 1.0..... ....1010 .1.0.... */
             disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x1:
                 /* ....1110 1.01.... ....1010 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:136 */
+                /* ../target/arm/vfp.decode:150 */
                 if (trans_VFNMS_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00a00000:
             /* ....1110 1.1..... ....1010 .0.0.... */
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 1.10.... ....1010 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:133 */
+                /* ../target/arm/vfp.decode:147 */
                 disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VFMA_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 1.11.... ....1010 .0.0.... */
                 disas_vfp_extract_disas_vfp_Fmt_23(ctx, &u.f_disas_vfp10, insn);
                 switch (insn & 0x000000a0) {
                 case 0x00000000:
                     /* ....1110 1.11.... ....1010 0000.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:143 */
+                    /* ../target/arm/vfp.decode:159 */
                     if (trans_VMOV_imm_sp(ctx, &u.f_disas_vfp10)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00a00010:
             /* ....1110 1.1..... ....1010 .0.1.... */
             disas_vfp_extract_disas_vfp_Fmt_13(ctx, &u.f_disas_vfp5, insn);
             switch (insn & 0x004000af) {
             case 0x00400000:
                 /* ....1110 111..... ....1010 00010000 */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:76 */
+                /* ../target/arm/vfp.decode:76 */
                 if (trans_VMSR_VMRS(ctx, &u.f_disas_vfp5)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00a00040:
             /* ....1110 1.1..... ....1010 .1.0.... */
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....1110 1.10.... ....1010 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:134 */
+                /* ../target/arm/vfp.decode:148 */
                 disas_vfp_extract_vfp_dnm_s(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VFMS_sp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....1110 1.11.... ....1010 .1.0.... */
                 switch (insn & 0x000a0000) {
@@ -822,84 +1086,84 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
                         switch (insn & 0x00010080) {
                         case 0x00000000:
                             /* ....1110 1.110000 ....1010 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:148 */
+                            /* ../target/arm/vfp.decode:164 */
                             if (trans_VMOV_reg_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x00000080:
                             /* ....1110 1.110000 ....1010 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:151 */
+                            /* ../target/arm/vfp.decode:168 */
                             if (trans_VABS_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x00010000:
                             /* ....1110 1.110001 ....1010 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:154 */
+                            /* ../target/arm/vfp.decode:172 */
                             if (trans_VNEG_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x00010080:
                             /* ....1110 1.110001 ....1010 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:157 */
+                            /* ../target/arm/vfp.decode:176 */
                             if (trans_VSQRT_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....1110 1.11010. ....1010 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:160 */
+                        /* ../target/arm/vfp.decode:181 */
                         disas_vfp_extract_disas_vfp_Fmt_25(ctx, &u.f_disas_vfp11, insn);
                         if (trans_VCMP_sp(ctx, &u.f_disas_vfp11)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00020000:
                     /* ....1110 1.110.1. ....1010 .1.0.... */
                     switch (insn & 0x00050000) {
                     case 0x00000000:
                         /* ....1110 1.110010 ....1010 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:166 */
+                        /* ../target/arm/vfp.decode:187 */
                         disas_vfp_extract_disas_vfp_Fmt_27(ctx, &u.f_disas_vfp12, insn);
                         if (trans_VCVT_f32_f16(ctx, &u.f_disas_vfp12)) return true;
-                        return false;
+                        break;
                     case 0x00010000:
                         /* ....1110 1.110011 ....1010 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:173 */
+                        /* ../target/arm/vfp.decode:194 */
                         disas_vfp_extract_disas_vfp_Fmt_27(ctx, &u.f_disas_vfp12, insn);
                         if (trans_VCVT_f16_f32(ctx, &u.f_disas_vfp12)) return true;
-                        return false;
+                        break;
                     case 0x00040000:
                         /* ....1110 1.110110 ....1010 .1.0.... */
                         disas_vfp_extract_vfp_dm_ss(ctx, &u.f_disas_vfp1, insn);
                         switch ((insn >> 7) & 0x1) {
                         case 0x0:
                             /* ....1110 1.110110 ....1010 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:178 */
+                            /* ../target/arm/vfp.decode:200 */
                             if (trans_VRINTR_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....1110 1.110110 ....1010 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:181 */
+                            /* ../target/arm/vfp.decode:204 */
                             if (trans_VRINTZ_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x00050000:
                         /* ....1110 1.110111 ....1010 .1.0.... */
                         switch ((insn >> 7) & 0x1) {
                         case 0x0:
                             /* ....1110 1.110111 ....1010 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:184 */
+                            /* ../target/arm/vfp.decode:208 */
                             disas_vfp_extract_vfp_dm_ss(ctx, &u.f_disas_vfp1, insn);
                             if (trans_VRINTX_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....1110 1.110111 ....1010 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:189 */
+                            /* ../target/arm/vfp.decode:213 */
                             disas_vfp_extract_vfp_dm_ds(ctx, &u.f_disas_vfp1, insn);
                             if (trans_VCVT_sp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00080000:
                     /* ....1110 1.111.0. ....1010 .1.0.... */
                     switch ((insn >> 18) & 0x1) {
@@ -909,31 +1173,31 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 16) & 0x1) {
                         case 0x0:
                             /* ....1110 1.111000 ....1010 .1.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:193 */
+                            /* ../target/arm/vfp.decode:219 */
                             if (trans_VCVT_int_sp(ctx, &u.f_disas_vfp13)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....1110 1.11110. ....1010 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:212 */
+                        /* ../target/arm/vfp.decode:242 */
                         disas_vfp_extract_disas_vfp_Fmt_34(ctx, &u.f_disas_vfp15, insn);
                         if (trans_VCVT_sp_int(ctx, &u.f_disas_vfp15)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x000a0000:
                     /* ....1110 1.111.1. ....1010 .1.0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:206 */
+                    /* ../target/arm/vfp.decode:234 */
                     disas_vfp_extract_disas_vfp_Fmt_32(ctx, &u.f_disas_vfp14, insn);
                     if (trans_VCVT_fix_sp(ctx, &u.f_disas_vfp14)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0e000b00:
         /* ....1110 ........ ....1011 ........ */
         switch (insn & 0x00100010) {
@@ -943,41 +1207,41 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
             switch (insn & 0x00a00040) {
             case 0x00000000:
                 /* ....1110 0.00.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:107 */
+                /* ../target/arm/vfp.decode:108 */
                 if (trans_VMLA_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00000040:
                 /* ....1110 0.00.... ....1011 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:110 */
+                /* ../target/arm/vfp.decode:112 */
                 if (trans_VMLS_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00200000:
                 /* ....1110 0.10.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:119 */
+                /* ../target/arm/vfp.decode:124 */
                 if (trans_VMUL_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00200040:
                 /* ....1110 0.10.... ....1011 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:122 */
+                /* ../target/arm/vfp.decode:128 */
                 if (trans_VNMUL_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00800000:
                 /* ....1110 1.00.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:131 */
+                /* ../target/arm/vfp.decode:140 */
                 if (trans_VDIV_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00a00000:
                 /* ....1110 1.10.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:138 */
+                /* ../target/arm/vfp.decode:152 */
                 if (trans_VFMA_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00a00040:
                 /* ....1110 1.10.... ....1011 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:139 */
+                /* ../target/arm/vfp.decode:153 */
                 if (trans_VFMS_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00000010:
             /* ....1110 ...0.... ....1011 ...1.... */
             switch (insn & 0x0080000f) {
@@ -993,90 +1257,90 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 6) & 0x1) {
                         case 0x0:
                             /* ....1110 00.0.... ....1011 .0010000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:70 */
+                            /* ../target/arm/vfp.decode:70 */
                             if (trans_VMOV_from_gp(ctx, &u.f_disas_vfp3)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....1110 00.0.... ....1011 ..110000 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:68 */
+                        /* ../target/arm/vfp.decode:68 */
                         disas_vfp_extract_disas_vfp_Fmt_10(ctx, &u.f_disas_vfp3, insn);
                         if (trans_VMOV_from_gp(ctx, &u.f_disas_vfp3)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....1110 01.0.... ....1011 ...10000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:66 */
+                    /* ../target/arm/vfp.decode:66 */
                     disas_vfp_extract_disas_vfp_Fmt_9(ctx, &u.f_disas_vfp3, insn);
                     if (trans_VMOV_from_gp(ctx, &u.f_disas_vfp3)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800000:
                 /* ....1110 1..0.... ....1011 ...10000 */
                 disas_vfp_extract_disas_vfp_Fmt_12(ctx, &u.f_disas_vfp4, insn);
                 switch ((insn >> 6) & 0x1) {
                 case 0x0:
                     /* ....1110 1..0.... ....1011 .0.10000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:73 */
+                    /* ../target/arm/vfp.decode:73 */
                     if (trans_VDUP(ctx, &u.f_disas_vfp4)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00100000:
             /* ....1110 ...1.... ....1011 ...0.... */
             switch (insn & 0x00a00040) {
             case 0x00000000:
                 /* ....1110 0.01.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:113 */
+                /* ../target/arm/vfp.decode:116 */
                 disas_vfp_extract_vfp_dnm_d(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VNMLS_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00000040:
                 /* ....1110 0.01.... ....1011 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:116 */
+                /* ../target/arm/vfp.decode:120 */
                 disas_vfp_extract_vfp_dnm_d(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VNMLA_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00200000:
                 /* ....1110 0.11.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:125 */
+                /* ../target/arm/vfp.decode:132 */
                 disas_vfp_extract_vfp_dnm_d(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VADD_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00200040:
                 /* ....1110 0.11.... ....1011 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:128 */
+                /* ../target/arm/vfp.decode:136 */
                 disas_vfp_extract_vfp_dnm_d(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VSUB_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00800000:
                 /* ....1110 1.01.... ....1011 .0.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:140 */
+                /* ../target/arm/vfp.decode:154 */
                 disas_vfp_extract_vfp_dnm_d(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VFNMA_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00800040:
                 /* ....1110 1.01.... ....1011 .1.0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:141 */
+                /* ../target/arm/vfp.decode:155 */
                 disas_vfp_extract_vfp_dnm_d(ctx, &u.f_disas_vfp0, insn);
                 if (trans_VFNMS_dp(ctx, &u.f_disas_vfp0)) return true;
-                return false;
+                break;
             case 0x00a00000:
                 /* ....1110 1.11.... ....1011 .0.0.... */
                 disas_vfp_extract_disas_vfp_Fmt_24(ctx, &u.f_disas_vfp10, insn);
                 switch (insn & 0x000000a0) {
                 case 0x00000000:
                     /* ....1110 1.11.... ....1011 0000.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:145 */
+                    /* ../target/arm/vfp.decode:161 */
                     if (trans_VMOV_imm_dp(ctx, &u.f_disas_vfp10)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00a00040:
                 /* ....1110 1.11.... ....1011 .1.0.... */
                 switch (insn & 0x000a0000) {
@@ -1089,84 +1353,84 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
                         switch (insn & 0x00010080) {
                         case 0x00000000:
                             /* ....1110 1.110000 ....1011 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:149 */
+                            /* ../target/arm/vfp.decode:165 */
                             if (trans_VMOV_reg_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x00000080:
                             /* ....1110 1.110000 ....1011 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:152 */
+                            /* ../target/arm/vfp.decode:169 */
                             if (trans_VABS_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x00010000:
                             /* ....1110 1.110001 ....1011 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:155 */
+                            /* ../target/arm/vfp.decode:173 */
                             if (trans_VNEG_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x00010080:
                             /* ....1110 1.110001 ....1011 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:158 */
+                            /* ../target/arm/vfp.decode:177 */
                             if (trans_VSQRT_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....1110 1.11010. ....1011 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:162 */
+                        /* ../target/arm/vfp.decode:183 */
                         disas_vfp_extract_disas_vfp_Fmt_26(ctx, &u.f_disas_vfp11, insn);
                         if (trans_VCMP_dp(ctx, &u.f_disas_vfp11)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00020000:
                     /* ....1110 1.110.1. ....1011 .1.0.... */
                     switch (insn & 0x00050000) {
                     case 0x00000000:
                         /* ....1110 1.110010 ....1011 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:168 */
+                        /* ../target/arm/vfp.decode:189 */
                         disas_vfp_extract_disas_vfp_Fmt_28(ctx, &u.f_disas_vfp12, insn);
                         if (trans_VCVT_f64_f16(ctx, &u.f_disas_vfp12)) return true;
-                        return false;
+                        break;
                     case 0x00010000:
                         /* ....1110 1.110011 ....1011 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:175 */
+                        /* ../target/arm/vfp.decode:196 */
                         disas_vfp_extract_disas_vfp_Fmt_29(ctx, &u.f_disas_vfp12, insn);
                         if (trans_VCVT_f16_f64(ctx, &u.f_disas_vfp12)) return true;
-                        return false;
+                        break;
                     case 0x00040000:
                         /* ....1110 1.110110 ....1011 .1.0.... */
                         disas_vfp_extract_vfp_dm_dd(ctx, &u.f_disas_vfp1, insn);
                         switch ((insn >> 7) & 0x1) {
                         case 0x0:
                             /* ....1110 1.110110 ....1011 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:179 */
+                            /* ../target/arm/vfp.decode:201 */
                             if (trans_VRINTR_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....1110 1.110110 ....1011 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:182 */
+                            /* ../target/arm/vfp.decode:205 */
                             if (trans_VRINTZ_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x00050000:
                         /* ....1110 1.110111 ....1011 .1.0.... */
                         switch ((insn >> 7) & 0x1) {
                         case 0x0:
                             /* ....1110 1.110111 ....1011 01.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:185 */
+                            /* ../target/arm/vfp.decode:209 */
                             disas_vfp_extract_vfp_dm_dd(ctx, &u.f_disas_vfp1, insn);
                             if (trans_VRINTX_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....1110 1.110111 ....1011 11.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:190 */
+                            /* ../target/arm/vfp.decode:214 */
                             disas_vfp_extract_vfp_dm_sd(ctx, &u.f_disas_vfp1, insn);
                             if (trans_VCVT_dp(ctx, &u.f_disas_vfp1)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00080000:
                     /* ....1110 1.111.0. ....1011 .1.0.... */
                     switch ((insn >> 18) & 0x1) {
@@ -1175,41 +1439,41 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 16) & 0x1) {
                         case 0x0:
                             /* ....1110 1.111000 ....1011 .1.0.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:195 */
+                            /* ../target/arm/vfp.decode:221 */
                             disas_vfp_extract_disas_vfp_Fmt_31(ctx, &u.f_disas_vfp13, insn);
                             if (trans_VCVT_int_dp(ctx, &u.f_disas_vfp13)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....1110 1.111001 ....1011 .1.0.... */
                             disas_vfp_extract_vfp_dm_sd(ctx, &u.f_disas_vfp1, insn);
                             switch ((insn >> 7) & 0x1) {
                             case 0x1:
                                 /* ....1110 1.111001 ....1011 11.0.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:199 */
+                                /* ../target/arm/vfp.decode:225 */
                                 if (trans_VJCVT(ctx, &u.f_disas_vfp1)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....1110 1.11110. ....1011 .1.0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:214 */
+                        /* ../target/arm/vfp.decode:244 */
                         disas_vfp_extract_disas_vfp_Fmt_35(ctx, &u.f_disas_vfp15, insn);
                         if (trans_VCVT_dp_int(ctx, &u.f_disas_vfp15)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x000a0000:
                     /* ....1110 1.111.1. ....1011 .1.0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:208 */
+                    /* ../target/arm/vfp.decode:236 */
                     disas_vfp_extract_disas_vfp_Fmt_33(ctx, &u.f_disas_vfp14, insn);
                     if (trans_VCVT_fix_dp(ctx, &u.f_disas_vfp14)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00100010:
             /* ....1110 ...1.... ....1011 ...1.... */
             switch (insn & 0x0040000f) {
@@ -1222,29 +1486,29 @@ static bool disas_vfp(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x00800040) {
                     case 0x00000000:
                         /* ....1110 00.1.... ....1011 .0010000 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:63 */
+                        /* ../target/arm/vfp.decode:63 */
                         if (trans_VMOV_to_gp(ctx, &u.f_disas_vfp2)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....1110 .0.1.... ....1011 ..110000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:61 */
+                    /* ../target/arm/vfp.decode:61 */
                     disas_vfp_extract_disas_vfp_Fmt_7(ctx, &u.f_disas_vfp2, insn);
                     if (trans_VMOV_to_gp(ctx, &u.f_disas_vfp2)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00400000:
                 /* ....1110 .1.1.... ....1011 ...10000 */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/vfp.decode:59 */
+                /* ../target/arm/vfp.decode:59 */
                 disas_vfp_extract_disas_vfp_Fmt_6(ctx, &u.f_disas_vfp2, insn);
                 if (trans_VMOV_to_gp(ctx, &u.f_disas_vfp2)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }

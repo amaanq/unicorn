@@ -111,39 +111,44 @@ static bool disas_neon_ls(DisasContext *ctx, uint32_t insn)
     switch (insn & 0xff900000) {
     case 0xf4000000:
         /* 11110100 0..0.... ........ ........ */
+        /* ../target/arm/neon-ls.decode:35 */
         disas_neon_ls_extract_disas_neon_ls_Fmt_0(ctx, &u.f_disas_neon_ls0, insn);
         if (trans_VLDST_multiple(ctx, &u.f_disas_neon_ls0)) return true;
-        return false;
+        break;
     case 0xf4800000:
         /* 11110100 1..0.... ........ ........ */
         switch ((insn >> 10) & 0x3) {
         case 0x0:
             /* 11110100 1..0.... ....00.. ........ */
+            /* ../target/arm/neon-ls.decode:47 */
             disas_neon_ls_extract_disas_neon_ls_Fmt_2(ctx, &u.f_disas_neon_ls2, insn);
             if (trans_VLDST_single(ctx, &u.f_disas_neon_ls2)) return true;
-            return false;
+            break;
         case 0x1:
             /* 11110100 1..0.... ....01.. ........ */
+            /* ../target/arm/neon-ls.decode:49 */
             disas_neon_ls_extract_disas_neon_ls_Fmt_3(ctx, &u.f_disas_neon_ls2, insn);
             if (trans_VLDST_single(ctx, &u.f_disas_neon_ls2)) return true;
-            return false;
+            break;
         case 0x2:
             /* 11110100 1..0.... ....10.. ........ */
+            /* ../target/arm/neon-ls.decode:51 */
             disas_neon_ls_extract_disas_neon_ls_Fmt_4(ctx, &u.f_disas_neon_ls2, insn);
             if (trans_VLDST_single(ctx, &u.f_disas_neon_ls2)) return true;
-            return false;
+            break;
         case 0x3:
             /* 11110100 1..0.... ....11.. ........ */
             disas_neon_ls_extract_disas_neon_ls_Fmt_1(ctx, &u.f_disas_neon_ls1, insn);
             switch ((insn >> 21) & 0x1) {
             case 0x1:
                 /* 11110100 1.10.... ....11.. ........ */
+                /* ../target/arm/neon-ls.decode:40 */
                 if (trans_VLD_all_lanes(ctx, &u.f_disas_neon_ls1)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }

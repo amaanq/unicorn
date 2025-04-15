@@ -49,7 +49,7 @@
  * it anymore.
  *
  * Writers check for concurrent resizes by comparing ht->map before and after
- * acquiring their bucket lock. If they don't match, a resize has occured
+ * acquiring their bucket lock. If they don't match, a resize has occurred
  * while the bucket spinlock was being acquired.
  *
  * Related Work:
@@ -104,11 +104,11 @@ struct qht_iter {
 
 /*
  * Note: reading partially-updated pointers in @pointers could lead to
- * segfaults. We thus access them with atomic_read/set; this guarantees
+ * segfaults. We thus access them with qatomic_read/set; this guarantees
  * that the compiler makes all those accesses atomic. We also need the
- * volatile-like behavior in atomic_read, since otherwise the compiler
+ * volatile-like behavior in qatomic_read, since otherwise the compiler
  * might refetch the pointer.
- * atomic_read's are of course not necessary when the bucket lock is held.
+ * qatomic_read's are of course not necessary when the bucket lock is held.
  *
  * If both ht->lock and b->lock are grabbed, ht->lock should always
  * be grabbed first.

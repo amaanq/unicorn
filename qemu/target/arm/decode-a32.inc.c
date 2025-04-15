@@ -18,7 +18,7 @@ typedef struct {
     int rn;
     int rt;
     int rt2;
-} arg_disas_a3226;
+} arg_disas_a3228;
 
 typedef struct {
     int : 0;
@@ -63,6 +63,23 @@ typedef struct {
     int u;
     int w;
 } arg_ldst_rr;
+
+typedef struct {
+    int cp;
+    int crm;
+    int crn;
+    int opc1;
+    int opc2;
+    int rt;
+} arg_mcr;
+
+typedef struct {
+    int cp;
+    int crm;
+    int opc1;
+    int rt;
+    int rt2;
+} arg_mcrr;
 
 typedef struct {
     int r;
@@ -462,9 +479,9 @@ typedef arg_ldst_ri arg_LDRT_ri;
 static bool trans_LDRT_ri(DisasContext *ctx, arg_LDRT_ri *a);
 typedef arg_ldst_ri arg_LDRBT_ri;
 static bool trans_LDRBT_ri(DisasContext *ctx, arg_LDRBT_ri *a);
-typedef arg_disas_a3226 arg_SWP;
+typedef arg_disas_a3228 arg_SWP;
 static bool trans_SWP(DisasContext *ctx, arg_SWP *a);
-typedef arg_disas_a3226 arg_SWPB;
+typedef arg_disas_a3228 arg_SWPB;
 static bool trans_SWPB(DisasContext *ctx, arg_SWPB *a);
 typedef arg_strex arg_STREX;
 static bool trans_STREX(DisasContext *ctx, arg_STREX *a);
@@ -660,6 +677,14 @@ typedef arg_i arg_B;
 static bool trans_B(DisasContext *ctx, arg_B *a);
 typedef arg_i arg_BL;
 static bool trans_BL(DisasContext *ctx, arg_BL *a);
+typedef arg_mcrr arg_MCRR;
+static bool trans_MCRR(DisasContext *ctx, arg_MCRR *a);
+typedef arg_mcrr arg_MRRC;
+static bool trans_MRRC(DisasContext *ctx, arg_MRRC *a);
+typedef arg_mcr arg_MCR;
+static bool trans_MCR(DisasContext *ctx, arg_MCR *a);
+typedef arg_mcr arg_MRC;
+static bool trans_MRC(DisasContext *ctx, arg_MRC *a);
 typedef arg_i arg_SVC;
 static bool trans_SVC(DisasContext *ctx, arg_SVC *a);
 
@@ -768,7 +793,7 @@ static void disas_a32_extract_disas_a32_Fmt_48(DisasContext *ctx, arg_ldst_block
     a->list = extract32(insn, 0, 16);
 }
 
-static void disas_a32_extract_disas_a32_Fmt_50(DisasContext *ctx, arg_i *a, uint32_t insn)
+static void disas_a32_extract_disas_a32_Fmt_52(DisasContext *ctx, arg_i *a, uint32_t insn)
 {
     a->imm = extract32(insn, 0, 24);
 }
@@ -916,6 +941,25 @@ static void disas_a32_extract_ldst_rs_pw0(DisasContext *ctx, arg_ldst_rr *a, uin
     a->rm = extract32(insn, 0, 4);
     a->p = 0;
     a->w = 0;
+}
+
+static void disas_a32_extract_mcr(DisasContext *ctx, arg_mcr *a, uint32_t insn)
+{
+    a->opc1 = extract32(insn, 21, 3);
+    a->crn = extract32(insn, 16, 4);
+    a->rt = extract32(insn, 12, 4);
+    a->cp = extract32(insn, 8, 4);
+    a->opc2 = extract32(insn, 5, 3);
+    a->crm = extract32(insn, 0, 4);
+}
+
+static void disas_a32_extract_mcrr(DisasContext *ctx, arg_mcrr *a, uint32_t insn)
+{
+    a->rt2 = extract32(insn, 16, 4);
+    a->rt = extract32(insn, 12, 4);
+    a->cp = extract32(insn, 8, 4);
+    a->opc1 = extract32(insn, 4, 4);
+    a->crm = extract32(insn, 0, 4);
 }
 
 static void disas_a32_extract_mov16(DisasContext *ctx, arg_ri *a, uint32_t insn)
@@ -1091,7 +1135,7 @@ static void disas_a32_extract_strex(DisasContext *ctx, arg_strex *a, uint32_t in
     a->rt2 = 15;
 }
 
-static void disas_a32_extract_swp(DisasContext *ctx, arg_disas_a3226 *a, uint32_t insn)
+static void disas_a32_extract_swp(DisasContext *ctx, arg_disas_a3228 *a, uint32_t insn)
 {
     a->rn = extract32(insn, 16, 4);
     a->rt = extract32(insn, 12, 4);
@@ -1103,13 +1147,15 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
     union {
         arg_bfi f_bfi;
         arg_bfx f_bfx;
-        arg_disas_a3226 f_disas_a3226;
+        arg_disas_a3228 f_disas_a3228;
         arg_empty f_empty;
         arg_i f_i;
         arg_ldrex f_ldrex;
         arg_ldst_block f_ldst_block;
         arg_ldst_ri f_ldst_ri;
         arg_ldst_rr f_ldst_rr;
+        arg_mcr f_mcr;
+        arg_mcrr f_mcrr;
         arg_mrs_bank f_mrs_bank;
         arg_mrs_reg f_mrs_reg;
         arg_msr_bank f_msr_bank;
@@ -1140,46 +1186,46 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 21) & 0x7) {
             case 0x0:
                 /* ....0000 000..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:60 */
+                /* ../target/arm/a32.decode:62 */
                 if (trans_AND_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0000 001..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:61 */
+                /* ../target/arm/a32.decode:63 */
                 if (trans_EOR_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x2:
                 /* ....0000 010..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:62 */
+                /* ../target/arm/a32.decode:64 */
                 if (trans_SUB_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ....0000 011..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:63 */
+                /* ../target/arm/a32.decode:65 */
                 if (trans_RSB_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x4:
                 /* ....0000 100..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:64 */
+                /* ../target/arm/a32.decode:66 */
                 if (trans_ADD_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x5:
                 /* ....0000 101..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:65 */
+                /* ../target/arm/a32.decode:67 */
                 if (trans_ADC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x6:
                 /* ....0000 110..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:66 */
+                /* ../target/arm/a32.decode:68 */
                 if (trans_SBC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x7:
                 /* ....0000 111..... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:67 */
+                /* ../target/arm/a32.decode:69 */
                 if (trans_RSC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00000010:
             /* ....0000 ........ ........ ...1.... */
             switch (insn & 0x00600080) {
@@ -1189,16 +1235,16 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 23) & 0x1) {
                 case 0x0:
                     /* ....0000 000..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:92 */
+                    /* ../target/arm/a32.decode:94 */
                     if (trans_AND_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 100..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:96 */
+                    /* ../target/arm/a32.decode:98 */
                     if (trans_ADD_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000080:
                 /* ....0000 .00..... ........ 1..1.... */
                 switch ((insn >> 5) & 0x3) {
@@ -1211,85 +1257,85 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 12) & 0xf) {
                         case 0x0:
                             /* ....0000 000..... 0000.... 1001.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:144 */
+                            /* ../target/arm/a32.decode:146 */
                             if (trans_MUL(ctx, &u.f_s_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 100..... ........ 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:148 */
+                        /* ../target/arm/a32.decode:150 */
                         disas_a32_extract_s_rdamn(ctx, &u.f_s_rrrr, insn);
                         if (trans_UMULL(ctx, &u.f_s_rrrr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 .00..... ........ 1011.... */
                     disas_a32_extract_ldst_rr_pw0(ctx, &u.f_ldst_rr, insn);
                     switch (insn & 0x00100f00) {
                     case 0x00000000:
                         /* ....0000 .000.... ....0000 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:249 */
+                        /* ../target/arm/a32.decode:251 */
                         if (trans_STRH_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     case 0x00100000:
                         /* ....0000 .001.... ....0000 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:258 */
+                        /* ../target/arm/a32.decode:260 */
                         if (trans_LDRH_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x2:
                     /* ....0000 .00..... ........ 1101.... */
                     disas_a32_extract_ldst_rr_pw0(ctx, &u.f_ldst_rr, insn);
                     switch (insn & 0x00100f00) {
                     case 0x00000000:
                         /* ....0000 .000.... ....0000 1101.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:252 */
+                        /* ../target/arm/a32.decode:254 */
                         if (trans_LDRD_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     case 0x00100000:
                         /* ....0000 .001.... ....0000 1101.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:261 */
+                        /* ../target/arm/a32.decode:263 */
                         if (trans_LDRSB_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* ....0000 .00..... ........ 1111.... */
                     disas_a32_extract_ldst_rr_pw0(ctx, &u.f_ldst_rr, insn);
                     switch (insn & 0x00100f00) {
                     case 0x00000000:
                         /* ....0000 .000.... ....0000 1111.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:255 */
+                        /* ../target/arm/a32.decode:257 */
                         if (trans_STRD_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     case 0x00100000:
                         /* ....0000 .001.... ....0000 1111.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:264 */
+                        /* ../target/arm/a32.decode:266 */
                         if (trans_LDRSH_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200000:
                 /* ....0000 .01..... ........ 0..1.... */
                 disas_a32_extract_s_rrr_shr(ctx, &u.f_s_rrr_shr, insn);
                 switch ((insn >> 23) & 0x1) {
                 case 0x0:
                     /* ....0000 001..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:93 */
+                    /* ../target/arm/a32.decode:95 */
                     if (trans_EOR_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 101..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:97 */
+                    /* ../target/arm/a32.decode:99 */
                     if (trans_ADC_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200080:
                 /* ....0000 .01..... ........ 1..1.... */
                 switch ((insn >> 5) & 0x3) {
@@ -1299,72 +1345,72 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 23) & 0x1) {
                     case 0x0:
                         /* ....0000 001..... ........ 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:145 */
+                        /* ../target/arm/a32.decode:147 */
                         if (trans_MLA(ctx, &u.f_s_rrrr)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 101..... ........ 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:149 */
+                        /* ../target/arm/a32.decode:151 */
                         if (trans_UMLAL(ctx, &u.f_s_rrrr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 .01..... ........ 1011.... */
                     disas_a32_extract_ldst_rr_p0w1(ctx, &u.f_ldst_rr, insn);
                     switch (insn & 0x00100f00) {
                     case 0x00000000:
                         /* ....0000 .010.... ....0000 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:272 */
+                        /* ../target/arm/a32.decode:274 */
                         if (trans_STRHT_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     case 0x00100000:
                         /* ....0000 .011.... ....0000 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:273 */
+                        /* ../target/arm/a32.decode:275 */
                         if (trans_LDRHT_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x2:
                     /* ....0000 .01..... ........ 1101.... */
                     disas_a32_extract_ldst_rr_p0w1(ctx, &u.f_ldst_rr, insn);
                     switch (insn & 0x00100f00) {
                     case 0x00100000:
                         /* ....0000 .011.... ....0000 1101.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:274 */
+                        /* ../target/arm/a32.decode:276 */
                         if (trans_LDRSBT_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* ....0000 .01..... ........ 1111.... */
                     disas_a32_extract_ldst_rr_p0w1(ctx, &u.f_ldst_rr, insn);
                     switch (insn & 0x00100f00) {
                     case 0x00100000:
                         /* ....0000 .011.... ....0000 1111.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:275 */
+                        /* ../target/arm/a32.decode:277 */
                         if (trans_LDRSHT_rr(ctx, &u.f_ldst_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00400000:
                 /* ....0000 .10..... ........ 0..1.... */
                 disas_a32_extract_s_rrr_shr(ctx, &u.f_s_rrr_shr, insn);
                 switch ((insn >> 23) & 0x1) {
                 case 0x0:
                     /* ....0000 010..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:94 */
+                    /* ../target/arm/a32.decode:96 */
                     if (trans_SUB_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 110..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:98 */
+                    /* ../target/arm/a32.decode:100 */
                     if (trans_SBC_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00400080:
                 /* ....0000 .10..... ........ 1..1.... */
                 switch ((insn >> 5) & 0x3) {
@@ -1377,85 +1423,85 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 20) & 0x1) {
                         case 0x0:
                             /* ....0000 0100.... ........ 1001.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:146 */
+                            /* ../target/arm/a32.decode:148 */
                             if (trans_UMAAL(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 110..... ........ 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:150 */
+                        /* ../target/arm/a32.decode:152 */
                         disas_a32_extract_s_rdamn(ctx, &u.f_s_rrrr, insn);
                         if (trans_SMULL(ctx, &u.f_s_rrrr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 .10..... ........ 1011.... */
                     disas_a32_extract_ldst_ri8_pw0(ctx, &u.f_ldst_ri, insn);
                     switch ((insn >> 20) & 0x1) {
                     case 0x0:
                         /* ....0000 .100.... ........ 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:310 */
+                        /* ../target/arm/a32.decode:312 */
                         if (trans_STRH_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 .101.... ........ 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:319 */
+                        /* ../target/arm/a32.decode:321 */
                         if (trans_LDRH_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x2:
                     /* ....0000 .10..... ........ 1101.... */
                     disas_a32_extract_ldst_ri8_pw0(ctx, &u.f_ldst_ri, insn);
                     switch ((insn >> 20) & 0x1) {
                     case 0x0:
                         /* ....0000 .100.... ........ 1101.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:313 */
+                        /* ../target/arm/a32.decode:315 */
                         if (trans_LDRD_ri_a32(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 .101.... ........ 1101.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:322 */
+                        /* ../target/arm/a32.decode:324 */
                         if (trans_LDRSB_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* ....0000 .10..... ........ 1111.... */
                     disas_a32_extract_ldst_ri8_pw0(ctx, &u.f_ldst_ri, insn);
                     switch ((insn >> 20) & 0x1) {
                     case 0x0:
                         /* ....0000 .100.... ........ 1111.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:316 */
+                        /* ../target/arm/a32.decode:318 */
                         if (trans_STRD_ri_a32(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 .101.... ........ 1111.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:325 */
+                        /* ../target/arm/a32.decode:327 */
                         if (trans_LDRSH_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00600000:
                 /* ....0000 .11..... ........ 0..1.... */
                 disas_a32_extract_s_rrr_shr(ctx, &u.f_s_rrr_shr, insn);
                 switch ((insn >> 23) & 0x1) {
                 case 0x0:
                     /* ....0000 011..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:95 */
+                    /* ../target/arm/a32.decode:97 */
                     if (trans_RSB_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 111..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:99 */
+                    /* ../target/arm/a32.decode:101 */
                     if (trans_RSC_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00600080:
                 /* ....0000 .11..... ........ 1..1.... */
                 switch ((insn >> 5) & 0x3) {
@@ -1468,61 +1514,61 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 20) & 0x1) {
                         case 0x0:
                             /* ....0000 0110.... ........ 1001.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:147 */
+                            /* ../target/arm/a32.decode:149 */
                             if (trans_MLS(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 111..... ........ 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:151 */
+                        /* ../target/arm/a32.decode:153 */
                         disas_a32_extract_s_rdamn(ctx, &u.f_s_rrrr, insn);
                         if (trans_SMLAL(ctx, &u.f_s_rrrr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0000 .11..... ........ 1011.... */
                     disas_a32_extract_ldst_ri8_p0w1(ctx, &u.f_ldst_ri, insn);
                     switch ((insn >> 20) & 0x1) {
                     case 0x0:
                         /* ....0000 .110.... ........ 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:333 */
+                        /* ../target/arm/a32.decode:335 */
                         if (trans_STRHT_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0000 .111.... ........ 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:334 */
+                        /* ../target/arm/a32.decode:336 */
                         if (trans_LDRHT_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x2:
                     /* ....0000 .11..... ........ 1101.... */
                     disas_a32_extract_ldst_ri8_p0w1(ctx, &u.f_ldst_ri, insn);
                     switch ((insn >> 20) & 0x1) {
                     case 0x1:
                         /* ....0000 .111.... ........ 1101.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:335 */
+                        /* ../target/arm/a32.decode:337 */
                         if (trans_LDRSBT_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* ....0000 .11..... ........ 1111.... */
                     disas_a32_extract_ldst_ri8_p0w1(ctx, &u.f_ldst_ri, insn);
                     switch ((insn >> 20) & 0x1) {
                     case 0x1:
                         /* ....0000 .111.... ........ 1111.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:336 */
+                        /* ../target/arm/a32.decode:338 */
                         if (trans_LDRSHT_ri(ctx, &u.f_ldst_ri)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000000:
             /* ....0001 ........ ........ ...0.... */
             switch (insn & 0x00a00000) {
@@ -1541,129 +1587,129 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000f0100) {
                             case 0x000f0000:
                                 /* ....0001 0.001111 ....0000 00000000 */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:226 */
+                                /* ../target/arm/a32.decode:228 */
                                 if (trans_MRS_reg(ctx, &u.f_mrs_reg)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x00000200:
                             /* ....0001 0.00.... ....001. 00000000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:223 */
+                            /* ../target/arm/a32.decode:225 */
                             disas_a32_extract_disas_a32_Fmt_20(ctx, &u.f_mrs_bank, insn);
                             if (trans_MRS_bank(ctx, &u.f_mrs_bank)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x2:
                         /* ....0001 0.00.... ........ 0100.... */
                         disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                         switch (insn & 0x00400f00) {
                         case 0x00000000:
                             /* ....0001 0000.... ....0000 0100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:207 */
+                            /* ../target/arm/a32.decode:209 */
                             if (trans_CRC32B(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         case 0x00000200:
                             /* ....0001 0000.... ....0010 0100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:210 */
+                            /* ../target/arm/a32.decode:212 */
                             if (trans_CRC32CB(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         case 0x00400000:
                             /* ....0001 0100.... ....0000 0100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:209 */
+                            /* ../target/arm/a32.decode:211 */
                             if (trans_CRC32W(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         case 0x00400200:
                             /* ....0001 0100.... ....0010 0100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:212 */
+                            /* ../target/arm/a32.decode:214 */
                             if (trans_CRC32CW(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x4:
                         /* ....0001 0.00.... ........ 1000.... */
                         disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                         switch ((insn >> 22) & 0x1) {
                         case 0x0:
                             /* ....0001 0000.... ........ 1000.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:164 */
+                            /* ../target/arm/a32.decode:166 */
                             if (trans_SMLABB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0100.... ........ 1000.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:172 */
+                            /* ../target/arm/a32.decode:174 */
                             if (trans_SMLALBB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x5:
                         /* ....0001 0.00.... ........ 1010.... */
                         disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                         switch ((insn >> 22) & 0x1) {
                         case 0x0:
                             /* ....0001 0000.... ........ 1010.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:166 */
+                            /* ../target/arm/a32.decode:168 */
                             if (trans_SMLATB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0100.... ........ 1010.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:174 */
+                            /* ../target/arm/a32.decode:176 */
                             if (trans_SMLALTB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x6:
                         /* ....0001 0.00.... ........ 1100.... */
                         disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                         switch ((insn >> 22) & 0x1) {
                         case 0x0:
                             /* ....0001 0000.... ........ 1100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:165 */
+                            /* ../target/arm/a32.decode:167 */
                             if (trans_SMLABT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0100.... ........ 1100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:173 */
+                            /* ../target/arm/a32.decode:175 */
                             if (trans_SMLALBT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x7:
                         /* ....0001 0.00.... ........ 1110.... */
                         disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                         switch ((insn >> 22) & 0x1) {
                         case 0x0:
                             /* ....0001 0000.... ........ 1110.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:167 */
+                            /* ../target/arm/a32.decode:169 */
                             if (trans_SMLATT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0100.... ........ 1110.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:175 */
+                            /* ../target/arm/a32.decode:177 */
                             if (trans_SMLALTT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0001 0.01.... ........ ...0.... */
                     disas_a32_extract_S_xrr_shi(ctx, &u.f_s_rrr_shi, insn);
                     switch (insn & 0x0040f000) {
                     case 0x00000000:
                         /* ....0001 0001.... 0000.... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:68 */
+                        /* ../target/arm/a32.decode:70 */
                         if (trans_TST_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                        return false;
+                        break;
                     case 0x00400000:
                         /* ....0001 0101.... 0000.... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:70 */
+                        /* ../target/arm/a32.decode:72 */
                         if (trans_CMP_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200000:
                 /* ....0001 0.1..... ........ ...0.... */
                 switch ((insn >> 20) & 0x1) {
@@ -1679,187 +1725,187 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                             switch ((insn >> 8) & 0x1) {
                             case 0x0:
                                 /* ....0001 0.10.... 11110000 0000.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:227 */
+                                /* ../target/arm/a32.decode:229 */
                                 if (trans_MSR_reg(ctx, &u.f_msr_reg)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x79:
                             /* ....0001 0.10.... 1111001. 0000.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:224 */
+                            /* ../target/arm/a32.decode:226 */
                             disas_a32_extract_disas_a32_Fmt_21(ctx, &u.f_msr_bank, insn);
                             if (trans_MSR_bank(ctx, &u.f_msr_bank)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0001 0.10.... ........ 0010.... */
                         disas_a32_extract_rm(ctx, &u.f_r, insn);
                         switch (insn & 0x004fff00) {
                         case 0x000fff00:
                             /* ....0001 00101111 11111111 0010.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:230 */
+                            /* ../target/arm/a32.decode:232 */
                             if (trans_BXJ(ctx, &u.f_r)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x2:
                         /* ....0001 0.10.... ........ 0100.... */
                         disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                         switch (insn & 0x00400f00) {
                         case 0x00000000:
                             /* ....0001 0010.... ....0000 0100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:208 */
+                            /* ../target/arm/a32.decode:210 */
                             if (trans_CRC32H(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         case 0x00000200:
                             /* ....0001 0010.... ....0010 0100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:211 */
+                            /* ../target/arm/a32.decode:213 */
                             if (trans_CRC32CH(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x3:
                         /* ....0001 0.10.... ........ 0110.... */
                         disas_a32_extract_disas_a32_Fmt_16(ctx, &u.f_empty, insn);
                         switch (insn & 0x004fff0f) {
                         case 0x0040000e:
                             /* ....0001 01100000 00000000 01101110 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:235 */
+                            /* ../target/arm/a32.decode:237 */
                             if (trans_ERET(ctx, &u.f_empty)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x4:
                         /* ....0001 0.10.... ........ 1000.... */
                         switch ((insn >> 22) & 0x1) {
                         case 0x0:
                             /* ....0001 0010.... ........ 1000.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:168 */
+                            /* ../target/arm/a32.decode:170 */
                             disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                             if (trans_SMLAWB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0110.... ........ 1000.... */
                             disas_a32_extract_rd0mn(ctx, &u.f_rrrr, insn);
                             switch ((insn >> 12) & 0xf) {
                             case 0x0:
                                 /* ....0001 0110.... 0000.... 1000.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:176 */
+                                /* ../target/arm/a32.decode:178 */
                                 if (trans_SMULBB(ctx, &u.f_rrrr)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x5:
                         /* ....0001 0.10.... ........ 1010.... */
                         disas_a32_extract_rd0mn(ctx, &u.f_rrrr, insn);
                         switch (insn & 0x0040f000) {
                         case 0x00000000:
                             /* ....0001 0010.... 0000.... 1010.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:169 */
+                            /* ../target/arm/a32.decode:171 */
                             if (trans_SMULWB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x00400000:
                             /* ....0001 0110.... 0000.... 1010.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:178 */
+                            /* ../target/arm/a32.decode:180 */
                             if (trans_SMULTB(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x6:
                         /* ....0001 0.10.... ........ 1100.... */
                         switch ((insn >> 22) & 0x1) {
                         case 0x0:
                             /* ....0001 0010.... ........ 1100.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:170 */
+                            /* ../target/arm/a32.decode:172 */
                             disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                             if (trans_SMLAWT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0110.... ........ 1100.... */
                             disas_a32_extract_rd0mn(ctx, &u.f_rrrr, insn);
                             switch ((insn >> 12) & 0xf) {
                             case 0x0:
                                 /* ....0001 0110.... 0000.... 1100.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:177 */
+                                /* ../target/arm/a32.decode:179 */
                                 if (trans_SMULBT(ctx, &u.f_rrrr)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x7:
                         /* ....0001 0.10.... ........ 1110.... */
                         disas_a32_extract_rd0mn(ctx, &u.f_rrrr, insn);
                         switch (insn & 0x0040f000) {
                         case 0x00000000:
                             /* ....0001 0010.... 0000.... 1110.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:171 */
+                            /* ../target/arm/a32.decode:173 */
                             if (trans_SMULWT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         case 0x00400000:
                             /* ....0001 0110.... 0000.... 1110.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:179 */
+                            /* ../target/arm/a32.decode:181 */
                             if (trans_SMULTT(ctx, &u.f_rrrr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0001 0.11.... ........ ...0.... */
                     disas_a32_extract_S_xrr_shi(ctx, &u.f_s_rrr_shi, insn);
                     switch (insn & 0x0040f000) {
                     case 0x00000000:
                         /* ....0001 0011.... 0000.... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:69 */
+                        /* ../target/arm/a32.decode:71 */
                         if (trans_TEQ_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                        return false;
+                        break;
                     case 0x00400000:
                         /* ....0001 0111.... 0000.... ...0.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:71 */
+                        /* ../target/arm/a32.decode:73 */
                         if (trans_CMN_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800000:
                 /* ....0001 1.0..... ........ ...0.... */
                 disas_a32_extract_s_rrr_shi(ctx, &u.f_s_rrr_shi, insn);
                 switch ((insn >> 22) & 0x1) {
                 case 0x0:
                     /* ....0001 100..... ........ ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:72 */
+                    /* ../target/arm/a32.decode:74 */
                     if (trans_ORR_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* ....0001 110..... ........ ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:74 */
+                    /* ../target/arm/a32.decode:76 */
                     if (trans_BIC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00a00000:
                 /* ....0001 1.1..... ........ ...0.... */
                 disas_a32_extract_s_rxr_shi(ctx, &u.f_s_rrr_shi, insn);
                 switch (insn & 0x004f0000) {
                 case 0x00000000:
                     /* ....0001 101.0000 ........ ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:73 */
+                    /* ../target/arm/a32.decode:75 */
                     if (trans_MOV_rxri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x00400000:
                     /* ....0001 111.0000 ........ ...0.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:75 */
+                    /* ../target/arm/a32.decode:77 */
                     if (trans_MVN_rxri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000010:
             /* ....0001 ........ ........ ...1.... */
             switch (insn & 0x00400080) {
@@ -1878,32 +1924,32 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                             switch ((insn >> 8) & 0xf) {
                             case 0x0:
                                 /* ....0001 0000.... ....0000 0101.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:157 */
+                                /* ../target/arm/a32.decode:159 */
                                 if (trans_QADD(ctx, &u.f_rrr)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x3:
                             /* ....0001 0000.... ........ 0111.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:237 */
+                            /* ../target/arm/a32.decode:239 */
                             disas_a32_extract_i16(ctx, &u.f_i, insn);
                             if (trans_HLT(ctx, &u.f_i)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0001 0001.... ........ 0..1.... */
                         disas_a32_extract_S_xrr_shr(ctx, &u.f_s_rrr_shr, insn);
                         switch ((insn >> 12) & 0xf) {
                         case 0x0:
                             /* ....0001 0001.... 0000.... 0..1.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:100 */
+                            /* ../target/arm/a32.decode:102 */
                             if (trans_TST_xrrr(ctx, &u.f_s_rrr_shr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00200000:
                     /* ....0001 001..... ........ 0..1.... */
                     switch ((insn >> 20) & 0x1) {
@@ -1916,211 +1962,211 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                             switch ((insn >> 8) & 0xfff) {
                             case 0xfff:
                                 /* ....0001 00101111 11111111 0001.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:229 */
+                                /* ../target/arm/a32.decode:231 */
                                 if (trans_BX(ctx, &u.f_r)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x1:
                             /* ....0001 0010.... ........ 0011.... */
                             disas_a32_extract_rm(ctx, &u.f_r, insn);
                             switch ((insn >> 8) & 0xfff) {
                             case 0xfff:
                                 /* ....0001 00101111 11111111 0011.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:231 */
+                                /* ../target/arm/a32.decode:233 */
                                 if (trans_BLX_r(ctx, &u.f_r)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x2:
                             /* ....0001 0010.... ........ 0101.... */
                             disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                             switch ((insn >> 8) & 0xf) {
                             case 0x0:
                                 /* ....0001 0010.... ....0000 0101.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:158 */
+                                /* ../target/arm/a32.decode:160 */
                                 if (trans_QSUB(ctx, &u.f_rrr)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x3:
                             /* ....0001 0010.... ........ 0111.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:238 */
+                            /* ../target/arm/a32.decode:240 */
                             disas_a32_extract_i16(ctx, &u.f_i, insn);
                             if (trans_BKPT(ctx, &u.f_i)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0001 0011.... ........ 0..1.... */
                         disas_a32_extract_S_xrr_shr(ctx, &u.f_s_rrr_shr, insn);
                         switch ((insn >> 12) & 0xf) {
                         case 0x0:
                             /* ....0001 0011.... 0000.... 0..1.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:101 */
+                            /* ../target/arm/a32.decode:103 */
                             if (trans_TEQ_xrrr(ctx, &u.f_s_rrr_shr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00800000:
                     /* ....0001 100..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:104 */
+                    /* ../target/arm/a32.decode:106 */
                     disas_a32_extract_s_rrr_shr(ctx, &u.f_s_rrr_shr, insn);
                     if (trans_ORR_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x00a00000:
                     /* ....0001 101..... ........ 0..1.... */
                     disas_a32_extract_s_rxr_shr(ctx, &u.f_s_rrr_shr, insn);
                     switch ((insn >> 16) & 0xf) {
                     case 0x0:
                         /* ....0001 101.0000 ........ 0..1.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:105 */
+                        /* ../target/arm/a32.decode:107 */
                         if (trans_MOV_rxrr(ctx, &u.f_s_rrr_shr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000080:
                 /* ....0001 .0...... ........ 1..1.... */
                 switch (insn & 0x00100f60) {
                 case 0x00000000:
                     /* ....0001 .0.0.... ....0000 1001.... */
-                    disas_a32_extract_swp(ctx, &u.f_disas_a3226, insn);
+                    disas_a32_extract_swp(ctx, &u.f_disas_a3228, insn);
                     switch (insn & 0x00a00000) {
                     case 0x00000000:
                         /* ....0001 0000.... ....0000 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:364 */
-                        if (trans_SWP(ctx, &u.f_disas_a3226)) return true;
-                        return false;
+                        /* ../target/arm/a32.decode:366 */
+                        if (trans_SWP(ctx, &u.f_disas_a3228)) return true;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000020:
                     /* ....0001 .0.0.... ....0000 1011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:250 */
+                    /* ../target/arm/a32.decode:252 */
                     disas_a32_extract_ldst_rr_p1w(ctx, &u.f_ldst_rr, insn);
                     if (trans_STRH_rr(ctx, &u.f_ldst_rr)) return true;
-                    return false;
+                    break;
                 case 0x00000040:
                     /* ....0001 .0.0.... ....0000 1101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:253 */
+                    /* ../target/arm/a32.decode:255 */
                     disas_a32_extract_ldst_rr_p1w(ctx, &u.f_ldst_rr, insn);
                     if (trans_LDRD_rr(ctx, &u.f_ldst_rr)) return true;
-                    return false;
+                    break;
                 case 0x00000060:
                     /* ....0001 .0.0.... ....0000 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:256 */
+                    /* ../target/arm/a32.decode:258 */
                     disas_a32_extract_ldst_rr_p1w(ctx, &u.f_ldst_rr, insn);
                     if (trans_STRD_rr(ctx, &u.f_ldst_rr)) return true;
-                    return false;
+                    break;
                 case 0x00000c00:
                     /* ....0001 .0.0.... ....1100 1001.... */
                     disas_a32_extract_stl(ctx, &u.f_ldrex, insn);
                     switch (insn & 0x00a0f000) {
                     case 0x0080f000:
                         /* ....0001 1000.... 11111100 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:388 */
+                        /* ../target/arm/a32.decode:390 */
                         if (trans_STL(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000e00:
                     /* ....0001 .0.0.... ....1110 1001.... */
                     disas_a32_extract_strex(ctx, &u.f_strex, insn);
                     switch (insn & 0x00a00000) {
                     case 0x00800000:
                         /* ....0001 1000.... ....1110 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:383 */
+                        /* ../target/arm/a32.decode:385 */
                         if (trans_STLEX(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     case 0x00a00000:
                         /* ....0001 1010.... ....1110 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:384 */
+                        /* ../target/arm/a32.decode:386 */
                         if (trans_STLEXD_a32(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000f00:
                     /* ....0001 .0.0.... ....1111 1001.... */
                     disas_a32_extract_strex(ctx, &u.f_strex, insn);
                     switch (insn & 0x00a00000) {
                     case 0x00800000:
                         /* ....0001 1000.... ....1111 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:378 */
+                        /* ../target/arm/a32.decode:380 */
                         if (trans_STREX(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     case 0x00a00000:
                         /* ....0001 1010.... ....1111 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:379 */
+                        /* ../target/arm/a32.decode:381 */
                         if (trans_STREXD_a32(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100020:
                     /* ....0001 .0.1.... ....0000 1011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:259 */
+                    /* ../target/arm/a32.decode:261 */
                     disas_a32_extract_ldst_rr_p1w(ctx, &u.f_ldst_rr, insn);
                     if (trans_LDRH_rr(ctx, &u.f_ldst_rr)) return true;
-                    return false;
+                    break;
                 case 0x00100040:
                     /* ....0001 .0.1.... ....0000 1101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:262 */
+                    /* ../target/arm/a32.decode:264 */
                     disas_a32_extract_ldst_rr_p1w(ctx, &u.f_ldst_rr, insn);
                     if (trans_LDRSB_rr(ctx, &u.f_ldst_rr)) return true;
-                    return false;
+                    break;
                 case 0x00100060:
                     /* ....0001 .0.1.... ....0000 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:265 */
+                    /* ../target/arm/a32.decode:267 */
                     disas_a32_extract_ldst_rr_p1w(ctx, &u.f_ldst_rr, insn);
                     if (trans_LDRSH_rr(ctx, &u.f_ldst_rr)) return true;
-                    return false;
+                    break;
                 case 0x00100c00:
                     /* ....0001 .0.1.... ....1100 1001.... */
                     disas_a32_extract_ldrex(ctx, &u.f_ldrex, insn);
                     switch (insn & 0x00a0000f) {
                     case 0x0080000f:
                         /* ....0001 1001.... ....1100 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:402 */
+                        /* ../target/arm/a32.decode:404 */
                         if (trans_LDA(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100e00:
                     /* ....0001 .0.1.... ....1110 1001.... */
                     disas_a32_extract_ldrex(ctx, &u.f_ldrex, insn);
                     switch (insn & 0x00a0000f) {
                     case 0x0080000f:
                         /* ....0001 1001.... ....1110 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:397 */
+                        /* ../target/arm/a32.decode:399 */
                         if (trans_LDAEX(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00a0000f:
                         /* ....0001 1011.... ....1110 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:398 */
+                        /* ../target/arm/a32.decode:400 */
                         if (trans_LDAEXD_a32(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100f00:
                     /* ....0001 .0.1.... ....1111 1001.... */
                     disas_a32_extract_ldrex(ctx, &u.f_ldrex, insn);
                     switch (insn & 0x00a0000f) {
                     case 0x0080000f:
                         /* ....0001 1001.... ....1111 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:392 */
+                        /* ../target/arm/a32.decode:394 */
                         if (trans_LDREX(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00a0000f:
                         /* ....0001 1011.... ....1111 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:393 */
+                        /* ../target/arm/a32.decode:395 */
                         if (trans_LDREXD_a32(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00400000:
                 /* ....0001 .1...... ........ 0..1.... */
                 switch (insn & 0x00a00000) {
@@ -2136,32 +2182,32 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                             switch ((insn >> 8) & 0xf) {
                             case 0x0:
                                 /* ....0001 0100.... ....0000 0101.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:159 */
+                                /* ../target/arm/a32.decode:161 */
                                 if (trans_QDADD(ctx, &u.f_rrr)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x3:
                             /* ....0001 0100.... ........ 0111.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:239 */
+                            /* ../target/arm/a32.decode:241 */
                             disas_a32_extract_i16(ctx, &u.f_i, insn);
                             if (trans_HVC(ctx, &u.f_i)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0001 0101.... ........ 0..1.... */
                         disas_a32_extract_S_xrr_shr(ctx, &u.f_s_rrr_shr, insn);
                         switch ((insn >> 12) & 0xf) {
                         case 0x0:
                             /* ....0001 0101.... 0000.... 0..1.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:102 */
+                            /* ../target/arm/a32.decode:104 */
                             if (trans_CMP_xrrr(ctx, &u.f_s_rrr_shr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00200000:
                     /* ....0001 011..... ........ 0..1.... */
                     switch ((insn >> 20) & 0x1) {
@@ -2170,66 +2216,66 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                         switch (insn & 0x00000f60) {
                         case 0x00000040:
                             /* ....0001 0110.... ....0000 0101.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:160 */
+                            /* ../target/arm/a32.decode:162 */
                             disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                             if (trans_QDSUB(ctx, &u.f_rrr)) return true;
-                            return false;
+                            break;
                         case 0x00000060:
                             /* ....0001 0110.... ....0000 0111.... */
                             disas_a32_extract_disas_a32_Fmt_24(ctx, &u.f_i, insn);
                             switch ((insn >> 12) & 0xff) {
                             case 0x0:
                                 /* ....0001 01100000 00000000 0111.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:240 */
+                                /* ../target/arm/a32.decode:242 */
                                 if (trans_SMC(ctx, &u.f_i)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         case 0x00000f00:
                             /* ....0001 0110.... ....1111 0001.... */
                             disas_a32_extract_rdm(ctx, &u.f_rr, insn);
                             switch ((insn >> 16) & 0xf) {
                             case 0xf:
                                 /* ....0001 01101111 ....1111 0001.... */
-                                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:233 */
+                                /* ../target/arm/a32.decode:235 */
                                 if (trans_CLZ(ctx, &u.f_rr)) return true;
-                                return false;
+                                break;
                             }
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x1:
                         /* ....0001 0111.... ........ 0..1.... */
                         disas_a32_extract_S_xrr_shr(ctx, &u.f_s_rrr_shr, insn);
                         switch ((insn >> 12) & 0xf) {
                         case 0x0:
                             /* ....0001 0111.... 0000.... 0..1.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:103 */
+                            /* ../target/arm/a32.decode:105 */
                             if (trans_CMN_xrrr(ctx, &u.f_s_rrr_shr)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00800000:
                     /* ....0001 110..... ........ 0..1.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:106 */
+                    /* ../target/arm/a32.decode:108 */
                     disas_a32_extract_s_rrr_shr(ctx, &u.f_s_rrr_shr, insn);
                     if (trans_BIC_rrrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x00a00000:
                     /* ....0001 111..... ........ 0..1.... */
                     disas_a32_extract_s_rxr_shr(ctx, &u.f_s_rrr_shr, insn);
                     switch ((insn >> 16) & 0xf) {
                     case 0x0:
                         /* ....0001 111.0000 ........ 0..1.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:107 */
+                        /* ../target/arm/a32.decode:109 */
                         if (trans_MVN_rxrr(ctx, &u.f_s_rrr_shr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00400080:
                 /* ....0001 .1...... ........ 1..1.... */
                 switch (insn & 0x00100060) {
@@ -2238,209 +2284,209 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x00a00f00) {
                     case 0x00000000:
                         /* ....0001 0100.... ....0000 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:365 */
-                        disas_a32_extract_swp(ctx, &u.f_disas_a3226, insn);
-                        if (trans_SWPB(ctx, &u.f_disas_a3226)) return true;
-                        return false;
+                        /* ../target/arm/a32.decode:367 */
+                        disas_a32_extract_swp(ctx, &u.f_disas_a3228, insn);
+                        if (trans_SWPB(ctx, &u.f_disas_a3228)) return true;
+                        break;
                     case 0x00800c00:
                         /* ....0001 1100.... ....1100 1001.... */
                         disas_a32_extract_stl(ctx, &u.f_ldrex, insn);
                         switch ((insn >> 12) & 0xf) {
                         case 0xf:
                             /* ....0001 1100.... 11111100 1001.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:389 */
+                            /* ../target/arm/a32.decode:391 */
                             if (trans_STLB(ctx, &u.f_ldrex)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x00800e00:
                         /* ....0001 1100.... ....1110 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:385 */
+                        /* ../target/arm/a32.decode:387 */
                         disas_a32_extract_strex(ctx, &u.f_strex, insn);
                         if (trans_STLEXB(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     case 0x00800f00:
                         /* ....0001 1100.... ....1111 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:380 */
+                        /* ../target/arm/a32.decode:382 */
                         disas_a32_extract_strex(ctx, &u.f_strex, insn);
                         if (trans_STREXB(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     case 0x00a00c00:
                         /* ....0001 1110.... ....1100 1001.... */
                         disas_a32_extract_stl(ctx, &u.f_ldrex, insn);
                         switch ((insn >> 12) & 0xf) {
                         case 0xf:
                             /* ....0001 1110.... 11111100 1001.... */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:390 */
+                            /* ../target/arm/a32.decode:392 */
                             if (trans_STLH(ctx, &u.f_ldrex)) return true;
-                            return false;
+                            break;
                         }
-                        return false;
+                        break;
                     case 0x00a00e00:
                         /* ....0001 1110.... ....1110 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:386 */
+                        /* ../target/arm/a32.decode:388 */
                         disas_a32_extract_strex(ctx, &u.f_strex, insn);
                         if (trans_STLEXH(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     case 0x00a00f00:
                         /* ....0001 1110.... ....1111 1001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:381 */
+                        /* ../target/arm/a32.decode:383 */
                         disas_a32_extract_strex(ctx, &u.f_strex, insn);
                         if (trans_STREXH(ctx, &u.f_strex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000020:
                     /* ....0001 .1.0.... ........ 1011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:311 */
+                    /* ../target/arm/a32.decode:313 */
                     disas_a32_extract_ldst_ri8_p1w(ctx, &u.f_ldst_ri, insn);
                     if (trans_STRH_ri(ctx, &u.f_ldst_ri)) return true;
-                    return false;
+                    break;
                 case 0x00000040:
                     /* ....0001 .1.0.... ........ 1101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:314 */
+                    /* ../target/arm/a32.decode:316 */
                     disas_a32_extract_ldst_ri8_p1w(ctx, &u.f_ldst_ri, insn);
                     if (trans_LDRD_ri_a32(ctx, &u.f_ldst_ri)) return true;
-                    return false;
+                    break;
                 case 0x00000060:
                     /* ....0001 .1.0.... ........ 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:317 */
+                    /* ../target/arm/a32.decode:319 */
                     disas_a32_extract_ldst_ri8_p1w(ctx, &u.f_ldst_ri, insn);
                     if (trans_STRD_ri_a32(ctx, &u.f_ldst_ri)) return true;
-                    return false;
+                    break;
                 case 0x00100000:
                     /* ....0001 .1.1.... ........ 1001.... */
                     disas_a32_extract_ldrex(ctx, &u.f_ldrex, insn);
                     switch (insn & 0x00a00f0f) {
                     case 0x00800c0f:
                         /* ....0001 1101.... ....1100 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:403 */
+                        /* ../target/arm/a32.decode:405 */
                         if (trans_LDAB(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00800e0f:
                         /* ....0001 1101.... ....1110 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:399 */
+                        /* ../target/arm/a32.decode:401 */
                         if (trans_LDAEXB(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00800f0f:
                         /* ....0001 1101.... ....1111 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:394 */
+                        /* ../target/arm/a32.decode:396 */
                         if (trans_LDREXB(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00a00c0f:
                         /* ....0001 1111.... ....1100 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:404 */
+                        /* ../target/arm/a32.decode:406 */
                         if (trans_LDAH(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00a00e0f:
                         /* ....0001 1111.... ....1110 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:400 */
+                        /* ../target/arm/a32.decode:402 */
                         if (trans_LDAEXH(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     case 0x00a00f0f:
                         /* ....0001 1111.... ....1111 10011111 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:395 */
+                        /* ../target/arm/a32.decode:397 */
                         if (trans_LDREXH(ctx, &u.f_ldrex)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100020:
                     /* ....0001 .1.1.... ........ 1011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:320 */
+                    /* ../target/arm/a32.decode:322 */
                     disas_a32_extract_ldst_ri8_p1w(ctx, &u.f_ldst_ri, insn);
                     if (trans_LDRH_ri(ctx, &u.f_ldst_ri)) return true;
-                    return false;
+                    break;
                 case 0x00100040:
                     /* ....0001 .1.1.... ........ 1101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:323 */
+                    /* ../target/arm/a32.decode:325 */
                     disas_a32_extract_ldst_ri8_p1w(ctx, &u.f_ldst_ri, insn);
                     if (trans_LDRSB_ri(ctx, &u.f_ldst_ri)) return true;
-                    return false;
+                    break;
                 case 0x00100060:
                     /* ....0001 .1.1.... ........ 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:326 */
+                    /* ../target/arm/a32.decode:328 */
                     disas_a32_extract_ldst_ri8_p1w(ctx, &u.f_ldst_ri, insn);
                     if (trans_LDRSH_ri(ctx, &u.f_ldst_ri)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x1:
         /* ....001. ........ ........ ........ */
         switch ((insn >> 21) & 0xf) {
         case 0x0:
             /* ....0010 000..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:120 */
+            /* ../target/arm/a32.decode:122 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_AND_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x1:
             /* ....0010 001..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:121 */
+            /* ../target/arm/a32.decode:123 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_EOR_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x2:
             /* ....0010 010..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:122 */
+            /* ../target/arm/a32.decode:124 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_SUB_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x3:
             /* ....0010 011..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:123 */
+            /* ../target/arm/a32.decode:125 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_RSB_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x4:
             /* ....0010 100..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:124 */
+            /* ../target/arm/a32.decode:126 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_ADD_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x5:
             /* ....0010 101..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:125 */
+            /* ../target/arm/a32.decode:127 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_ADC_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x6:
             /* ....0010 110..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:126 */
+            /* ../target/arm/a32.decode:128 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_SBC_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x7:
             /* ....0010 111..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:127 */
+            /* ../target/arm/a32.decode:129 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_RSC_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x8:
             /* ....0011 000..... ........ ........ */
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....0011 0000.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:80 */
+                /* ../target/arm/a32.decode:82 */
                 disas_a32_extract_mov16(ctx, &u.f_ri, insn);
                 if (trans_MOVW(ctx, &u.f_ri)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0011 0001.... ........ ........ */
                 disas_a32_extract_S_xri_rot(ctx, &u.f_s_rri_rot, insn);
                 switch ((insn >> 12) & 0xf) {
                 case 0x0:
                     /* ....0011 0001.... 0000.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:128 */
+                    /* ../target/arm/a32.decode:130 */
                     if (trans_TST_xri(ctx, &u.f_s_rri_rot)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x9:
             /* ....0011 001..... ........ ........ */
             switch (insn & 0x0010f000) {
@@ -2450,115 +2496,115 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                     /* ....0011 00100000 1111.... ........ */
                     if ((insn & 0x000000ff) == 0x00000001) {
                         /* ....0011 00100000 1111.... 00000001 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:188 */
+                        /* ../target/arm/a32.decode:190 */
                         disas_a32_extract_disas_a32_Fmt_16(ctx, &u.f_empty, insn);
                         if (trans_YIELD(ctx, &u.f_empty)) return true;
                     }
                     if ((insn & 0x000000ff) == 0x00000002) {
                         /* ....0011 00100000 1111.... 00000010 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:189 */
+                        /* ../target/arm/a32.decode:191 */
                         disas_a32_extract_disas_a32_Fmt_16(ctx, &u.f_empty, insn);
                         if (trans_WFE(ctx, &u.f_empty)) return true;
                     }
                     if ((insn & 0x000000ff) == 0x00000003) {
                         /* ....0011 00100000 1111.... 00000011 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:190 */
+                        /* ../target/arm/a32.decode:192 */
                         disas_a32_extract_disas_a32_Fmt_16(ctx, &u.f_empty, insn);
                         if (trans_WFI(ctx, &u.f_empty)) return true;
                     }
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:198 */
+                    /* ../target/arm/a32.decode:200 */
                     disas_a32_extract_disas_a32_Fmt_16(ctx, &u.f_empty, insn);
                     if (trans_NOP(ctx, &u.f_empty)) return true;
                 }
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:201 */
+                /* ../target/arm/a32.decode:203 */
                 disas_a32_extract_msr_i(ctx, &u.f_msr_i, insn);
                 u.f_msr_i.r = 0;
                 if (trans_MSR_imm(ctx, &u.f_msr_i)) return true;
-                return false;
+                break;
             case 0x00100000:
                 /* ....0011 0011.... 0000.... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:129 */
+                /* ../target/arm/a32.decode:131 */
                 disas_a32_extract_S_xri_rot(ctx, &u.f_s_rri_rot, insn);
                 if (trans_TEQ_xri(ctx, &u.f_s_rri_rot)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0xa:
             /* ....0011 010..... ........ ........ */
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....0011 0100.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:81 */
+                /* ../target/arm/a32.decode:83 */
                 disas_a32_extract_mov16(ctx, &u.f_ri, insn);
                 if (trans_MOVT(ctx, &u.f_ri)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0011 0101.... ........ ........ */
                 disas_a32_extract_S_xri_rot(ctx, &u.f_s_rri_rot, insn);
                 switch ((insn >> 12) & 0xf) {
                 case 0x0:
                     /* ....0011 0101.... 0000.... ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:130 */
+                    /* ../target/arm/a32.decode:132 */
                     if (trans_CMP_xri(ctx, &u.f_s_rri_rot)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0xb:
             /* ....0011 011..... ........ ........ */
             switch (insn & 0x0010f000) {
             case 0x0000f000:
                 /* ....0011 0110.... 1111.... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:203 */
+                /* ../target/arm/a32.decode:205 */
                 disas_a32_extract_msr_i(ctx, &u.f_msr_i, insn);
                 u.f_msr_i.r = 1;
                 if (trans_MSR_imm(ctx, &u.f_msr_i)) return true;
-                return false;
+                break;
             case 0x00100000:
                 /* ....0011 0111.... 0000.... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:131 */
+                /* ../target/arm/a32.decode:133 */
                 disas_a32_extract_S_xri_rot(ctx, &u.f_s_rri_rot, insn);
                 if (trans_CMN_xri(ctx, &u.f_s_rri_rot)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0xc:
             /* ....0011 100..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:132 */
+            /* ../target/arm/a32.decode:134 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_ORR_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0xd:
             /* ....0011 101..... ........ ........ */
             disas_a32_extract_s_rxi_rot(ctx, &u.f_s_rri_rot, insn);
             switch ((insn >> 16) & 0xf) {
             case 0x0:
                 /* ....0011 101.0000 ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:133 */
+                /* ../target/arm/a32.decode:135 */
                 if (trans_MOV_rxi(ctx, &u.f_s_rri_rot)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0xe:
             /* ....0011 110..... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:134 */
+            /* ../target/arm/a32.decode:136 */
             disas_a32_extract_s_rri_rot(ctx, &u.f_s_rri_rot, insn);
             if (trans_BIC_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0xf:
             /* ....0011 111..... ........ ........ */
             disas_a32_extract_s_rxi_rot(ctx, &u.f_s_rri_rot, insn);
             switch ((insn >> 16) & 0xf) {
             case 0x0:
                 /* ....0011 111.0000 ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:135 */
+                /* ../target/arm/a32.decode:137 */
                 if (trans_MVN_rxi(ctx, &u.f_s_rri_rot)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x2:
         /* ....010. ........ ........ ........ */
         switch (insn & 0x01500000) {
@@ -2567,95 +2613,95 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 21) & 0x1) {
             case 0x0:
                 /* ....0100 .000.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:344 */
+                /* ../target/arm/a32.decode:346 */
                 disas_a32_extract_ldst_ri12_pw0(ctx, &u.f_ldst_ri, insn);
                 if (trans_STR_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0100 .010.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:355 */
+                /* ../target/arm/a32.decode:357 */
                 disas_a32_extract_ldst_ri12_p0w1(ctx, &u.f_ldst_ri, insn);
                 if (trans_STRT_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00100000:
             /* ....0100 .0.1.... ........ ........ */
             switch ((insn >> 21) & 0x1) {
             case 0x0:
                 /* ....0100 .001.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:349 */
+                /* ../target/arm/a32.decode:351 */
                 disas_a32_extract_ldst_ri12_pw0(ctx, &u.f_ldst_ri, insn);
                 if (trans_LDR_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0100 .011.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:357 */
+                /* ../target/arm/a32.decode:359 */
                 disas_a32_extract_ldst_ri12_p0w1(ctx, &u.f_ldst_ri, insn);
                 if (trans_LDRT_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00400000:
             /* ....0100 .1.0.... ........ ........ */
             switch ((insn >> 21) & 0x1) {
             case 0x0:
                 /* ....0100 .100.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:346 */
+                /* ../target/arm/a32.decode:348 */
                 disas_a32_extract_ldst_ri12_pw0(ctx, &u.f_ldst_ri, insn);
                 if (trans_STRB_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0100 .110.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:356 */
+                /* ../target/arm/a32.decode:358 */
                 disas_a32_extract_ldst_ri12_p0w1(ctx, &u.f_ldst_ri, insn);
                 if (trans_STRBT_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00500000:
             /* ....0100 .1.1.... ........ ........ */
             switch ((insn >> 21) & 0x1) {
             case 0x0:
                 /* ....0100 .101.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:351 */
+                /* ../target/arm/a32.decode:353 */
                 disas_a32_extract_ldst_ri12_pw0(ctx, &u.f_ldst_ri, insn);
                 if (trans_LDRB_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0100 .111.... ........ ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:358 */
+                /* ../target/arm/a32.decode:360 */
                 disas_a32_extract_ldst_ri12_p0w1(ctx, &u.f_ldst_ri, insn);
                 if (trans_LDRBT_ri(ctx, &u.f_ldst_ri)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000000:
             /* ....0101 .0.0.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:343 */
+            /* ../target/arm/a32.decode:345 */
             disas_a32_extract_ldst_ri12_p1w(ctx, &u.f_ldst_ri, insn);
             if (trans_STR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x01100000:
             /* ....0101 .0.1.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:348 */
+            /* ../target/arm/a32.decode:350 */
             disas_a32_extract_ldst_ri12_p1w(ctx, &u.f_ldst_ri, insn);
             if (trans_LDR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x01400000:
             /* ....0101 .1.0.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:345 */
+            /* ../target/arm/a32.decode:347 */
             disas_a32_extract_ldst_ri12_p1w(ctx, &u.f_ldst_ri, insn);
             if (trans_STRB_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x01500000:
             /* ....0101 .1.1.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:350 */
+            /* ../target/arm/a32.decode:352 */
             disas_a32_extract_ldst_ri12_p1w(ctx, &u.f_ldst_ri, insn);
             if (trans_LDRB_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x3:
         /* ....011. ........ ........ ........ */
         switch (insn & 0x01400010) {
@@ -2664,30 +2710,30 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 20) & 0x3) {
             case 0x0:
                 /* ....0110 .000.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:284 */
+                /* ../target/arm/a32.decode:286 */
                 disas_a32_extract_ldst_rs_pw0(ctx, &u.f_ldst_rr, insn);
                 if (trans_STR_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0110 .001.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:289 */
+                /* ../target/arm/a32.decode:291 */
                 disas_a32_extract_ldst_rs_pw0(ctx, &u.f_ldst_rr, insn);
                 if (trans_LDR_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* ....0110 .010.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:297 */
+                /* ../target/arm/a32.decode:299 */
                 disas_a32_extract_ldst_rs_p0w1(ctx, &u.f_ldst_rr, insn);
                 if (trans_STRT_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ....0110 .011.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:299 */
+                /* ../target/arm/a32.decode:301 */
                 disas_a32_extract_ldst_rs_p0w1(ctx, &u.f_ldst_rr, insn);
                 if (trans_LDRT_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00000010:
             /* ....0110 .0...... ........ ...1.... */
             switch (insn & 0x00a00020) {
@@ -2697,234 +2743,234 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x00100fc0) {
                 case 0x00100f00:
                     /* ....0110 0001.... ....1111 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:426 */
+                    /* ../target/arm/a32.decode:428 */
                     if (trans_SADD16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0001.... ....1111 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:428 */
+                    /* ../target/arm/a32.decode:430 */
                     if (trans_SSAX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f80:
                     /* ....0110 0001.... ....1111 1001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:430 */
+                    /* ../target/arm/a32.decode:432 */
                     if (trans_SADD8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000020:
                 /* ....0110 000..... ........ ..11.... */
                 disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                 switch (insn & 0x00100fc0) {
                 case 0x00100f00:
                     /* ....0110 0001.... ....1111 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:427 */
+                    /* ../target/arm/a32.decode:429 */
                     if (trans_SASX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0001.... ....1111 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:429 */
+                    /* ../target/arm/a32.decode:431 */
                     if (trans_SSUB16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100fc0:
                     /* ....0110 0001.... ....1111 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:431 */
+                    /* ../target/arm/a32.decode:433 */
                     if (trans_SSUB8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200000:
                 /* ....0110 001..... ........ ..01.... */
                 disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                 switch (insn & 0x00100fc0) {
                 case 0x00000f00:
                     /* ....0110 0010.... ....1111 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:433 */
+                    /* ../target/arm/a32.decode:435 */
                     if (trans_QADD16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000f40:
                     /* ....0110 0010.... ....1111 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:435 */
+                    /* ../target/arm/a32.decode:437 */
                     if (trans_QSAX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000f80:
                     /* ....0110 0010.... ....1111 1001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:437 */
+                    /* ../target/arm/a32.decode:439 */
                     if (trans_QADD8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f00:
                     /* ....0110 0011.... ....1111 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:440 */
+                    /* ../target/arm/a32.decode:442 */
                     if (trans_SHADD16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0011.... ....1111 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:442 */
+                    /* ../target/arm/a32.decode:444 */
                     if (trans_SHSAX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f80:
                     /* ....0110 0011.... ....1111 1001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:444 */
+                    /* ../target/arm/a32.decode:446 */
                     if (trans_SHADD8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200020:
                 /* ....0110 001..... ........ ..11.... */
                 disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                 switch (insn & 0x00100fc0) {
                 case 0x00000f00:
                     /* ....0110 0010.... ....1111 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:434 */
+                    /* ../target/arm/a32.decode:436 */
                     if (trans_QASX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000f40:
                     /* ....0110 0010.... ....1111 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:436 */
+                    /* ../target/arm/a32.decode:438 */
                     if (trans_QSUB16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000fc0:
                     /* ....0110 0010.... ....1111 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:438 */
+                    /* ../target/arm/a32.decode:440 */
                     if (trans_QSUB8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f00:
                     /* ....0110 0011.... ....1111 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:441 */
+                    /* ../target/arm/a32.decode:443 */
                     if (trans_SHASX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0011.... ....1111 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:443 */
+                    /* ../target/arm/a32.decode:445 */
                     if (trans_SHSUB16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100fc0:
                     /* ....0110 0011.... ....1111 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:445 */
+                    /* ../target/arm/a32.decode:447 */
                     if (trans_SHSUB8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800000:
                 /* ....0110 100..... ........ ..01.... */
                 disas_a32_extract_disas_a32_Fmt_43(ctx, &u.f_pkh, insn);
                 switch ((insn >> 20) & 0x1) {
                 case 0x0:
                     /* ....0110 1000.... ........ ..01.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:470 */
+                    /* ../target/arm/a32.decode:472 */
                     if (trans_PKH(ctx, &u.f_pkh)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800020:
                 /* ....0110 100..... ........ ..11.... */
                 switch (insn & 0x001003c0) {
                 case 0x00000040:
                     /* ....0110 1000.... ......00 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:484 */
+                    /* ../target/arm/a32.decode:486 */
                     disas_a32_extract_rrr_rot(ctx, &u.f_rrr_rot, insn);
                     if (trans_SXTAB16(ctx, &u.f_rrr_rot)) return true;
-                    return false;
+                    break;
                 case 0x00000380:
                     /* ....0110 1000.... ......11 1011.... */
                     disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                     switch ((insn >> 10) & 0x3) {
                     case 0x3:
                         /* ....0110 1000.... ....1111 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:491 */
+                        /* ../target/arm/a32.decode:493 */
                         if (trans_SEL(ctx, &u.f_rrr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00a00000:
                 /* ....0110 101..... ........ ..01.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:476 */
+                /* ../target/arm/a32.decode:478 */
                 disas_a32_extract_sat(ctx, &u.f_sat, insn);
                 if (trans_SSAT(ctx, &u.f_sat)) return true;
-                return false;
+                break;
             case 0x00a00020:
                 /* ....0110 101..... ........ ..11.... */
                 switch (insn & 0x001003c0) {
                 case 0x00000040:
                     /* ....0110 1010.... ......00 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:485 */
+                    /* ../target/arm/a32.decode:487 */
                     disas_a32_extract_rrr_rot(ctx, &u.f_rrr_rot, insn);
                     if (trans_SXTAB(ctx, &u.f_rrr_rot)) return true;
-                    return false;
+                    break;
                 case 0x00000300:
                     /* ....0110 1010.... ......11 0011.... */
                     disas_a32_extract_sat16(ctx, &u.f_sat, insn);
                     switch ((insn >> 10) & 0x3) {
                     case 0x3:
                         /* ....0110 1010.... ....1111 0011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:479 */
+                        /* ../target/arm/a32.decode:481 */
                         if (trans_SSAT16(ctx, &u.f_sat)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100040:
                     /* ....0110 1011.... ......00 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:486 */
+                    /* ../target/arm/a32.decode:488 */
                     disas_a32_extract_rrr_rot(ctx, &u.f_rrr_rot, insn);
                     if (trans_SXTAH(ctx, &u.f_rrr_rot)) return true;
-                    return false;
+                    break;
                 case 0x00100300:
                     /* ....0110 1011.... ......11 0011.... */
                     disas_a32_extract_rdm(ctx, &u.f_rr, insn);
                     switch (insn & 0x000f0c00) {
                     case 0x000f0c00:
                         /* ....0110 10111111 ....1111 0011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:492 */
+                        /* ../target/arm/a32.decode:494 */
                         if (trans_REV(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100380:
                     /* ....0110 1011.... ......11 1011.... */
                     disas_a32_extract_rdm(ctx, &u.f_rr, insn);
                     switch (insn & 0x000f0c00) {
                     case 0x000f0c00:
                         /* ....0110 10111111 ....1111 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:493 */
+                        /* ../target/arm/a32.decode:495 */
                         if (trans_REV16(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00400000:
             /* ....0110 .1...... ........ ...0.... */
             switch ((insn >> 20) & 0x3) {
             case 0x0:
                 /* ....0110 .100.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:286 */
+                /* ../target/arm/a32.decode:288 */
                 disas_a32_extract_ldst_rs_pw0(ctx, &u.f_ldst_rr, insn);
                 if (trans_STRB_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0110 .101.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:291 */
+                /* ../target/arm/a32.decode:293 */
                 disas_a32_extract_ldst_rs_pw0(ctx, &u.f_ldst_rr, insn);
                 if (trans_LDRB_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* ....0110 .110.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:298 */
+                /* ../target/arm/a32.decode:300 */
                 disas_a32_extract_ldst_rs_p0w1(ctx, &u.f_ldst_rr, insn);
                 if (trans_STRBT_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ....0110 .111.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:300 */
+                /* ../target/arm/a32.decode:302 */
                 disas_a32_extract_ldst_rs_p0w1(ctx, &u.f_ldst_rr, insn);
                 if (trans_LDRBT_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00400010:
             /* ....0110 .1...... ........ ...1.... */
             switch (insn & 0x00a00020) {
@@ -2934,199 +2980,199 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x00100fc0) {
                 case 0x00100f00:
                     /* ....0110 0101.... ....1111 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:447 */
+                    /* ../target/arm/a32.decode:449 */
                     if (trans_UADD16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0101.... ....1111 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:449 */
+                    /* ../target/arm/a32.decode:451 */
                     if (trans_USAX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f80:
                     /* ....0110 0101.... ....1111 1001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:451 */
+                    /* ../target/arm/a32.decode:453 */
                     if (trans_UADD8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000020:
                 /* ....0110 010..... ........ ..11.... */
                 disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                 switch (insn & 0x00100fc0) {
                 case 0x00100f00:
                     /* ....0110 0101.... ....1111 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:448 */
+                    /* ../target/arm/a32.decode:450 */
                     if (trans_UASX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0101.... ....1111 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:450 */
+                    /* ../target/arm/a32.decode:452 */
                     if (trans_USUB16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100fc0:
                     /* ....0110 0101.... ....1111 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:452 */
+                    /* ../target/arm/a32.decode:454 */
                     if (trans_USUB8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200000:
                 /* ....0110 011..... ........ ..01.... */
                 disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                 switch (insn & 0x00100fc0) {
                 case 0x00000f00:
                     /* ....0110 0110.... ....1111 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:454 */
+                    /* ../target/arm/a32.decode:456 */
                     if (trans_UQADD16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000f40:
                     /* ....0110 0110.... ....1111 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:456 */
+                    /* ../target/arm/a32.decode:458 */
                     if (trans_UQSAX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000f80:
                     /* ....0110 0110.... ....1111 1001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:458 */
+                    /* ../target/arm/a32.decode:460 */
                     if (trans_UQADD8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f00:
                     /* ....0110 0111.... ....1111 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:461 */
+                    /* ../target/arm/a32.decode:463 */
                     if (trans_UHADD16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0111.... ....1111 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:463 */
+                    /* ../target/arm/a32.decode:465 */
                     if (trans_UHSAX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f80:
                     /* ....0110 0111.... ....1111 1001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:465 */
+                    /* ../target/arm/a32.decode:467 */
                     if (trans_UHADD8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200020:
                 /* ....0110 011..... ........ ..11.... */
                 disas_a32_extract_rndm(ctx, &u.f_rrr, insn);
                 switch (insn & 0x00100fc0) {
                 case 0x00000f00:
                     /* ....0110 0110.... ....1111 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:455 */
+                    /* ../target/arm/a32.decode:457 */
                     if (trans_UQASX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000f40:
                     /* ....0110 0110.... ....1111 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:457 */
+                    /* ../target/arm/a32.decode:459 */
                     if (trans_UQSUB16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00000fc0:
                     /* ....0110 0110.... ....1111 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:459 */
+                    /* ../target/arm/a32.decode:461 */
                     if (trans_UQSUB8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f00:
                     /* ....0110 0111.... ....1111 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:462 */
+                    /* ../target/arm/a32.decode:464 */
                     if (trans_UHASX(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100f40:
                     /* ....0110 0111.... ....1111 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:464 */
+                    /* ../target/arm/a32.decode:466 */
                     if (trans_UHSUB16(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 case 0x00100fc0:
                     /* ....0110 0111.... ....1111 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:466 */
+                    /* ../target/arm/a32.decode:468 */
                     if (trans_UHSUB8(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800020:
                 /* ....0110 110..... ........ ..11.... */
                 disas_a32_extract_rrr_rot(ctx, &u.f_rrr_rot, insn);
                 switch (insn & 0x001003c0) {
                 case 0x00000040:
                     /* ....0110 1100.... ......00 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:487 */
+                    /* ../target/arm/a32.decode:489 */
                     if (trans_UXTAB16(ctx, &u.f_rrr_rot)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00a00000:
                 /* ....0110 111..... ........ ..01.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:477 */
+                /* ../target/arm/a32.decode:479 */
                 disas_a32_extract_sat(ctx, &u.f_sat, insn);
                 if (trans_USAT(ctx, &u.f_sat)) return true;
-                return false;
+                break;
             case 0x00a00020:
                 /* ....0110 111..... ........ ..11.... */
                 switch (insn & 0x001003c0) {
                 case 0x00000040:
                     /* ....0110 1110.... ......00 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:488 */
+                    /* ../target/arm/a32.decode:490 */
                     disas_a32_extract_rrr_rot(ctx, &u.f_rrr_rot, insn);
                     if (trans_UXTAB(ctx, &u.f_rrr_rot)) return true;
-                    return false;
+                    break;
                 case 0x00000300:
                     /* ....0110 1110.... ......11 0011.... */
                     disas_a32_extract_sat16(ctx, &u.f_sat, insn);
                     switch ((insn >> 10) & 0x3) {
                     case 0x3:
                         /* ....0110 1110.... ....1111 0011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:480 */
+                        /* ../target/arm/a32.decode:482 */
                         if (trans_USAT16(ctx, &u.f_sat)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100040:
                     /* ....0110 1111.... ......00 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:489 */
+                    /* ../target/arm/a32.decode:491 */
                     disas_a32_extract_rrr_rot(ctx, &u.f_rrr_rot, insn);
                     if (trans_UXTAH(ctx, &u.f_rrr_rot)) return true;
-                    return false;
+                    break;
                 case 0x00100300:
                     /* ....0110 1111.... ......11 0011.... */
                     disas_a32_extract_rdm(ctx, &u.f_rr, insn);
                     switch (insn & 0x000f0c00) {
                     case 0x000f0c00:
                         /* ....0110 11111111 ....1111 0011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:495 */
+                        /* ../target/arm/a32.decode:497 */
                         if (trans_RBIT(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00100380:
                     /* ....0110 1111.... ......11 1011.... */
                     disas_a32_extract_rdm(ctx, &u.f_rr, insn);
                     switch (insn & 0x000f0c00) {
                     case 0x000f0c00:
                         /* ....0110 11111111 ....1111 1011.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:494 */
+                        /* ../target/arm/a32.decode:496 */
                         if (trans_REVSH(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000000:
             /* ....0111 .0...... ........ ...0.... */
             disas_a32_extract_ldst_rs_p1w(ctx, &u.f_ldst_rr, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....0111 .0.0.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:285 */
+                /* ../target/arm/a32.decode:287 */
                 if (trans_STR_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0111 .0.1.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:290 */
+                /* ../target/arm/a32.decode:292 */
                 if (trans_LDR_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01000010:
             /* ....0111 .0...... ........ ...1.... */
             switch (insn & 0x00a00060) {
@@ -3135,102 +3181,102 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0000.... ........ 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:501 */
+                    /* ../target/arm/a32.decode:503 */
                     disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                     if (trans_SMLAD(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 case 0x00100000:
                     /* ....0111 0001.... ........ 0001.... */
                     disas_a32_extract_rdmn(ctx, &u.f_rrr, insn);
                     switch ((insn >> 12) & 0xf) {
                     case 0xf:
                         /* ....0111 0001.... 1111.... 0001.... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:506 */
+                        /* ../target/arm/a32.decode:508 */
                         if (trans_SDIV(ctx, &u.f_rrr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000020:
                 /* ....0111 000..... ........ .011.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0000.... ........ 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:502 */
+                    /* ../target/arm/a32.decode:504 */
                     if (trans_SMLADX(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000040:
                 /* ....0111 000..... ........ .101.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0000.... ........ 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:503 */
+                    /* ../target/arm/a32.decode:505 */
                     if (trans_SMLSD(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000060:
                 /* ....0111 000..... ........ .111.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0000.... ........ 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:504 */
+                    /* ../target/arm/a32.decode:506 */
                     if (trans_SMLSDX(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00200000:
                 /* ....0111 001..... ........ .001.... */
                 disas_a32_extract_rdmn(ctx, &u.f_rrr, insn);
                 switch (insn & 0x0010f080) {
                 case 0x0010f000:
                     /* ....0111 0011.... 1111.... 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:507 */
+                    /* ../target/arm/a32.decode:509 */
                     if (trans_UDIV(ctx, &u.f_rrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800000:
                 /* ....0111 100..... ........ .001.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 1000.... ........ 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:409 */
+                    /* ../target/arm/a32.decode:411 */
                     if (trans_USADA8(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00a00040:
                 /* ....0111 101..... ........ .101.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:414 */
+                /* ../target/arm/a32.decode:416 */
                 disas_a32_extract_bfx(ctx, &u.f_bfx, insn);
                 if (trans_SBFX(ctx, &u.f_bfx)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01400000:
             /* ....0111 .1...... ........ ...0.... */
             disas_a32_extract_ldst_rs_p1w(ctx, &u.f_ldst_rr, insn);
             switch ((insn >> 20) & 0x1) {
             case 0x0:
                 /* ....0111 .1.0.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:287 */
+                /* ../target/arm/a32.decode:289 */
                 if (trans_STRB_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* ....0111 .1.1.... ........ ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:292 */
+                /* ../target/arm/a32.decode:294 */
                 if (trans_LDRB_rr(ctx, &u.f_ldst_rr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01400010:
             /* ....0111 .1...... ........ ...1.... */
             switch (insn & 0x00a00060) {
@@ -3240,134 +3286,166 @@ static bool disas_a32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0100.... ........ 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:509 */
+                    /* ../target/arm/a32.decode:511 */
                     if (trans_SMLALD(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 case 0x00100000:
                     /* ....0111 0101.... ........ 0001.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:514 */
+                    /* ../target/arm/a32.decode:516 */
                     if (trans_SMMLA(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000020:
                 /* ....0111 010..... ........ .011.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0100.... ........ 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:510 */
+                    /* ../target/arm/a32.decode:512 */
                     if (trans_SMLALDX(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 case 0x00100000:
                     /* ....0111 0101.... ........ 0011.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:515 */
+                    /* ../target/arm/a32.decode:517 */
                     if (trans_SMMLAR(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000040:
                 /* ....0111 010..... ........ .101.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0100.... ........ 0101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:511 */
+                    /* ../target/arm/a32.decode:513 */
                     if (trans_SMLSLD(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 case 0x00100080:
                     /* ....0111 0101.... ........ 1101.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:516 */
+                    /* ../target/arm/a32.decode:518 */
                     if (trans_SMMLS(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000060:
                 /* ....0111 010..... ........ .111.... */
                 disas_a32_extract_rdamn(ctx, &u.f_rrrr, insn);
                 switch (insn & 0x00100080) {
                 case 0x00000000:
                     /* ....0111 0100.... ........ 0111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:512 */
+                    /* ../target/arm/a32.decode:514 */
                     if (trans_SMLSLDX(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 case 0x00100080:
                     /* ....0111 0101.... ........ 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:517 */
+                    /* ../target/arm/a32.decode:519 */
                     if (trans_SMMLSR(ctx, &u.f_rrrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00800000:
                 /* ....0111 110..... ........ .001.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:418 */
+                /* ../target/arm/a32.decode:420 */
                 disas_a32_extract_disas_a32_Fmt_42(ctx, &u.f_bfi, insn);
                 if (trans_BFCI(ctx, &u.f_bfi)) return true;
-                return false;
+                break;
             case 0x00a00040:
                 /* ....0111 111..... ........ .101.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:415 */
+                /* ../target/arm/a32.decode:417 */
                 disas_a32_extract_bfx(ctx, &u.f_bfx, insn);
                 if (trans_UBFX(ctx, &u.f_bfx)) return true;
-                return false;
+                break;
             case 0x00a00060:
                 /* ....0111 111..... ........ .111.... */
                 disas_a32_extract_disas_a32_Fmt_16(ctx, &u.f_empty, insn);
                 switch (insn & 0xf0100080) {
                 case 0xe0100080:
                     /* 11100111 1111.... ........ 1111.... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:422 */
+                    /* ../target/arm/a32.decode:424 */
                     if (trans_UDF(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x4:
         /* ....100. ........ ........ ........ */
         disas_a32_extract_disas_a32_Fmt_48(ctx, &u.f_ldst_block, insn);
         switch ((insn >> 20) & 0x1) {
         case 0x0:
             /* ....100. ...0.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:521 */
+            /* ../target/arm/a32.decode:523 */
             if (trans_STM(ctx, &u.f_ldst_block)) return true;
-            return false;
+            break;
         case 0x1:
             /* ....100. ...1.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:522 */
+            /* ../target/arm/a32.decode:524 */
             if (trans_LDM_a32(ctx, &u.f_ldst_block)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x5:
         /* ....101. ........ ........ ........ */
         disas_a32_extract_branch(ctx, &u.f_i, insn);
         switch ((insn >> 24) & 0x1) {
         case 0x0:
             /* ....1010 ........ ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:529 */
+            /* ../target/arm/a32.decode:531 */
             if (trans_B(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x1:
             /* ....1011 ........ ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:530 */
+            /* ../target/arm/a32.decode:532 */
             if (trans_BL(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
+    case 0x6:
+        /* ....110. ........ ........ ........ */
+        disas_a32_extract_mcrr(ctx, &u.f_mcrr, insn);
+        switch ((insn >> 20) & 0x1f) {
+        case 0x4:
+            /* ....1100 0100.... ........ ........ */
+            /* ../target/arm/a32.decode:545 */
+            if (trans_MCRR(ctx, &u.f_mcrr)) return true;
+            break;
+        case 0x5:
+            /* ....1100 0101.... ........ ........ */
+            /* ../target/arm/a32.decode:546 */
+            if (trans_MRRC(ctx, &u.f_mcrr)) return true;
+            break;
+        }
+        break;
     case 0x7:
         /* ....111. ........ ........ ........ */
-        disas_a32_extract_disas_a32_Fmt_50(ctx, &u.f_i, insn);
         switch ((insn >> 24) & 0x1) {
+        case 0x0:
+            /* ....1110 ........ ........ ........ */
+            disas_a32_extract_mcr(ctx, &u.f_mcr, insn);
+            switch (insn & 0x00100010) {
+            case 0x00000010:
+                /* ....1110 ...0.... ........ ...1.... */
+                /* ../target/arm/a32.decode:548 */
+                if (trans_MCR(ctx, &u.f_mcr)) return true;
+                break;
+            case 0x00100010:
+                /* ....1110 ...1.... ........ ...1.... */
+                /* ../target/arm/a32.decode:549 */
+                if (trans_MRC(ctx, &u.f_mcr)) return true;
+                break;
+            }
+            break;
         case 0x1:
             /* ....1111 ........ ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32.decode:534 */
+            /* ../target/arm/a32.decode:553 */
+            disas_a32_extract_disas_a32_Fmt_52(ctx, &u.f_i, insn);
             if (trans_SVC(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }

@@ -189,7 +189,7 @@ enum IOMMUMemoryRegionAttr {
     IOMMU_ATTR_SPAPR_TCE_FD
 };
 
-/**
+/*
  * IOMMUMemoryRegionClass:
  *
  * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
@@ -206,8 +206,11 @@ enum IOMMUMemoryRegionAttr {
  * attributes and the output TLB entry depends on the transaction
  * attributes, we represent this using IOMMU indexes. Each index
  * selects a particular translation table that the IOMMU has:
+ *
  *   @attrs_to_index returns the IOMMU index for a set of transaction attributes
+ *
  *   @translate takes an input address and an IOMMU index
+ *
  * and the mapping returned can only depend on the input address and the
  * IOMMU index.
  *
@@ -216,8 +219,10 @@ enum IOMMUMemoryRegionAttr {
  * for secure transactions and one for non-secure transactions.
  */
 typedef struct IOMMUMemoryRegionClass {
-    /*
-     * Return a TLB entry that contains a given address.
+    /* public: */
+    /**
+     * @translate:
+     *
      *
      * The IOMMUAccessFlags indicated via @flag are optional and may
      * be specified as IOMMU_NONE to indicate that the caller needs
@@ -237,13 +242,20 @@ typedef struct IOMMUMemoryRegionClass {
      * information when the IOMMU mapping changes.
      *
      * @iommu: the IOMMUMemoryRegion
+     *
      * @hwaddr: address to be translated within the memory region
-     * @flag: requested access permissions
+     *
+     * @flag: requested access permission
+     *
      * @iommu_idx: IOMMU index for the translation
      */
     IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
                                IOMMUAccessFlags flag, int iommu_idx);
-    /* Returns minimum supported page size in bytes.
+    /**
+     * @get_min_page_size:
+     *
+     * Returns minimum supported page size in bytes.
+     *
      * If this method is not provided then the minimum is assumed to
      * be TARGET_PAGE_SIZE.
      *
@@ -251,7 +263,10 @@ typedef struct IOMMUMemoryRegionClass {
      */
     uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
 
-    /* Get IOMMU misc attributes. This is an optional method that
+    /**
+     * @get_attr:
+     *
+     * Get IOMMU misc attributes. This is an optional method that
      * can be used to allow users of the IOMMU to get implementation-specific
      * information. The IOMMU implements this method to handle calls
      * by IOMMU users to memory_region_iommu_get_attr() by filling in
@@ -269,7 +284,10 @@ typedef struct IOMMUMemoryRegionClass {
     int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr attr,
                     void *data);
 
-    /* Return the IOMMU index to use for a given set of transaction attributes.
+    /**
+     * @attrs_to_index:
+     *
+     * Return the IOMMU index to use for a given set of transaction attributes.
      *
      * Optional method: if an IOMMU only supports a single IOMMU index then
      * the default implementation of memory_region_iommu_attrs_to_index()
@@ -282,7 +300,10 @@ typedef struct IOMMUMemoryRegionClass {
      */
     int (*attrs_to_index)(IOMMUMemoryRegion *iommu, MemTxAttrs attrs);
 
-    /* Return the number of IOMMU indexes this IOMMU supports.
+    /**
+     * @num_indexes:
+     *
+     * Return the number of IOMMU indexes this IOMMU supports.
      *
      * Optional method: if this method is not provided, then
      * memory_region_iommu_num_indexes() will return 1, indicating that
@@ -291,6 +312,31 @@ typedef struct IOMMUMemoryRegionClass {
      * @iommu: the IOMMUMemoryRegion
      */
     int (*num_indexes)(IOMMUMemoryRegion *iommu);
+
+    /**
+     * @iommu_set_page_size_mask:
+     *
+     * Restrict the page size mask that can be supported with a given IOMMU
+     * memory region. Used for example to propagate host physical IOMMU page
+     * size mask limitations to the virtual IOMMU.
+     *
+     * Optional method: if this method is not provided, then the default global
+     * page mask is used.
+     *
+     * @iommu: the IOMMUMemoryRegion
+     *
+     * @page_size_mask: a bitmask of supported page sizes. At least one bit,
+     * representing the smallest page size, must be set. Additional set bits
+     * represent supported block sizes. For example a host physical IOMMU that
+     * uses page tables with a page size of 4kB, and supports 2MB and 4GB
+     * blocks, will set mask 0x40201000. A granule of 4kB with indiscriminate
+     * block sizes is specified with mask 0xfffffffffffff000.
+     *
+     * Returns 0 on success, or a negative error. In case of failure, the error
+     * object must be created.
+     */
+     int (*iommu_set_page_size_mask)(IOMMUMemoryRegion *iommu,
+                                     uint64_t page_size_mask);
 } IOMMUMemoryRegionClass;
 
 /** MemoryRegion:
@@ -343,7 +389,7 @@ struct IOMMUMemoryRegion {
     QLIST_FOREACH((n), &(mr)->iommu_notify, node)
 
 /**
- * MemoryListener: callbacks structure for updates to the physical memory map
+ * struct MemoryListener: callbacks structure for updates to the physical memory map
  *
  * Allows a component to adjust to changes in the guest-visible memory map.
  * Use with memory_listener_register() and memory_listener_unregister().
@@ -454,7 +500,7 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
 
 
 /**
- * MemoryRegionSection: describes a fragment of a #MemoryRegion
+ * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
  *
  * @mr: the region, or %NULL if empty
  * @fv: the flat view of the address space the region is mapped in

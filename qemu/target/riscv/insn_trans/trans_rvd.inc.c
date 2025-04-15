@@ -21,10 +21,10 @@
 static bool trans_fld(DisasContext *ctx, arg_fld *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
-    TCGv t0 = tcg_temp_new(tcg_ctx);
-    gen_get_gpr(tcg_ctx, t0, a->rs1);
     REQUIRE_FPU;
     REQUIRE_EXT(ctx, RVD);
+    TCGv t0 = tcg_temp_new(tcg_ctx);
+    gen_get_gpr(tcg_ctx, t0, a->rs1);
     tcg_gen_addi_tl(tcg_ctx, t0, t0, a->imm);
 
     tcg_gen_qemu_ld_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEQ);
@@ -37,10 +37,10 @@ static bool trans_fld(DisasContext *ctx, arg_fld *a)
 static bool trans_fsd(DisasContext *ctx, arg_fsd *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
-    TCGv t0 = tcg_temp_new(tcg_ctx);
-    gen_get_gpr(tcg_ctx, t0, a->rs1);
     REQUIRE_FPU;
     REQUIRE_EXT(ctx, RVD);
+    TCGv t0 = tcg_temp_new(tcg_ctx);
+    gen_get_gpr(tcg_ctx, t0, a->rs1);
     tcg_gen_addi_tl(tcg_ctx, t0, t0, a->imm);
 
     tcg_gen_qemu_st_i64(tcg_ctx, tcg_ctx->cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEQ);

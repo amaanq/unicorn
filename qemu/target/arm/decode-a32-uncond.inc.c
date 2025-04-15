@@ -25,12 +25,10 @@ typedef struct {
     int w;
 } arg_srs;
 
-#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wredundant-decls"
-# ifdef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#ifdef __clang__
 #  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
-# endif
 #endif
 
 typedef arg_i arg_BLX_i;
@@ -60,9 +58,7 @@ static bool trans_PLDW(DisasContext *ctx, arg_PLDW *a);
 typedef arg_empty arg_PLI;
 static bool trans_PLI(DisasContext *ctx, arg_PLI *a);
 
-#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-# pragma GCC diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 static void disas_a32_uncond_extract_disas_a32_uncond_Fmt_0(DisasContext *ctx, arg_i *a, uint32_t insn)
 {
@@ -123,63 +119,63 @@ static bool disas_a32_uncond(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 9) & 0x1) {
             case 0x0:
                 /* 11110001 0000...0 0000000. ..0..... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:43 */
+                /* ../target/arm/a32-uncond.decode:43 */
                 if (trans_CPS(ctx, &u.f_cps)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01010000:
             /* 11110001 0000...1 000000.. ..0..... */
             disas_a32_uncond_extract_disas_a32_uncond_Fmt_5(ctx, &u.f_setend, insn);
             switch (insn & 0x000e01df) {
             case 0x00000000:
                 /* 11110001 00000001 000000.0 00000000 */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:56 */
+                /* ../target/arm/a32-uncond.decode:56 */
                 if (trans_SETEND(ctx, &u.f_setend)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x7a:
         /* 1111010. ........ ........ ........ */
         disas_a32_uncond_extract_disas_a32_uncond_Fmt_4(ctx, &u.f_empty, insn);
         switch (insn & 0x01700000) {
         case 0x00100000:
             /* 11110100 .001.... ........ ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:73 */
+            /* ../target/arm/a32-uncond.decode:73 */
             if (trans_PLDW(ctx, &u.f_empty)) return true;
-            return false;
+            break;
         case 0x00500000:
             /* 11110100 .101.... ........ ........ */
             switch ((insn >> 12) & 0xf) {
             case 0xf:
                 /* 11110100 .101.... 1111.... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:62 */
+                /* ../target/arm/a32-uncond.decode:62 */
                 if (trans_PLI(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01100000:
             /* 11110101 .001.... ........ ........ */
             switch ((insn >> 12) & 0xf) {
             case 0xf:
                 /* 11110101 .001.... 1111.... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:61 */
+                /* ../target/arm/a32-uncond.decode:61 */
                 if (trans_PLDW(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01500000:
             /* 11110101 .101.... ........ ........ */
             switch ((insn >> 12) & 0xf) {
             case 0xf:
                 /* 11110101 .101.... 1111.... ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:60 */
+                /* ../target/arm/a32-uncond.decode:60 */
                 if (trans_PLD(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01700000:
             /* 11110101 .111.... ........ ........ */
             switch (insn & 0x008ffff0) {
@@ -188,81 +184,81 @@ static bool disas_a32_uncond(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x0000000f) {
                 case 0x0000000f:
                     /* 11110101 01111111 11110000 00011111 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:49 */
+                    /* ../target/arm/a32-uncond.decode:49 */
                     if (trans_CLREX(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x000ff040:
                 /* 11110101 01111111 11110000 0100.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:50 */
+                /* ../target/arm/a32-uncond.decode:50 */
                 if (trans_DSB(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             case 0x000ff050:
                 /* 11110101 01111111 11110000 0101.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:51 */
+                /* ../target/arm/a32-uncond.decode:51 */
                 if (trans_DMB(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             case 0x000ff060:
                 /* 11110101 01111111 11110000 0110.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:52 */
+                /* ../target/arm/a32-uncond.decode:52 */
                 if (trans_ISB(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             case 0x000ff070:
                 /* 11110101 01111111 11110000 0111.... */
                 switch (insn & 0x0000000f) {
                 case 0x00000000:
                     /* 11110101 01111111 11110000 01110000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:53 */
+                    /* ../target/arm/a32-uncond.decode:53 */
                     if (trans_SB(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x7b:
         /* 1111011. ........ ........ ........ */
         disas_a32_uncond_extract_disas_a32_uncond_Fmt_4(ctx, &u.f_empty, insn);
         switch (insn & 0x01700010) {
         case 0x00100000:
             /* 11110110 .001.... ........ ...0.... */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:74 */
+            /* ../target/arm/a32-uncond.decode:74 */
             if (trans_PLDW(ctx, &u.f_empty)) return true;
-            return false;
+            break;
         case 0x00500000:
             /* 11110110 .101.... ........ ...0.... */
             switch ((insn >> 12) & 0xf) {
             case 0xf:
                 /* 11110110 .101.... 1111.... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:66 */
+                /* ../target/arm/a32-uncond.decode:66 */
                 if (trans_PLI(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01100000:
             /* 11110111 .001.... ........ ...0.... */
             switch ((insn >> 12) & 0xf) {
             case 0xf:
                 /* 11110111 .001.... 1111.... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:65 */
+                /* ../target/arm/a32-uncond.decode:65 */
                 if (trans_PLDW(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x01500000:
             /* 11110111 .101.... ........ ...0.... */
             switch ((insn >> 12) & 0xf) {
             case 0xf:
                 /* 11110111 .101.... 1111.... ...0.... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:64 */
+                /* ../target/arm/a32-uncond.decode:64 */
                 if (trans_PLD(ctx, &u.f_empty)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x7c:
         /* 1111100. ........ ........ ........ */
         switch (insn & 0x0050ffe0) {
@@ -272,30 +268,30 @@ static bool disas_a32_uncond(DisasContext *ctx, uint32_t insn)
             switch (insn & 0x0000001f) {
             case 0x00000000:
                 /* 1111100. .0.1.... 00001010 00000000 */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:41 */
+                /* ../target/arm/a32-uncond.decode:41 */
                 if (trans_RFE(ctx, &u.f_rfe)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00400500:
             /* 1111100. .1.0.... 00000101 000..... */
             disas_a32_uncond_extract_disas_a32_uncond_Fmt_2(ctx, &u.f_srs, insn);
             switch ((insn >> 16) & 0xf) {
             case 0xd:
                 /* 1111100. .1.01101 00000101 000..... */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:42 */
+                /* ../target/arm/a32-uncond.decode:42 */
                 if (trans_SRS(ctx, &u.f_srs)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x7d:
         /* 1111101. ........ ........ ........ */
-        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/a32-uncond.decode:33 */
+        /* ../target/arm/a32-uncond.decode:33 */
         disas_a32_uncond_extract_disas_a32_uncond_Fmt_0(ctx, &u.f_i, insn);
         if (trans_BLX_i(ctx, &u.f_i)) return true;
-        return false;
+        break;
     }
     return false;
 }

@@ -166,8 +166,7 @@ static void arm_cpu_reset(CPUState *dev)
     env->vfp.xregs[ARM_VFP_MVFR1] = cpu->isar.mvfr1;
     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
 
-    cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
-    s->halted = cpu->start_powered_off;
+    cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
 
     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
@@ -205,6 +204,15 @@ static void arm_cpu_reset(CPUState *dev)
         uint32_t initial_pc; /* Loaded from 0x4 */
         // uint8_t *rom;
         uint32_t vecbase;
+
+        if (cpu_isar_feature(aa32_lob, cpu)) {
+            /*
+             * LTPSIZE is constant 4 if MVE not implemented, and resets
+             * to an UNKNOWN value if MVE is implemented. We choose to
+             * always reset to 4.
+             */
+            env->v7m.ltpsize = 4;
+        }
 
         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
             env->v7m.secure = true;
@@ -348,12 +356,15 @@ static void arm_cpu_reset(CPUState *dev)
     set_flush_to_zero(1, &env->vfp.standard_fp_status);
     set_flush_inputs_to_zero(1, &env->vfp.standard_fp_status);
     set_default_nan_mode(1, &env->vfp.standard_fp_status);
+    set_default_nan_mode(1, &env->vfp.standard_fp_status_f16);
     set_float_detect_tininess(float_tininess_before_rounding,
                               &env->vfp.fp_status);
     set_float_detect_tininess(float_tininess_before_rounding,
                               &env->vfp.standard_fp_status);
     set_float_detect_tininess(float_tininess_before_rounding,
                               &env->vfp.fp_status_f16);
+    set_float_detect_tininess(float_tininess_before_rounding,
+                              &env->vfp.standard_fp_status_f16);
 
     hw_breakpoint_update_all(cpu);
     hw_watchpoint_update_all(cpu);
@@ -594,6 +605,14 @@ void arm_cpu_update_vfiq(ARMCPU *cpu)
             cpu_reset_interrupt(cs, CPU_INTERRUPT_VFIQ);
         }
     }
+
+    // if (kvm_enabled()) {
+    //     kvm_arm_steal_time_finalize(cpu, &local_err);
+    //     if (local_err != NULL) {
+    //         error_propagate(errp, local_err);
+    //         return;
+    //     }
+    // }
 }
 
 static uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz)
@@ -807,17 +826,22 @@ void arm_cpu_realizefn(struct uc_struct *uc, CPUState *dev)
         u = cpu->isar.mvfr0;
         FIELD_DP32(u, MVFR0, FPSP, 0, u);
         FIELD_DP32(u, MVFR0, FPDP, 0, u);
-        FIELD_DP32(u, MVFR0, FPTRAP, 0, u);
         FIELD_DP32(u, MVFR0, FPDIVIDE, 0, u);
         FIELD_DP32(u, MVFR0, FPSQRT, 0, u);
-        FIELD_DP32(u, MVFR0, FPSHVEC, 0, u);
         FIELD_DP32(u, MVFR0, FPROUND, 0, u);
+        if (!arm_feature(env, ARM_FEATURE_M)) {
+            FIELD_DP32(u, MVFR0, FPTRAP, 0, u);
+            FIELD_DP32(u, MVFR0, FPSHVEC, 0, u);
+        }
         cpu->isar.mvfr0 = u;
 
         u = cpu->isar.mvfr1;
         FIELD_DP32(u, MVFR1, FPFTZ, 0, u);
         FIELD_DP32(u, MVFR1, FPDNAN, 0, u);
         FIELD_DP32(u, MVFR1, FPHP, 0, u);
+        if (arm_feature(env, ARM_FEATURE_M)) {
+            FIELD_DP32(u, MVFR1, FP16, 0, u);
+        }
         cpu->isar.mvfr1 = u;
 
         u = cpu->isar.mvfr2;
@@ -853,16 +877,18 @@ void arm_cpu_realizefn(struct uc_struct *uc, CPUState *dev)
         FIELD_DP32(u, ID_ISAR6, FHM, 0, u);
         cpu->isar.id_isar6 = u;
 
-        u = cpu->isar.mvfr1;
-        FIELD_DP32(u, MVFR1, SIMDLS, 0, u);
-        FIELD_DP32(u, MVFR1, SIMDINT, 0, u);
-        FIELD_DP32(u, MVFR1, SIMDSP, 0, u);
-        FIELD_DP32(u, MVFR1, SIMDHP, 0, u);
-        cpu->isar.mvfr1 = u;
+        if (!arm_feature(env, ARM_FEATURE_M)) {
+            u = cpu->isar.mvfr1;
+            FIELD_DP32(u, MVFR1, SIMDLS, 0, u);
+            FIELD_DP32(u, MVFR1, SIMDINT, 0, u);
+            FIELD_DP32(u, MVFR1, SIMDSP, 0, u);
+            FIELD_DP32(u, MVFR1, SIMDHP, 0, u);
+            cpu->isar.mvfr1 = u;
 
-        u = cpu->isar.mvfr2;
-        FIELD_DP32(u, MVFR2, SIMDMISC, 0, u);
-        cpu->isar.mvfr2 = u;
+            u = cpu->isar.mvfr2;
+            FIELD_DP32(u, MVFR2, SIMDMISC, 0, u);
+            cpu->isar.mvfr2 = u;
+        }
     }
 
     if (!cpu->has_neon && !cpu->has_vfp) {
@@ -980,7 +1006,6 @@ void arm_cpu_realizefn(struct uc_struct *uc, CPUState *dev)
     }
     if (arm_feature(env, ARM_FEATURE_LPAE)) {
         set_feature(env, ARM_FEATURE_V7MP);
-        set_feature(env, ARM_FEATURE_PXN);
     }
     if (arm_feature(env, ARM_FEATURE_CBAR_RO)) {
         set_feature(env, ARM_FEATURE_CBAR);
@@ -1055,7 +1080,7 @@ void arm_cpu_realizefn(struct uc_struct *uc, CPUState *dev)
         /* Disable the security extension feature bits in the processor feature
          * registers as well. These are id_pfr1[7:4] and id_aa64pfr0[15:12].
          */
-        cpu->id_pfr1 &= ~0xf0;
+        cpu->isar.id_pfr1 &= ~0xf0;
         cpu->isar.id_aa64pfr0 &= ~0xf000;
     }
 
@@ -1084,7 +1109,7 @@ void arm_cpu_realizefn(struct uc_struct *uc, CPUState *dev)
          * id_aa64pfr0_el1[11:8].
          */
         cpu->isar.id_aa64pfr0 &= ~0xf00;
-        cpu->id_pfr1 &= ~0xf000;
+        cpu->isar.id_pfr1 &= ~0xf000;
     }
 
     /* MPU can be configured out of a PMSA CPU either by setting has-mpu
@@ -1266,8 +1291,8 @@ static void arm1136_r2_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x00000000;
     cpu->ctr = 0x1dd20d2;
     cpu->reset_sctlr = 0x00050078;
-    cpu->id_pfr0 = 0x111;
-    cpu->id_pfr1 = 0x1;
+    cpu->isar.id_pfr0 = 0x111;
+    cpu->isar.id_pfr1 = 0x1;
     cpu->isar.id_dfr0 = 0x2;
     cpu->id_afr0 = 0x3;
     cpu->isar.id_mmfr0 = 0x01130003;
@@ -1296,8 +1321,8 @@ static void arm1136_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x00000000;
     cpu->ctr = 0x1dd20d2;
     cpu->reset_sctlr = 0x00050078;
-    cpu->id_pfr0 = 0x111;
-    cpu->id_pfr1 = 0x1;
+    cpu->isar.id_pfr0 = 0x111;
+    cpu->isar.id_pfr1 = 0x1;
     cpu->isar.id_dfr0 = 0x2;
     cpu->id_afr0 = 0x3;
     cpu->isar.id_mmfr0 = 0x01130003;
@@ -1327,8 +1352,8 @@ static void arm1176_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x00000000;
     cpu->ctr = 0x1dd20d2;
     cpu->reset_sctlr = 0x00050078;
-    cpu->id_pfr0 = 0x111;
-    cpu->id_pfr1 = 0x11;
+    cpu->isar.id_pfr0 = 0x111;
+    cpu->isar.id_pfr1 = 0x11;
     cpu->isar.id_dfr0 = 0x33;
     cpu->id_afr0 = 0;
     cpu->isar.id_mmfr0 = 0x01130003;
@@ -1355,8 +1380,8 @@ static void arm11mpcore_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr0 = 0x11111111;
     cpu->isar.mvfr1 = 0x00000000;
     cpu->ctr = 0x1d192992; /* 32K icache 32K dcache */
-    cpu->id_pfr0 = 0x111;
-    cpu->id_pfr1 = 0x1;
+    cpu->isar.id_pfr0 = 0x111;
+    cpu->isar.id_pfr1 = 0x1;
     cpu->isar.id_dfr0 = 0;
     cpu->id_afr0 = 0x2;
     cpu->isar.id_mmfr0 = 0x01100103;
@@ -1387,8 +1412,8 @@ static void cortex_m3_initfn(struct uc_struct *uc, CPUState *obj)
     set_feature(&cpu->env, ARM_FEATURE_M_MAIN);
     cpu->midr = 0x410fc231;
     cpu->pmsav7_dregion = 8;
-    cpu->id_pfr0 = 0x00000030;
-    cpu->id_pfr1 = 0x00000200;
+    cpu->isar.id_pfr0 = 0x00000030;
+    cpu->isar.id_pfr1 = 0x00000200;
     cpu->isar.id_dfr0 = 0x00100000;
     cpu->id_afr0 = 0x00000000;
     cpu->isar.id_mmfr0 = 0x00000030;
@@ -1417,8 +1442,8 @@ static void cortex_m4_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr0 = 0x10110021;
     cpu->isar.mvfr1 = 0x11000011;
     cpu->isar.mvfr2 = 0x00000000;
-    cpu->id_pfr0 = 0x00000030;
-    cpu->id_pfr1 = 0x00000200;
+    cpu->isar.id_pfr0 = 0x00000030;
+    cpu->isar.id_pfr1 = 0x00000200;
     cpu->isar.id_dfr0 = 0x00100000;
     cpu->id_afr0 = 0x00000000;
     cpu->isar.id_mmfr0 = 0x00000030;
@@ -1447,8 +1472,8 @@ static void cortex_m7_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr0 = 0x10110221;
     cpu->isar.mvfr1 = 0x12000011;
     cpu->isar.mvfr2 = 0x00000040;
-    cpu->id_pfr0 = 0x00000030;
-    cpu->id_pfr1 = 0x00000200;
+    cpu->isar.id_pfr0 = 0x00000030;
+    cpu->isar.id_pfr1 = 0x00000200;
     cpu->isar.id_dfr0 = 0x00100000;
     cpu->id_afr0 = 0x00000000;
     cpu->isar.id_mmfr0 = 0x00100030;
@@ -1479,8 +1504,8 @@ static void cortex_m33_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr0 = 0x10110021;
     cpu->isar.mvfr1 = 0x11000011;
     cpu->isar.mvfr2 = 0x00000040;
-    cpu->id_pfr0 = 0x00000030;
-    cpu->id_pfr1 = 0x00000210;
+    cpu->isar.id_pfr0 = 0x00000030;
+    cpu->isar.id_pfr1 = 0x00000210;
     cpu->isar.id_dfr0 = 0x00200000;
     cpu->id_afr0 = 0x00000000;
     cpu->isar.id_mmfr0 = 0x00101F40;
@@ -1529,8 +1554,8 @@ static void cortex_r5_initfn(struct uc_struct *uc, CPUState *obj)
     set_feature(&cpu->env, ARM_FEATURE_PMSA);
     set_feature(&cpu->env, ARM_FEATURE_PMU);
     cpu->midr = 0x411fc153; /* r1p3 */
-    cpu->id_pfr0 = 0x0131;
-    cpu->id_pfr1 = 0x001;
+    cpu->isar.id_pfr0 = 0x0131;
+    cpu->isar.id_pfr1 = 0x001;
     cpu->isar.id_dfr0 = 0x010400;
     cpu->id_afr0 = 0x0;
     cpu->isar.id_mmfr0 = 0x0210030;
@@ -1581,8 +1606,8 @@ static void cortex_a8_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x00011111;
     cpu->ctr = 0x82048004;
     cpu->reset_sctlr = 0x00c50078;
-    cpu->id_pfr0 = 0x1031;
-    cpu->id_pfr1 = 0x11;
+    cpu->isar.id_pfr0 = 0x1031;
+    cpu->isar.id_pfr1 = 0x11;
     cpu->isar.id_dfr0 = 0x400;
     cpu->id_afr0 = 0;
     cpu->isar.id_mmfr0 = 0x31100003;
@@ -1652,8 +1677,8 @@ static void cortex_a9_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x01111111;
     cpu->ctr = 0x80038003;
     cpu->reset_sctlr = 0x00c50078;
-    cpu->id_pfr0 = 0x1031;
-    cpu->id_pfr1 = 0x11;
+    cpu->isar.id_pfr0 = 0x1031;
+    cpu->isar.id_pfr1 = 0x11;
     cpu->isar.id_dfr0 = 0x000;
     cpu->id_afr0 = 0;
     cpu->isar.id_mmfr0 = 0x00100103;
@@ -1713,8 +1738,8 @@ static void cortex_a7_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x11111111;
     cpu->ctr = 0x84448003;
     cpu->reset_sctlr = 0x00c50078;
-    cpu->id_pfr0 = 0x00001131;
-    cpu->id_pfr1 = 0x00011011;
+    cpu->isar.id_pfr0 = 0x00001131;
+    cpu->isar.id_pfr1 = 0x00011011;
     cpu->isar.id_dfr0 = 0x02010555;
     cpu->id_afr0 = 0x00000000;
     cpu->isar.id_mmfr0 = 0x10101105;
@@ -1756,8 +1781,8 @@ static void cortex_a15_initfn(struct uc_struct *uc, CPUState *obj)
     cpu->isar.mvfr1 = 0x11111111;
     cpu->ctr = 0x8444c004;
     cpu->reset_sctlr = 0x00c50078;
-    cpu->id_pfr0 = 0x00001131;
-    cpu->id_pfr1 = 0x00011011;
+    cpu->isar.id_pfr0 = 0x00001131;
+    cpu->isar.id_pfr1 = 0x00011011;
     cpu->isar.id_dfr0 = 0x02010555;
     cpu->id_afr0 = 0x00000000;
     cpu->isar.id_mmfr0 = 0x10201105;
@@ -1934,70 +1959,69 @@ static void pxa270c5_initfn(struct uc_struct *uc, CPUState *obj)
 }
 
 #ifndef TARGET_AARCH64
-/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+/*
+ * -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
  * otherwise, a CPU with as many features enabled as our emulation supports.
  * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64.c;
- * this only needs to handle 32 bits.
+ * this only needs to handle 32 bits, and need not care about KVM.
  */
 static void arm_max_initfn(struct uc_struct *uc, CPUState *obj)
 {
     ARMCPU *cpu = ARM_CPU(obj);
 
-    {
-        cortex_a15_initfn(uc, obj);
+    cortex_a15_initfn(uc, obj);
 
-        /* old-style VFP short-vector support */
-        FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1, cpu->isar.mvfr0);
+    /* old-style VFP short-vector support */
+    FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1, cpu->isar.mvfr0);
 
 // Unicorn: Enable this on ARM_MAX
 //#ifdef CONFIG_USER_ONLY
-        /* We don't set these in system emulation mode for the moment,
-         * since we don't correctly set (all of) the ID registers to
-         * advertise them.
-         */
-        set_feature(&cpu->env, ARM_FEATURE_V8);
-        {
-            uint32_t t;
+    /* We don't set these in system emulation mode for the moment,
+        * since we don't correctly set (all of) the ID registers to
+        * advertise them.
+        */
+    set_feature(&cpu->env, ARM_FEATURE_V8);
+    {
+        uint32_t t;
 
-            t = cpu->isar.id_isar5;
-            FIELD_DP32(t, ID_ISAR5, AES, 2, t);
-            FIELD_DP32(t, ID_ISAR5, SHA1, 1, t);
-            FIELD_DP32(t, ID_ISAR5, SHA2, 1, t);
-            FIELD_DP32(t, ID_ISAR5, CRC32, 1, t);
-            FIELD_DP32(t, ID_ISAR5, RDM, 1, t);
-            FIELD_DP32(t, ID_ISAR5, VCMA, 1, t);
-            cpu->isar.id_isar5 = t;
+        t = cpu->isar.id_isar5;
+        FIELD_DP32(t, ID_ISAR5, AES, 2, t);
+        FIELD_DP32(t, ID_ISAR5, SHA1, 1, t);
+        FIELD_DP32(t, ID_ISAR5, SHA2, 1, t);
+        FIELD_DP32(t, ID_ISAR5, CRC32, 1, t);
+        FIELD_DP32(t, ID_ISAR5, RDM, 1, t);
+        FIELD_DP32(t, ID_ISAR5, VCMA, 1, t);
+        cpu->isar.id_isar5 = t;
 
-            t = cpu->isar.id_isar6;
-            FIELD_DP32(t, ID_ISAR6, JSCVT, 1, t);
-            FIELD_DP32(t, ID_ISAR6, DP, 1, t);
-            FIELD_DP32(t, ID_ISAR6, FHM, 1, t);
-            FIELD_DP32(t, ID_ISAR6, SB, 1, t);
-            FIELD_DP32(t, ID_ISAR6, SPECRES, 1, t);
-            cpu->isar.id_isar6 = t;
+        t = cpu->isar.id_isar6;
+        FIELD_DP32(t, ID_ISAR6, JSCVT, 1, t);
+        FIELD_DP32(t, ID_ISAR6, DP, 1, t);
+        FIELD_DP32(t, ID_ISAR6, FHM, 1, t);
+        FIELD_DP32(t, ID_ISAR6, SB, 1, t);
+        FIELD_DP32(t, ID_ISAR6, SPECRES, 1, t);
+        cpu->isar.id_isar6 = t;
 
-            t = cpu->isar.mvfr1;
-            FIELD_DP32(t, MVFR1, FPHP, 2, t);     /* v8.0 FP support */
-            cpu->isar.mvfr1 = t;
+        t = cpu->isar.mvfr1;
+        FIELD_DP32(t, MVFR1, FPHP, 2, t);     /* v8.0 FP support */
+        cpu->isar.mvfr1 = t;
 
-            t = cpu->isar.mvfr2;
-            FIELD_DP32(t, MVFR2, SIMDMISC, 3, t); /* SIMD MaxNum */
-            FIELD_DP32(t, MVFR2, FPMISC, 4, t);   /* FP MaxNum */
-            cpu->isar.mvfr2 = t;
+        t = cpu->isar.mvfr2;
+        FIELD_DP32(t, MVFR2, SIMDMISC, 3, t); /* SIMD MaxNum */
+        FIELD_DP32(t, MVFR2, FPMISC, 4, t);   /* FP MaxNum */
+        cpu->isar.mvfr2 = t;
 
-            t = cpu->isar.id_mmfr3;
-            FIELD_DP32(t, ID_MMFR3, PAN, 2, t); /* ATS1E1 */
-            cpu->isar.id_mmfr3 = t;
+        t = cpu->isar.id_mmfr3;
+        FIELD_DP32(t, ID_MMFR3, PAN, 2, t); /* ATS1E1 */
+        cpu->isar.id_mmfr3 = t;
 
-            t = cpu->isar.id_mmfr4;
-            FIELD_DP32(t, ID_MMFR4, HPDS, 1, t); /* AA32HPD */
-            FIELD_DP32(t, ID_MMFR4, AC2, 1, t); /* ACTLR2, HACTLR2 */
-            FIELD_DP32(t, ID_MMFR4, CNP, 1, t); /* TTCNP */
-            FIELD_DP32(t, ID_MMFR4, XNX, 1, t); /* TTS2UXN */
-            cpu->isar.id_mmfr4 = t;
-        }
-//#endif
+        t = cpu->isar.id_mmfr4;
+        FIELD_DP32(t, ID_MMFR4, HPDS, 1, t); /* AA32HPD */
+        FIELD_DP32(t, ID_MMFR4, AC2, 1, t); /* ACTLR2, HACTLR2 */
+        FIELD_DP32(t, ID_MMFR4, CNP, 1, t); /* TTCNP */
+        FIELD_DP32(t, ID_MMFR4, XNX, 1, t); /* TTS2UXN */
+        cpu->isar.id_mmfr4 = t;
     }
+//#endif
 }
 #endif
 

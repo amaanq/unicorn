@@ -77,7 +77,6 @@ typedef struct {
 } arg_decode_insn3224;
 
 typedef struct {
-    int : 0;
 } arg_empty;
 
 typedef struct {
@@ -398,6 +397,26 @@ typedef arg_decode_insn3217 arg_fcvt_d_w;
 static bool trans_fcvt_d_w(DisasContext *ctx, arg_fcvt_d_w *a);
 typedef arg_decode_insn3217 arg_fcvt_d_wu;
 static bool trans_fcvt_d_wu(DisasContext *ctx, arg_fcvt_d_wu *a);
+typedef arg_decode_insn3218 arg_hlv_b;
+static bool trans_hlv_b(DisasContext *ctx, arg_hlv_b *a);
+typedef arg_decode_insn3218 arg_hlv_bu;
+static bool trans_hlv_bu(DisasContext *ctx, arg_hlv_bu *a);
+typedef arg_decode_insn3218 arg_hlv_h;
+static bool trans_hlv_h(DisasContext *ctx, arg_hlv_h *a);
+typedef arg_decode_insn3218 arg_hlv_hu;
+static bool trans_hlv_hu(DisasContext *ctx, arg_hlv_hu *a);
+typedef arg_decode_insn3218 arg_hlvx_hu;
+static bool trans_hlvx_hu(DisasContext *ctx, arg_hlvx_hu *a);
+typedef arg_decode_insn3218 arg_hlv_w;
+static bool trans_hlv_w(DisasContext *ctx, arg_hlv_w *a);
+typedef arg_decode_insn3218 arg_hlvx_wu;
+static bool trans_hlvx_wu(DisasContext *ctx, arg_hlvx_wu *a);
+typedef arg_decode_insn3222 arg_hsv_b;
+static bool trans_hsv_b(DisasContext *ctx, arg_hsv_b *a);
+typedef arg_decode_insn3222 arg_hsv_h;
+static bool trans_hsv_h(DisasContext *ctx, arg_hsv_h *a);
+typedef arg_decode_insn3222 arg_hsv_w;
+static bool trans_hsv_w(DisasContext *ctx, arg_hsv_w *a);
 typedef arg_decode_insn3222 arg_hfence_gvma;
 static bool trans_hfence_gvma(DisasContext *ctx, arg_hfence_gvma *a);
 typedef arg_decode_insn3222 arg_hfence_vvma;
@@ -1119,11 +1138,11 @@ static void decode_insn32_extract_csr(DisasContext *ctx, arg_decode_insn3214 *a,
     a->rd = extract32(insn, 7, 5);
 }
 
-static void decode_insn32_extract_decode_insn32_Fmt_28(DisasContext *ctx, arg_empty *a, uint32_t insn)
+static void decode_insn32_extract_decode_insn32_Fmt_29(DisasContext *ctx, arg_empty *a, uint32_t insn)
 {
 }
 
-static void decode_insn32_extract_decode_insn32_Fmt_29(DisasContext *ctx, arg_decode_insn3224 *a, uint32_t insn)
+static void decode_insn32_extract_decode_insn32_Fmt_30(DisasContext *ctx, arg_decode_insn3224 *a, uint32_t insn)
 {
     a->pred = extract32(insn, 24, 4);
     a->succ = extract32(insn, 20, 4);
@@ -1186,6 +1205,12 @@ static void decode_insn32_extract_r2_rm(DisasContext *ctx, arg_decode_insn3217 *
     a->rs1 = extract32(insn, 15, 5);
     a->rm = extract32(insn, 12, 3);
     a->rd = extract32(insn, 7, 5);
+}
+
+static void decode_insn32_extract_r2_s(DisasContext *ctx, arg_decode_insn3222 *a, uint32_t insn)
+{
+    a->rs2 = extract32(insn, 20, 5);
+    a->rs1 = extract32(insn, 15, 5);
 }
 
 static void decode_insn32_extract_r2_vm(DisasContext *ctx, arg_rmr *a, uint32_t insn)
@@ -1335,26 +1360,31 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 12) & 0x7) {
         case 0x0:
             /* ........ ........ .000.... .0000011 */
+            /* ../target/riscv/insn32.decode:111 */
             if (trans_lb(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x1:
             /* ........ ........ .001.... .0000011 */
+            /* ../target/riscv/insn32.decode:112 */
             if (trans_lh(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x2:
             /* ........ ........ .010.... .0000011 */
+            /* ../target/riscv/insn32.decode:113 */
             if (trans_lw(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x4:
             /* ........ ........ .100.... .0000011 */
+            /* ../target/riscv/insn32.decode:114 */
             if (trans_lbu(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x5:
             /* ........ ........ .101.... .0000011 */
+            /* ../target/riscv/insn32.decode:115 */
             if (trans_lhu(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000007:
         /* ........ ........ ........ .0000111 */
         switch ((insn >> 12) & 0x7) {
@@ -1367,60 +1397,70 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...000.0 0000.... .000.... .0000111 */
+                    /* ../target/riscv/insn32.decode:247 */
                     if (trans_vlbu_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...000.1 0000.... .000.... .0000111 */
+                    /* ../target/riscv/insn32.decode:254 */
                     if (trans_vlbuff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ...010.. ........ .000.... .0000111 */
+                /* ../target/riscv/insn32.decode:266 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlsbu_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ...011.. ........ .000.... .0000111 */
+                /* ../target/riscv/insn32.decode:278 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxbu_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x4:
                 /* ...100.. ........ .000.... .0000111 */
                 decode_insn32_extract_r2_nfvm(ctx, &u.f_r2nfvm, insn);
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...100.0 0000.... .000.... .0000111 */
+                    /* ../target/riscv/insn32.decode:243 */
                     if (trans_vlb_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...100.1 0000.... .000.... .0000111 */
+                    /* ../target/riscv/insn32.decode:250 */
                     if (trans_vlbff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x6:
                 /* ...110.. ........ .000.... .0000111 */
+                /* ../target/riscv/insn32.decode:262 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlsb_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x7:
                 /* ...111.. ........ .000.... .0000111 */
+                /* ../target/riscv/insn32.decode:274 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxb_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2:
             /* ........ ........ .010.... .0000111 */
+            /* ../target/riscv/insn32.decode:171 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_flw(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x3:
             /* ........ ........ .011.... .0000111 */
+            /* ../target/riscv/insn32.decode:199 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_fld(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x5:
             /* ........ ........ .101.... .0000111 */
             switch ((insn >> 26) & 0x7) {
@@ -1430,50 +1470,58 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...000.0 0000.... .101.... .0000111 */
+                    /* ../target/riscv/insn32.decode:248 */
                     if (trans_vlhu_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...000.1 0000.... .101.... .0000111 */
+                    /* ../target/riscv/insn32.decode:255 */
                     if (trans_vlhuff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ...010.. ........ .101.... .0000111 */
+                /* ../target/riscv/insn32.decode:267 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlshu_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ...011.. ........ .101.... .0000111 */
+                /* ../target/riscv/insn32.decode:279 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxhu_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x4:
                 /* ...100.. ........ .101.... .0000111 */
                 decode_insn32_extract_r2_nfvm(ctx, &u.f_r2nfvm, insn);
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...100.0 0000.... .101.... .0000111 */
+                    /* ../target/riscv/insn32.decode:244 */
                     if (trans_vlh_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...100.1 0000.... .101.... .0000111 */
+                    /* ../target/riscv/insn32.decode:251 */
                     if (trans_vlhff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x6:
                 /* ...110.. ........ .101.... .0000111 */
+                /* ../target/riscv/insn32.decode:263 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlsh_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x7:
                 /* ...111.. ........ .101.... .0000111 */
+                /* ../target/riscv/insn32.decode:275 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxh_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x6:
             /* ........ ........ .110.... .0000111 */
             switch ((insn >> 26) & 0x7) {
@@ -1483,50 +1531,58 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...000.0 0000.... .110.... .0000111 */
+                    /* ../target/riscv/insn32.decode:249 */
                     if (trans_vlwu_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...000.1 0000.... .110.... .0000111 */
+                    /* ../target/riscv/insn32.decode:256 */
                     if (trans_vlwuff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ...010.. ........ .110.... .0000111 */
+                /* ../target/riscv/insn32.decode:268 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlswu_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ...011.. ........ .110.... .0000111 */
+                /* ../target/riscv/insn32.decode:280 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxwu_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x4:
                 /* ...100.. ........ .110.... .0000111 */
                 decode_insn32_extract_r2_nfvm(ctx, &u.f_r2nfvm, insn);
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...100.0 0000.... .110.... .0000111 */
+                    /* ../target/riscv/insn32.decode:245 */
                     if (trans_vlw_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...100.1 0000.... .110.... .0000111 */
+                    /* ../target/riscv/insn32.decode:252 */
                     if (trans_vlwff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x6:
                 /* ...110.. ........ .110.... .0000111 */
+                /* ../target/riscv/insn32.decode:264 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlsw_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x7:
                 /* ...111.. ........ .110.... .0000111 */
+                /* ../target/riscv/insn32.decode:276 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxw_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x7:
             /* ........ ........ .111.... .0000111 */
             switch ((insn >> 26) & 0x7) {
@@ -1536,125 +1592,144 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1f) {
                 case 0x0:
                     /* ...000.0 0000.... .111.... .0000111 */
+                    /* ../target/riscv/insn32.decode:246 */
                     if (trans_vle_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* ...000.1 0000.... .111.... .0000111 */
+                    /* ../target/riscv/insn32.decode:253 */
                     if (trans_vleff_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ...010.. ........ .111.... .0000111 */
+                /* ../target/riscv/insn32.decode:265 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlse_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             case 0x3:
                 /* ...011.. ........ .111.... .0000111 */
+                /* ../target/riscv/insn32.decode:277 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vlxe_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0000000f:
         /* ........ ........ ........ .0001111 */
         switch ((insn >> 12) & 0x7) {
         case 0x0:
             /* ........ ........ .000.... .0001111 */
-            decode_insn32_extract_decode_insn32_Fmt_29(ctx, &u.f_decode_insn3224, insn);
+            /* ../target/riscv/insn32.decode:138 */
+            decode_insn32_extract_decode_insn32_Fmt_30(ctx, &u.f_decode_insn3224, insn);
             if (trans_fence(ctx, &u.f_decode_insn3224)) return true;
-            return false;
+            break;
         case 0x1:
             /* ........ ........ .001.... .0001111 */
-            decode_insn32_extract_decode_insn32_Fmt_28(ctx, &u.f_empty, insn);
+            /* ../target/riscv/insn32.decode:139 */
+            decode_insn32_extract_decode_insn32_Fmt_29(ctx, &u.f_empty, insn);
             if (trans_fence_i(ctx, &u.f_empty)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000013:
         /* ........ ........ ........ .0010011 */
         switch ((insn >> 12) & 0x7) {
         case 0x0:
             /* ........ ........ .000.... .0010011 */
+            /* ../target/riscv/insn32.decode:119 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_addi(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x1:
             /* ........ ........ .001.... .0010011 */
             decode_insn32_extract_sh(ctx, &u.f_shift, insn);
             switch ((insn >> 30) & 0x3) {
             case 0x0:
                 /* 00...... ........ .001.... .0010011 */
+                /* ../target/riscv/insn32.decode:125 */
                 if (trans_slli(ctx, &u.f_shift)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2:
             /* ........ ........ .010.... .0010011 */
+            /* ../target/riscv/insn32.decode:120 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_slti(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x3:
             /* ........ ........ .011.... .0010011 */
+            /* ../target/riscv/insn32.decode:121 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_sltiu(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x4:
             /* ........ ........ .100.... .0010011 */
+            /* ../target/riscv/insn32.decode:122 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_xori(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x5:
             /* ........ ........ .101.... .0010011 */
             decode_insn32_extract_sh(ctx, &u.f_shift, insn);
             switch ((insn >> 30) & 0x3) {
             case 0x0:
                 /* 00...... ........ .101.... .0010011 */
+                /* ../target/riscv/insn32.decode:126 */
                 if (trans_srli(ctx, &u.f_shift)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 01...... ........ .101.... .0010011 */
+                /* ../target/riscv/insn32.decode:127 */
                 if (trans_srai(ctx, &u.f_shift)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x6:
             /* ........ ........ .110.... .0010011 */
+            /* ../target/riscv/insn32.decode:123 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_ori(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x7:
             /* ........ ........ .111.... .0010011 */
+            /* ../target/riscv/insn32.decode:124 */
             decode_insn32_extract_i(ctx, &u.f_i, insn);
             if (trans_andi(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000017:
         /* ........ ........ ........ .0010111 */
+        /* ../target/riscv/insn32.decode:102 */
         decode_insn32_extract_u(ctx, &u.f_u, insn);
         if (trans_auipc(ctx, &u.f_u)) return true;
-        return false;
+        break;
     case 0x00000023:
         /* ........ ........ ........ .0100011 */
         decode_insn32_extract_s(ctx, &u.f_s, insn);
         switch ((insn >> 12) & 0x7) {
         case 0x0:
             /* ........ ........ .000.... .0100011 */
+            /* ../target/riscv/insn32.decode:116 */
             if (trans_sb(ctx, &u.f_s)) return true;
-            return false;
+            break;
         case 0x1:
             /* ........ ........ .001.... .0100011 */
+            /* ../target/riscv/insn32.decode:117 */
             if (trans_sh(ctx, &u.f_s)) return true;
-            return false;
+            break;
         case 0x2:
             /* ........ ........ .010.... .0100011 */
+            /* ../target/riscv/insn32.decode:118 */
             if (trans_sw(ctx, &u.f_s)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000027:
         /* ........ ........ ........ .0100111 */
         switch ((insn >> 12) & 0x7) {
@@ -1667,37 +1742,42 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x11f00000) {
                 case 0x00000000:
                     /* ...000.0 0000.... .000.... .0100111 */
+                    /* ../target/riscv/insn32.decode:257 */
                     if (trans_vsb_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ....10.. ........ .000.... .0100111 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 switch ((insn >> 28) & 0x1) {
                 case 0x0:
                     /* ...010.. ........ .000.... .0100111 */
+                    /* ../target/riscv/insn32.decode:269 */
                     if (trans_vssb_v(ctx, &u.f_rnfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* ....11.. ........ .000.... .0100111 */
+                /* ../target/riscv/insn32.decode:282 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vsxb_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2:
             /* ........ ........ .010.... .0100111 */
+            /* ../target/riscv/insn32.decode:172 */
             decode_insn32_extract_s(ctx, &u.f_s, insn);
             if (trans_fsw(ctx, &u.f_s)) return true;
-            return false;
+            break;
         case 0x3:
             /* ........ ........ .011.... .0100111 */
+            /* ../target/riscv/insn32.decode:200 */
             decode_insn32_extract_s(ctx, &u.f_s, insn);
             if (trans_fsd(ctx, &u.f_s)) return true;
-            return false;
+            break;
         case 0x5:
             /* ........ ........ .101.... .0100111 */
             switch ((insn >> 26) & 0x3) {
@@ -1707,27 +1787,30 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x11f00000) {
                 case 0x00000000:
                     /* ...000.0 0000.... .101.... .0100111 */
+                    /* ../target/riscv/insn32.decode:258 */
                     if (trans_vsh_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ....10.. ........ .101.... .0100111 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 switch ((insn >> 28) & 0x1) {
                 case 0x0:
                     /* ...010.. ........ .101.... .0100111 */
+                    /* ../target/riscv/insn32.decode:270 */
                     if (trans_vssh_v(ctx, &u.f_rnfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* ....11.. ........ .101.... .0100111 */
+                /* ../target/riscv/insn32.decode:283 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vsxh_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x6:
             /* ........ ........ .110.... .0100111 */
             switch ((insn >> 26) & 0x3) {
@@ -1737,27 +1820,30 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x11f00000) {
                 case 0x00000000:
                     /* ...000.0 0000.... .110.... .0100111 */
+                    /* ../target/riscv/insn32.decode:259 */
                     if (trans_vsw_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ....10.. ........ .110.... .0100111 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 switch ((insn >> 28) & 0x1) {
                 case 0x0:
                     /* ...010.. ........ .110.... .0100111 */
+                    /* ../target/riscv/insn32.decode:271 */
                     if (trans_vssw_v(ctx, &u.f_rnfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* ....11.. ........ .110.... .0100111 */
+                /* ../target/riscv/insn32.decode:284 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vsxw_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x7:
             /* ........ ........ .111.... .0100111 */
             switch ((insn >> 26) & 0x3) {
@@ -1767,553 +1853,643 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch (insn & 0x11f00000) {
                 case 0x00000000:
                     /* ...000.0 0000.... .111.... .0100111 */
+                    /* ../target/riscv/insn32.decode:260 */
                     if (trans_vse_v(ctx, &u.f_r2nfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* ....10.. ........ .111.... .0100111 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 switch ((insn >> 28) & 0x1) {
                 case 0x0:
                     /* ...010.. ........ .111.... .0100111 */
+                    /* ../target/riscv/insn32.decode:272 */
                     if (trans_vsse_v(ctx, &u.f_rnfvm)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* ....11.. ........ .111.... .0100111 */
+                /* ../target/riscv/insn32.decode:285 */
                 decode_insn32_extract_r_nfvm(ctx, &u.f_rnfvm, insn);
                 if (trans_vsxe_v(ctx, &u.f_rnfvm)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0000002f:
         /* ........ ........ ........ .0101111 */
         switch (insn & 0xf8007000) {
         case 0x00002000:
             /* 00000... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:161 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amoadd_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x00006000:
             /* 00000... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:289 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamoaddw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0x08002000:
             /* 00001... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:160 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amoswap_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x08006000:
             /* 00001... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:288 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamoswapw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0x10002000:
             /* 00010... ........ .010.... .0101111 */
             decode_insn32_extract_atom_ld(ctx, &u.f_atomic, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 00010..0 0000.... .010.... .0101111 */
+                /* ../target/riscv/insn32.decode:158 */
                 if (trans_lr_w(ctx, &u.f_atomic)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x18002000:
             /* 00011... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:159 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_sc_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x20002000:
             /* 00100... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:162 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amoxor_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x20006000:
             /* 00100... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:290 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamoxorw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0x40002000:
             /* 01000... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:164 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amoor_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x40006000:
             /* 01000... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:292 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamoorw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0x60002000:
             /* 01100... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:163 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amoand_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x60006000:
             /* 01100... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:291 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamoandw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0x80002000:
             /* 10000... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:165 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amomin_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0x80006000:
             /* 10000... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:293 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamominw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0xa0002000:
             /* 10100... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:166 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amomax_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0xa0006000:
             /* 10100... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:294 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamomaxw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0xc0002000:
             /* 11000... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:167 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amominu_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0xc0006000:
             /* 11000... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:295 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamominuw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         case 0xe0002000:
             /* 11100... ........ .010.... .0101111 */
+            /* ../target/riscv/insn32.decode:168 */
             decode_insn32_extract_atom_st(ctx, &u.f_atomic, insn);
             if (trans_amomaxu_w(ctx, &u.f_atomic)) return true;
-            return false;
+            break;
         case 0xe0006000:
             /* 11100... ........ .110.... .0101111 */
+            /* ../target/riscv/insn32.decode:296 */
             decode_insn32_extract_r_wdvm(ctx, &u.f_rwdvm, insn);
             if (trans_vamomaxuw_v(ctx, &u.f_rwdvm)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000033:
         /* ........ ........ ........ .0110011 */
         decode_insn32_extract_r(ctx, &u.f_r, insn);
         switch (insn & 0xfe007000) {
         case 0x00000000:
             /* 0000000. ........ .000.... .0110011 */
+            /* ../target/riscv/insn32.decode:128 */
             if (trans_add(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00001000:
             /* 0000000. ........ .001.... .0110011 */
+            /* ../target/riscv/insn32.decode:130 */
             if (trans_sll(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00002000:
             /* 0000000. ........ .010.... .0110011 */
+            /* ../target/riscv/insn32.decode:131 */
             if (trans_slt(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00003000:
             /* 0000000. ........ .011.... .0110011 */
+            /* ../target/riscv/insn32.decode:132 */
             if (trans_sltu(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00004000:
             /* 0000000. ........ .100.... .0110011 */
+            /* ../target/riscv/insn32.decode:133 */
             if (trans_xor(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00005000:
             /* 0000000. ........ .101.... .0110011 */
+            /* ../target/riscv/insn32.decode:134 */
             if (trans_srl(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00006000:
             /* 0000000. ........ .110.... .0110011 */
+            /* ../target/riscv/insn32.decode:136 */
             if (trans_or(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x00007000:
             /* 0000000. ........ .111.... .0110011 */
+            /* ../target/riscv/insn32.decode:137 */
             if (trans_and(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02000000:
             /* 0000001. ........ .000.... .0110011 */
+            /* ../target/riscv/insn32.decode:148 */
             if (trans_mul(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02001000:
             /* 0000001. ........ .001.... .0110011 */
+            /* ../target/riscv/insn32.decode:149 */
             if (trans_mulh(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02002000:
             /* 0000001. ........ .010.... .0110011 */
+            /* ../target/riscv/insn32.decode:150 */
             if (trans_mulhsu(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02003000:
             /* 0000001. ........ .011.... .0110011 */
+            /* ../target/riscv/insn32.decode:151 */
             if (trans_mulhu(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02004000:
             /* 0000001. ........ .100.... .0110011 */
+            /* ../target/riscv/insn32.decode:152 */
             if (trans_div(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02005000:
             /* 0000001. ........ .101.... .0110011 */
+            /* ../target/riscv/insn32.decode:153 */
             if (trans_divu(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02006000:
             /* 0000001. ........ .110.... .0110011 */
+            /* ../target/riscv/insn32.decode:154 */
             if (trans_rem(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x02007000:
             /* 0000001. ........ .111.... .0110011 */
+            /* ../target/riscv/insn32.decode:155 */
             if (trans_remu(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x40000000:
             /* 0100000. ........ .000.... .0110011 */
+            /* ../target/riscv/insn32.decode:129 */
             if (trans_sub(ctx, &u.f_r)) return true;
-            return false;
+            break;
         case 0x40005000:
             /* 0100000. ........ .101.... .0110011 */
+            /* ../target/riscv/insn32.decode:135 */
             if (trans_sra(ctx, &u.f_r)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000037:
         /* ........ ........ ........ .0110111 */
+        /* ../target/riscv/insn32.decode:101 */
         decode_insn32_extract_u(ctx, &u.f_u, insn);
         if (trans_lui(ctx, &u.f_u)) return true;
-        return false;
+        break;
     case 0x00000043:
         /* ........ ........ ........ .1000011 */
         decode_insn32_extract_r4_rm(ctx, &u.f_decode_insn3215, insn);
         switch ((insn >> 25) & 0x3) {
         case 0x0:
             /* .....00. ........ ........ .1000011 */
+            /* ../target/riscv/insn32.decode:173 */
             if (trans_fmadd_s(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         case 0x1:
             /* .....01. ........ ........ .1000011 */
+            /* ../target/riscv/insn32.decode:201 */
             if (trans_fmadd_d(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000047:
         /* ........ ........ ........ .1000111 */
         decode_insn32_extract_r4_rm(ctx, &u.f_decode_insn3215, insn);
         switch ((insn >> 25) & 0x3) {
         case 0x0:
             /* .....00. ........ ........ .1000111 */
+            /* ../target/riscv/insn32.decode:174 */
             if (trans_fmsub_s(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         case 0x1:
             /* .....01. ........ ........ .1000111 */
+            /* ../target/riscv/insn32.decode:202 */
             if (trans_fmsub_d(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0000004b:
         /* ........ ........ ........ .1001011 */
         decode_insn32_extract_r4_rm(ctx, &u.f_decode_insn3215, insn);
         switch ((insn >> 25) & 0x3) {
         case 0x0:
             /* .....00. ........ ........ .1001011 */
+            /* ../target/riscv/insn32.decode:175 */
             if (trans_fnmsub_s(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         case 0x1:
             /* .....01. ........ ........ .1001011 */
+            /* ../target/riscv/insn32.decode:203 */
             if (trans_fnmsub_d(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0000004f:
         /* ........ ........ ........ .1001111 */
         decode_insn32_extract_r4_rm(ctx, &u.f_decode_insn3215, insn);
         switch ((insn >> 25) & 0x3) {
         case 0x0:
             /* .....00. ........ ........ .1001111 */
+            /* ../target/riscv/insn32.decode:176 */
             if (trans_fnmadd_s(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         case 0x1:
             /* .....01. ........ ........ .1001111 */
+            /* ../target/riscv/insn32.decode:204 */
             if (trans_fnmadd_d(ctx, &u.f_decode_insn3215)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000053:
         /* ........ ........ ........ .1010011 */
         switch ((insn >> 25) & 0x7f) {
         case 0x0:
             /* 0000000. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:177 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fadd_s(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0x1:
             /* 0000001. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:205 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fadd_d(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0x4:
             /* 0000100. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:178 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fsub_s(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0x5:
             /* 0000101. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:206 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fsub_d(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0x8:
             /* 0001000. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:179 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fmul_s(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0x9:
             /* 0001001. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:207 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fmul_d(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0xc:
             /* 0001100. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:180 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fdiv_s(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0xd:
             /* 0001101. ........ ........ .1010011 */
+            /* ../target/riscv/insn32.decode:208 */
             decode_insn32_extract_r_rm(ctx, &u.f_decode_insn3216, insn);
             if (trans_fdiv_d(ctx, &u.f_decode_insn3216)) return true;
-            return false;
+            break;
         case 0x10:
             /* 0010000. ........ ........ .1010011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 12) & 0x7) {
             case 0x0:
                 /* 0010000. ........ .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:182 */
                 if (trans_fsgnj_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 0010000. ........ .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:183 */
                 if (trans_fsgnjn_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 0010000. ........ .010.... .1010011 */
+                /* ../target/riscv/insn32.decode:184 */
                 if (trans_fsgnjx_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x11:
             /* 0010001. ........ ........ .1010011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 12) & 0x7) {
             case 0x0:
                 /* 0010001. ........ .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:210 */
                 if (trans_fsgnj_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 0010001. ........ .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:211 */
                 if (trans_fsgnjn_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 0010001. ........ .010.... .1010011 */
+                /* ../target/riscv/insn32.decode:212 */
                 if (trans_fsgnjx_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x14:
             /* 0010100. ........ ........ .1010011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 12) & 0x7) {
             case 0x0:
                 /* 0010100. ........ .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:185 */
                 if (trans_fmin_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 0010100. ........ .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:186 */
                 if (trans_fmax_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x15:
             /* 0010101. ........ ........ .1010011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 12) & 0x7) {
             case 0x0:
                 /* 0010101. ........ .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:213 */
                 if (trans_fmin_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 0010101. ........ .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:214 */
                 if (trans_fmax_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x20:
             /* 0100000. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x1:
                 /* 01000000 0001.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:215 */
                 if (trans_fcvt_s_d(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x21:
             /* 0100001. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 01000010 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:216 */
                 if (trans_fcvt_d_s(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2c:
             /* 0101100. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 01011000 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:181 */
                 if (trans_fsqrt_s(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x2d:
             /* 0101101. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 01011010 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:209 */
                 if (trans_fsqrt_d(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x50:
             /* 1010000. ........ ........ .1010011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 12) & 0x7) {
             case 0x0:
                 /* 1010000. ........ .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:192 */
                 if (trans_fle_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1010000. ........ .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:191 */
                 if (trans_flt_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 1010000. ........ .010.... .1010011 */
+                /* ../target/riscv/insn32.decode:190 */
                 if (trans_feq_s(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x51:
             /* 1010001. ........ ........ .1010011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 12) & 0x7) {
             case 0x0:
                 /* 1010001. ........ .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:219 */
                 if (trans_fle_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 1010001. ........ .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:218 */
                 if (trans_flt_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 1010001. ........ .010.... .1010011 */
+                /* ../target/riscv/insn32.decode:217 */
                 if (trans_feq_d(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x60:
             /* 1100000. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 11000000 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:187 */
                 if (trans_fcvt_w_s(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 11000000 0001.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:188 */
                 if (trans_fcvt_wu_s(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x61:
             /* 1100001. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 11000010 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:221 */
                 if (trans_fcvt_w_d(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 11000010 0001.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:222 */
                 if (trans_fcvt_wu_d(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x68:
             /* 1101000. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 11010000 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:194 */
                 if (trans_fcvt_s_w(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 11010000 0001.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:195 */
                 if (trans_fcvt_s_wu(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x69:
             /* 1101001. ........ ........ .1010011 */
             decode_insn32_extract_r2_rm(ctx, &u.f_decode_insn3217, insn);
             switch ((insn >> 20) & 0x1f) {
             case 0x0:
                 /* 11010010 0000.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:223 */
                 if (trans_fcvt_d_w(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 11010010 0001.... ........ .1010011 */
+                /* ../target/riscv/insn32.decode:224 */
                 if (trans_fcvt_d_wu(ctx, &u.f_decode_insn3217)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x70:
             /* 1110000. ........ ........ .1010011 */
             decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
             switch (insn & 0x01f07000) {
             case 0x00000000:
                 /* 11100000 0000.... .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:189 */
                 if (trans_fmv_x_w(ctx, &u.f_decode_insn3218)) return true;
-                return false;
+                break;
             case 0x00001000:
                 /* 11100000 0000.... .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:193 */
                 if (trans_fclass_s(ctx, &u.f_decode_insn3218)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x71:
             /* 1110001. ........ ........ .1010011 */
             decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
             switch (insn & 0x01f07000) {
             case 0x00001000:
                 /* 11100010 0000.... .001.... .1010011 */
+                /* ../target/riscv/insn32.decode:220 */
                 if (trans_fclass_d(ctx, &u.f_decode_insn3218)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x78:
             /* 1111000. ........ ........ .1010011 */
             decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
             switch (insn & 0x01f07000) {
             case 0x00000000:
                 /* 11110000 0000.... .000.... .1010011 */
+                /* ../target/riscv/insn32.decode:196 */
                 if (trans_fmv_w_x(ctx, &u.f_decode_insn3218)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000057:
         /* ........ ........ ........ .1010111 */
         switch (insn & 0x80007000) {
@@ -2322,146 +2498,168 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 000000.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:299 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vadd_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 000010.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:302 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vsub_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 000100.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:376 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vminu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 000101.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:378 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmin_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 000110.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:380 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmaxu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 000111.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:382 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmax_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 001001.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:332 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vand_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 001010.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:335 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vor_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 001011.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:338 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vxor_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 001100.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:588 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vrgather_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 010000.. ........ .000.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100001. ........ .000.... .1010111 */
+                    /* ../target/riscv/insn32.decode:322 */
                     if (trans_vadc_vvm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x11:
                 /* 010001.. ........ .000.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100011. ........ .000.... .1010111 */
+                    /* ../target/riscv/insn32.decode:325 */
                     if (trans_vmadc_vvm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x12:
                 /* 010010.. ........ .000.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100101. ........ .000.... .1010111 */
+                    /* ../target/riscv/insn32.decode:328 */
                     if (trans_vsbc_vvm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x13:
                 /* 010011.. ........ .000.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100111. ........ .000.... .1010111 */
+                    /* ../target/riscv/insn32.decode:330 */
                     if (trans_vmsbc_vvm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x17:
                 /* 010111.. ........ .000.... .1010111 */
                 switch ((insn >> 25) & 0x1) {
                 case 0x0:
                     /* 0101110. ........ .000.... .1010111 */
+                    /* ../target/riscv/insn32.decode:424 */
                     decode_insn32_extract_r_vm_0(ctx, &u.f_rmrr, insn);
                     if (trans_vmerge_vvm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 0101111. ........ .000.... .1010111 */
                     decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
                     switch ((insn >> 20) & 0x1f) {
                     case 0x0:
                         /* 01011110 0000.... .000.... .1010111 */
+                        /* ../target/riscv/insn32.decode:421 */
                         if (trans_vmv_v_v(ctx, &u.f_decode_insn3218)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x18:
                 /* 011000.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:356 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmseq_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x19:
                 /* 011001.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:359 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsne_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1a:
                 /* 011010.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:362 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsltu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1b:
                 /* 011011.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:364 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmslt_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 011100.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:366 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsleu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 011101.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:369 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsle_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00001000:
             /* 0....... ........ .001.... .1010111 */
             switch (insn & 0x74000000) {
@@ -2471,656 +2669,759 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 000000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:463 */
                     if (trans_vfadd_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 000010.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:465 */
                     if (trans_vfsub_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x04000000:
                 /* 0000.1.. ........ .001.... .1010111 */
+                /* ../target/riscv/insn32.decode:558 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfredsum_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10000000:
                 /* 0001.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 000100.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:508 */
                     if (trans_vfmin_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 000110.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:510 */
                     if (trans_vfmax_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x14000000:
                 /* 0001.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 000101.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:559 */
                     if (trans_vfredmin_vs(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 000111.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:560 */
                     if (trans_vfredmax_vs(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x20000000:
                 /* 0010.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 001000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:512 */
                     if (trans_vfsgnj_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 001010.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:516 */
                     if (trans_vfsgnjx_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x24000000:
                 /* 0010.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 001001.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:514 */
                     if (trans_vfsgnjn_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x30000000:
                 /* 0011.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r2rd(ctx, &u.f_decode_insn3220, insn);
                 switch (insn & 0x0a0f8000) {
                 case 0x02000000:
                     /* 0011001. ....0000 0001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:580 */
                     if (trans_vfmv_f_s(ctx, &u.f_decode_insn3220)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x60000000:
                 /* 0110.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 011000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:518 */
                     if (trans_vmfeq_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 011010.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:528 */
                     if (trans_vmford_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x64000000:
                 /* 0110.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 011001.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:524 */
                     if (trans_vmfle_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 011011.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:522 */
                     if (trans_vmflt_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x70000000:
                 /* 0111.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 011100.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:520 */
                     if (trans_vmfne_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00002000:
             /* 0....... ........ .010.... .1010111 */
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 000000.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:547 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredsum_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 000001.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:548 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredand_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 000010.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:549 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredor_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 000011.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:550 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredxor_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 000100.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:551 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredminu_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 000101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:552 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredmin_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 000110.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:553 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredmaxu_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 000111.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:554 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vredmax_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 001100.. ........ .010.... .1010111 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0011001. ........ .010.... .1010111 */
+                    /* ../target/riscv/insn32.decode:578 */
                     if (trans_vext_x_v(ctx, &u.f_r)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x14:
                 /* 010100.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:571 */
                 decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                 if (trans_vmpopc_m(ctx, &u.f_rmr)) return true;
-                return false;
+                break;
             case 0x15:
                 /* 010101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:572 */
                 decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                 if (trans_vmfirst_m(ctx, &u.f_rmr)) return true;
-                return false;
+                break;
             case 0x16:
                 /* 010110.. ........ .010.... .1010111 */
                 switch ((insn >> 15) & 0x1f) {
                 case 0x1:
                     /* 010110.. ....0000 1010.... .1010111 */
+                    /* ../target/riscv/insn32.decode:573 */
                     decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                     if (trans_vmsbf_m(ctx, &u.f_rmr)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 010110.. ....0001 0010.... .1010111 */
+                    /* ../target/riscv/insn32.decode:575 */
                     decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                     if (trans_vmsof_m(ctx, &u.f_rmr)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 010110.. ....0001 1010.... .1010111 */
+                    /* ../target/riscv/insn32.decode:574 */
                     decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                     if (trans_vmsif_m(ctx, &u.f_rmr)) return true;
-                    return false;
+                    break;
                 case 0x10:
                     /* 010110.. ....1000 0010.... .1010111 */
+                    /* ../target/riscv/insn32.decode:576 */
                     decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                     if (trans_viota_m(ctx, &u.f_rmr)) return true;
-                    return false;
+                    break;
                 case 0x11:
                     /* 010110.. ....1000 1010.... .1010111 */
                     decode_insn32_extract_r1_vm(ctx, &u.f_decode_insn3219, insn);
                     switch ((insn >> 20) & 0x1f) {
                     case 0x0:
                         /* 010110.0 00001000 1010.... .1010111 */
+                        /* ../target/riscv/insn32.decode:577 */
                         if (trans_vid_v(ctx, &u.f_decode_insn3219)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x17:
                 /* 010111.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:591 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vcompress_vm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x18:
                 /* 011000.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:565 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmandnot_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x19:
                 /* 011001.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:563 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmand_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1a:
                 /* 011010.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:567 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmor_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1b:
                 /* 011011.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:566 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmxor_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 011100.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:569 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmornot_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 011101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:564 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmnand_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 011110.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:568 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmnor_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 011111.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:570 */
                 decode_insn32_extract_r(ctx, &u.f_r, insn);
                 if (trans_vmxnor_mm(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00003000:
             /* 0....... ........ .011.... .1010111 */
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 000000.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:301 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vadd_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 000011.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:305 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vrsub_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 001001.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:334 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vand_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 001010.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:337 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vor_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 001011.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:340 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vxor_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 001100.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:590 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vrgather_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xe:
                 /* 001110.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:583 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vslideup_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 001111.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:586 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vslidedown_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 010000.. ........ .011.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100001. ........ .011.... .1010111 */
+                    /* ../target/riscv/insn32.decode:324 */
                     if (trans_vadc_vim(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x11:
                 /* 010001.. ........ .011.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100011. ........ .011.... .1010111 */
+                    /* ../target/riscv/insn32.decode:327 */
                     if (trans_vmadc_vim(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x17:
                 /* 010111.. ........ .011.... .1010111 */
                 switch ((insn >> 25) & 0x1) {
                 case 0x0:
                     /* 0101110. ........ .011.... .1010111 */
+                    /* ../target/riscv/insn32.decode:426 */
                     decode_insn32_extract_r_vm_0(ctx, &u.f_rmrr, insn);
                     if (trans_vmerge_vim(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 0101111. ........ .011.... .1010111 */
                     decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
                     switch ((insn >> 20) & 0x1f) {
                     case 0x0:
                         /* 01011110 0000.... .011.... .1010111 */
+                        /* ../target/riscv/insn32.decode:423 */
                         if (trans_vmv_v_i(ctx, &u.f_decode_insn3218)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x18:
                 /* 011000.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:358 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmseq_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x19:
                 /* 011001.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:361 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsne_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 011100.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:368 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsleu_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 011101.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:371 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsle_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 011110.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:373 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsgtu_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 011111.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:375 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsgt_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00004000:
             /* 0....... ........ .100.... .1010111 */
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 000000.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:300 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vadd_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 000010.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:303 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vsub_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 000011.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:304 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vrsub_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 000100.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:377 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vminu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 000101.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:379 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmin_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 000110.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:381 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmaxu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 000111.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:383 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmax_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 001001.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:333 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vand_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 001010.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:336 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vor_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 001011.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:339 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vxor_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 001100.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:589 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vrgather_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xe:
                 /* 001110.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:582 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vslideup_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 001111.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:585 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vslidedown_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 010000.. ........ .100.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100001. ........ .100.... .1010111 */
+                    /* ../target/riscv/insn32.decode:323 */
                     if (trans_vadc_vxm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x11:
                 /* 010001.. ........ .100.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100011. ........ .100.... .1010111 */
+                    /* ../target/riscv/insn32.decode:326 */
                     if (trans_vmadc_vxm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x12:
                 /* 010010.. ........ .100.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100101. ........ .100.... .1010111 */
+                    /* ../target/riscv/insn32.decode:329 */
                     if (trans_vsbc_vxm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x13:
                 /* 010011.. ........ .100.... .1010111 */
                 decode_insn32_extract_r_vm_1(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 25) & 0x1) {
                 case 0x1:
                     /* 0100111. ........ .100.... .1010111 */
+                    /* ../target/riscv/insn32.decode:331 */
                     if (trans_vmsbc_vxm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x17:
                 /* 010111.. ........ .100.... .1010111 */
                 switch ((insn >> 25) & 0x1) {
                 case 0x0:
                     /* 0101110. ........ .100.... .1010111 */
+                    /* ../target/riscv/insn32.decode:425 */
                     decode_insn32_extract_r_vm_0(ctx, &u.f_rmrr, insn);
                     if (trans_vmerge_vxm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 0101111. ........ .100.... .1010111 */
                     decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
                     switch ((insn >> 20) & 0x1f) {
                     case 0x0:
                         /* 01011110 0000.... .100.... .1010111 */
+                        /* ../target/riscv/insn32.decode:422 */
                         if (trans_vmv_v_x(ctx, &u.f_decode_insn3218)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x18:
                 /* 011000.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:357 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmseq_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x19:
                 /* 011001.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:360 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsne_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1a:
                 /* 011010.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:363 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsltu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1b:
                 /* 011011.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:365 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmslt_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 011100.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:367 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsleu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 011101.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:370 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsle_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 011110.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:372 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsgtu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 011111.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:374 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmsgt_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00005000:
             /* 0....... ........ .101.... .1010111 */
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 000000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:464 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfadd_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 000010.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:466 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfsub_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 000100.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:509 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfmin_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 000110.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:511 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfmax_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x8:
                 /* 001000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:513 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfsgnj_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 001001.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:515 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfsgnjn_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 001010.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:517 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfsgnjx_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 001101.. ........ .101.... .1010111 */
                 decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
                 switch ((insn >> 20) & 0x3f) {
                 case 0x20:
                     /* 00110110 0000.... .101.... .1010111 */
+                    /* ../target/riscv/insn32.decode:581 */
                     if (trans_vfmv_s_f(ctx, &u.f_decode_insn3218)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x17:
                 /* 010111.. ........ .101.... .1010111 */
                 switch ((insn >> 25) & 0x1) {
                 case 0x0:
                     /* 0101110. ........ .101.... .1010111 */
+                    /* ../target/riscv/insn32.decode:531 */
                     decode_insn32_extract_r_vm_0(ctx, &u.f_rmrr, insn);
                     if (trans_vfmerge_vfm(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 0101111. ........ .101.... .1010111 */
                     decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
                     switch ((insn >> 20) & 0x1f) {
                     case 0x0:
                         /* 01011110 0000.... .101.... .1010111 */
+                        /* ../target/riscv/insn32.decode:532 */
                         if (trans_vfmv_v_f(ctx, &u.f_decode_insn3218)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x18:
                 /* 011000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:519 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmfeq_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x19:
                 /* 011001.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:525 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmfle_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1a:
                 /* 011010.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:529 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmford_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1b:
                 /* 011011.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:523 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmflt_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 011100.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:521 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmfne_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 011101.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:526 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmfgt_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 011111.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:527 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vmfge_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00006000:
             /* 0....... ........ .110.... .1010111 */
             switch ((insn >> 26) & 0x1f) {
@@ -3130,117 +3431,142 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x3f) {
                 case 0x20:
                     /* 00110110 0000.... .110.... .1010111 */
+                    /* ../target/riscv/insn32.decode:579 */
                     if (trans_vmv_s_x(ctx, &u.f_decode_insn3218)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0xe:
                 /* 001110.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:584 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vslide1up_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 001111.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:587 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vslide1down_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x00007000:
             /* 0....... ........ .111.... .1010111 */
+            /* ../target/riscv/insn32.decode:593 */
             decode_insn32_extract_r2_zimm(ctx, &u.f_decode_insn3221, insn);
             if (trans_vsetvli(ctx, &u.f_decode_insn3221)) return true;
-            return false;
+            break;
         case 0x80000000:
             /* 1....... ........ .000.... .1010111 */
             decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 100000.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:427 */
                 if (trans_vsaddu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 100001.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:430 */
                 if (trans_vsadd_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 100010.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:433 */
                 if (trans_vssubu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 100011.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:435 */
                 if (trans_vssub_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 100100.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:437 */
                 if (trans_vaadd_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 100101.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:341 */
                 if (trans_vsll_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 100110.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:440 */
                 if (trans_vasub_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 100111.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:442 */
                 if (trans_vsmul_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x8:
                 /* 101000.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:344 */
                 if (trans_vsrl_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 101001.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:347 */
                 if (trans_vsra_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 101010.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:451 */
                 if (trans_vssrl_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 101011.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:454 */
                 if (trans_vssra_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 101100.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:350 */
                 if (trans_vnsrl_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 101101.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:353 */
                 if (trans_vnsra_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xe:
                 /* 101110.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:457 */
                 if (trans_vnclipu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 101111.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:460 */
                 if (trans_vnclip_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 110000.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:555 */
                 if (trans_vwredsumu_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x11:
                 /* 110001.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:556 */
                 if (trans_vwredsum_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 111100.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:444 */
                 if (trans_vwsmaccu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 111101.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:446 */
                 if (trans_vwsmacc_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 111110.. ........ .000.... .1010111 */
+                /* ../target/riscv/insn32.decode:448 */
                 if (trans_vwsmaccsu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80001000:
             /* 1....... ........ .001.... .1010111 */
             switch (insn & 0x74000000) {
@@ -3249,737 +3575,888 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 100000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:478 */
                     decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                     if (trans_vfdiv_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 100010.. ........ .001.... .1010111 */
                     decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                     switch ((insn >> 15) & 0x1f) {
                     case 0x0:
                         /* 100010.. ....0000 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:533 */
                         if (trans_vfcvt_xu_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 100010.. ....0000 1001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:534 */
                         if (trans_vfcvt_x_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x2:
                         /* 100010.. ....0001 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:535 */
                         if (trans_vfcvt_f_xu_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x3:
                         /* 100010.. ....0001 1001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:536 */
                         if (trans_vfcvt_f_x_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x8:
                         /* 100010.. ....0100 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:537 */
                         if (trans_vfwcvt_xu_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x9:
                         /* 100010.. ....0100 1001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:538 */
                         if (trans_vfwcvt_x_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0xa:
                         /* 100010.. ....0101 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:539 */
                         if (trans_vfwcvt_f_xu_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0xb:
                         /* 100010.. ....0101 1001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:540 */
                         if (trans_vfwcvt_f_x_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0xc:
                         /* 100010.. ....0110 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:541 */
                         if (trans_vfwcvt_f_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x10:
                         /* 100010.. ....1000 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:542 */
                         if (trans_vfncvt_xu_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x11:
                         /* 100010.. ....1000 1001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:543 */
                         if (trans_vfncvt_x_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x12:
                         /* 100010.. ....1001 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:544 */
                         if (trans_vfncvt_f_xu_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x13:
                         /* 100010.. ....1001 1001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:545 */
                         if (trans_vfncvt_f_x_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     case 0x14:
                         /* 100010.. ....1010 0001.... .1010111 */
+                        /* ../target/riscv/insn32.decode:546 */
                         if (trans_vfncvt_f_f_v(ctx, &u.f_rmr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x04000000:
                 /* 1000.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r2_vm(ctx, &u.f_rmr, insn);
                 switch (insn & 0x080f8000) {
                 case 0x08000000:
                     /* 100011.. ....0000 0001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:507 */
                     if (trans_vfsqrt_v(ctx, &u.f_rmr)) return true;
-                    return false;
+                    break;
                 case 0x08080000:
                     /* 100011.. ....1000 0001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:530 */
                     if (trans_vfclass_v(ctx, &u.f_rmr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x10000000:
                 /* 1001.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 100100.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:476 */
                     if (trans_vfmul_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x20000000:
                 /* 1010.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 101000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:491 */
                     if (trans_vfmadd_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 101010.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:495 */
                     if (trans_vfmsub_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x24000000:
                 /* 1010.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 101001.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:493 */
                     if (trans_vfnmadd_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 101011.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:497 */
                     if (trans_vfnmsub_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x30000000:
                 /* 1011.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 101100.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:483 */
                     if (trans_vfmacc_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 101110.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:487 */
                     if (trans_vfmsac_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x34000000:
                 /* 1011.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 101101.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:484 */
                     if (trans_vfnmacc_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 101111.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:489 */
                     if (trans_vfnmsac_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x40000000:
                 /* 1100.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 110000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:468 */
                     if (trans_vfwadd_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 110010.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:472 */
                     if (trans_vfwsub_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x44000000:
                 /* 1100.1.. ........ .001.... .1010111 */
+                /* ../target/riscv/insn32.decode:562 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 if (trans_vfwredsum_vs(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x50000000:
                 /* 1101.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 110100.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:470 */
                     if (trans_vfwadd_wv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 110110.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:474 */
                     if (trans_vfwsub_wv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x60000000:
                 /* 1110.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 111000.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:481 */
                     if (trans_vfwmul_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x70000000:
                 /* 1111.0.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 111100.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:499 */
                     if (trans_vfwmacc_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 111110.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:503 */
                     if (trans_vfwmsac_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x74000000:
                 /* 1111.1.. ........ .001.... .1010111 */
                 decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
                 switch ((insn >> 27) & 0x1) {
                 case 0x0:
                     /* 111101.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:501 */
                     if (trans_vfwnmacc_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 111111.. ........ .001.... .1010111 */
+                    /* ../target/riscv/insn32.decode:505 */
                     if (trans_vfwnmsac_vv(ctx, &u.f_rmrr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80002000:
             /* 1....... ........ .010.... .1010111 */
             decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 100000.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:392 */
                 if (trans_vdivu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 100001.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:394 */
                 if (trans_vdiv_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 100010.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:396 */
                 if (trans_vremu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 100011.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:398 */
                 if (trans_vrem_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 100100.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:388 */
                 if (trans_vmulhu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 100101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:384 */
                 if (trans_vmul_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 100110.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:390 */
                 if (trans_vmulhsu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 100111.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:386 */
                 if (trans_vmulh_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 101001.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:410 */
                 if (trans_vmadd_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 101011.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:412 */
                 if (trans_vnmsub_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 101101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:406 */
                 if (trans_vmacc_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 101111.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:408 */
                 if (trans_vnmsac_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 110000.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:306 */
                 if (trans_vwaddu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x11:
                 /* 110001.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:308 */
                 if (trans_vwadd_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x12:
                 /* 110010.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:310 */
                 if (trans_vwsubu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x13:
                 /* 110011.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:312 */
                 if (trans_vwsub_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x14:
                 /* 110100.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:314 */
                 if (trans_vwaddu_wv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x15:
                 /* 110101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:316 */
                 if (trans_vwadd_wv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x16:
                 /* 110110.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:318 */
                 if (trans_vwsubu_wv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x17:
                 /* 110111.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:320 */
                 if (trans_vwsub_wv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x18:
                 /* 111000.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:400 */
                 if (trans_vwmulu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1a:
                 /* 111010.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:402 */
                 if (trans_vwmulsu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1b:
                 /* 111011.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:404 */
                 if (trans_vwmul_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 111100.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:414 */
                 if (trans_vwmaccu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 111101.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:416 */
                 if (trans_vwmacc_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 111110.. ........ .010.... .1010111 */
+                /* ../target/riscv/insn32.decode:418 */
                 if (trans_vwmaccsu_vv(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80003000:
             /* 1....... ........ .011.... .1010111 */
             decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 100000.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:429 */
                 if (trans_vsaddu_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 100001.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:432 */
                 if (trans_vsadd_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 100100.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:439 */
                 if (trans_vaadd_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 100101.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:343 */
                 if (trans_vsll_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x8:
                 /* 101000.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:346 */
                 if (trans_vsrl_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 101001.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:349 */
                 if (trans_vsra_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 101010.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:453 */
                 if (trans_vssrl_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 101011.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:456 */
                 if (trans_vssra_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 101100.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:352 */
                 if (trans_vnsrl_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 101101.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:355 */
                 if (trans_vnsra_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xe:
                 /* 101110.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:459 */
                 if (trans_vnclipu_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 101111.. ........ .011.... .1010111 */
+                /* ../target/riscv/insn32.decode:462 */
                 if (trans_vnclip_vi(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80004000:
             /* 1....... ........ .100.... .1010111 */
             decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 100000.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:428 */
                 if (trans_vsaddu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 100001.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:431 */
                 if (trans_vsadd_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 100010.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:434 */
                 if (trans_vssubu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 100011.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:436 */
                 if (trans_vssub_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 100100.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:438 */
                 if (trans_vaadd_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 100101.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:342 */
                 if (trans_vsll_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 100110.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:441 */
                 if (trans_vasub_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 100111.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:443 */
                 if (trans_vsmul_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x8:
                 /* 101000.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:345 */
                 if (trans_vsrl_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 101001.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:348 */
                 if (trans_vsra_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 101010.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:452 */
                 if (trans_vssrl_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 101011.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:455 */
                 if (trans_vssra_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 101100.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:351 */
                 if (trans_vnsrl_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 101101.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:354 */
                 if (trans_vnsra_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xe:
                 /* 101110.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:458 */
                 if (trans_vnclipu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 101111.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:461 */
                 if (trans_vnclip_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 111100.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:445 */
                 if (trans_vwsmaccu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 111101.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:447 */
                 if (trans_vwsmacc_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 111110.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:449 */
                 if (trans_vwsmaccsu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 111111.. ........ .100.... .1010111 */
+                /* ../target/riscv/insn32.decode:450 */
                 if (trans_vwsmaccus_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80005000:
             /* 1....... ........ .101.... .1010111 */
             decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 100000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:479 */
                 if (trans_vfdiv_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 100001.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:480 */
                 if (trans_vfrdiv_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 100100.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:477 */
                 if (trans_vfmul_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 100111.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:467 */
                 if (trans_vfrsub_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x8:
                 /* 101000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:492 */
                 if (trans_vfmadd_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 101001.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:494 */
                 if (trans_vfnmadd_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xa:
                 /* 101010.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:496 */
                 if (trans_vfmsub_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 101011.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:498 */
                 if (trans_vfnmsub_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xc:
                 /* 101100.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:486 */
                 if (trans_vfmacc_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 101101.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:485 */
                 if (trans_vfnmacc_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xe:
                 /* 101110.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:488 */
                 if (trans_vfmsac_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 101111.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:490 */
                 if (trans_vfnmsac_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 110000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:469 */
                 if (trans_vfwadd_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x12:
                 /* 110010.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:473 */
                 if (trans_vfwsub_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x14:
                 /* 110100.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:471 */
                 if (trans_vfwadd_wf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x16:
                 /* 110110.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:475 */
                 if (trans_vfwsub_wf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x18:
                 /* 111000.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:482 */
                 if (trans_vfwmul_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 111100.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:500 */
                 if (trans_vfwmacc_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 111101.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:502 */
                 if (trans_vfwnmacc_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 111110.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:504 */
                 if (trans_vfwmsac_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 111111.. ........ .101.... .1010111 */
+                /* ../target/riscv/insn32.decode:506 */
                 if (trans_vfwnmsac_vf(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80006000:
             /* 1....... ........ .110.... .1010111 */
             decode_insn32_extract_r_vm(ctx, &u.f_rmrr, insn);
             switch ((insn >> 26) & 0x1f) {
             case 0x0:
                 /* 100000.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:393 */
                 if (trans_vdivu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 100001.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:395 */
                 if (trans_vdiv_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 100010.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:397 */
                 if (trans_vremu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 100011.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:399 */
                 if (trans_vrem_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x4:
                 /* 100100.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:389 */
                 if (trans_vmulhu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 100101.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:385 */
                 if (trans_vmul_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 100110.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:391 */
                 if (trans_vmulhsu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 100111.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:387 */
                 if (trans_vmulh_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x9:
                 /* 101001.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:411 */
                 if (trans_vmadd_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xb:
                 /* 101011.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:413 */
                 if (trans_vnmsub_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xd:
                 /* 101101.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:407 */
                 if (trans_vmacc_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0xf:
                 /* 101111.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:409 */
                 if (trans_vnmsac_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x10:
                 /* 110000.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:307 */
                 if (trans_vwaddu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x11:
                 /* 110001.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:309 */
                 if (trans_vwadd_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x12:
                 /* 110010.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:311 */
                 if (trans_vwsubu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x13:
                 /* 110011.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:313 */
                 if (trans_vwsub_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x14:
                 /* 110100.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:315 */
                 if (trans_vwaddu_wx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x15:
                 /* 110101.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:317 */
                 if (trans_vwadd_wx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x16:
                 /* 110110.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:319 */
                 if (trans_vwsubu_wx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x17:
                 /* 110111.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:321 */
                 if (trans_vwsub_wx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x18:
                 /* 111000.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:401 */
                 if (trans_vwmulu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1a:
                 /* 111010.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:403 */
                 if (trans_vwmulsu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1b:
                 /* 111011.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:405 */
                 if (trans_vwmul_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1c:
                 /* 111100.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:415 */
                 if (trans_vwmaccu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1d:
                 /* 111101.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:417 */
                 if (trans_vwmacc_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1e:
                 /* 111110.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:419 */
                 if (trans_vwmaccsu_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             case 0x1f:
                 /* 111111.. ........ .110.... .1010111 */
+                /* ../target/riscv/insn32.decode:420 */
                 if (trans_vwmaccus_vx(ctx, &u.f_rmrr)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x80007000:
             /* 1....... ........ .111.... .1010111 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 25) & 0x3f) {
             case 0x0:
                 /* 1000000. ........ .111.... .1010111 */
+                /* ../target/riscv/insn32.decode:594 */
                 if (trans_vsetvl(ctx, &u.f_r)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000063:
         /* ........ ........ ........ .1100011 */
         decode_insn32_extract_b(ctx, &u.f_b, insn);
         switch ((insn >> 12) & 0x7) {
         case 0x0:
             /* ........ ........ .000.... .1100011 */
+            /* ../target/riscv/insn32.decode:105 */
             if (trans_beq(ctx, &u.f_b)) return true;
-            return false;
+            break;
         case 0x1:
             /* ........ ........ .001.... .1100011 */
+            /* ../target/riscv/insn32.decode:106 */
             if (trans_bne(ctx, &u.f_b)) return true;
-            return false;
+            break;
         case 0x4:
             /* ........ ........ .100.... .1100011 */
+            /* ../target/riscv/insn32.decode:107 */
             if (trans_blt(ctx, &u.f_b)) return true;
-            return false;
+            break;
         case 0x5:
             /* ........ ........ .101.... .1100011 */
+            /* ../target/riscv/insn32.decode:108 */
             if (trans_bge(ctx, &u.f_b)) return true;
-            return false;
+            break;
         case 0x6:
             /* ........ ........ .110.... .1100011 */
+            /* ../target/riscv/insn32.decode:109 */
             if (trans_bltu(ctx, &u.f_b)) return true;
-            return false;
+            break;
         case 0x7:
             /* ........ ........ .111.... .1100011 */
+            /* ../target/riscv/insn32.decode:110 */
             if (trans_bgeu(ctx, &u.f_b)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x00000067:
         /* ........ ........ ........ .1100111 */
         decode_insn32_extract_i(ctx, &u.f_i, insn);
         switch ((insn >> 12) & 0x7) {
         case 0x0:
             /* ........ ........ .000.... .1100111 */
+            /* ../target/riscv/insn32.decode:104 */
             if (trans_jalr(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x0000006f:
         /* ........ ........ ........ .1101111 */
+        /* ../target/riscv/insn32.decode:103 */
         decode_insn32_extract_j(ctx, &u.f_j, insn);
         if (trans_jal(ctx, &u.f_j)) return true;
-        return false;
+        break;
     case 0x00000073:
         /* ........ ........ ........ .1110011 */
         switch ((insn >> 12) & 0x7) {
@@ -3988,111 +4465,218 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             switch (insn & 0xfe000f80) {
             case 0x00000000:
                 /* 0000000. ........ .0000000 01110011 */
-                decode_insn32_extract_decode_insn32_Fmt_28(ctx, &u.f_empty, insn);
+                decode_insn32_extract_decode_insn32_Fmt_29(ctx, &u.f_empty, insn);
                 switch ((insn >> 15) & 0x3ff) {
                 case 0x0:
                     /* 00000000 00000000 00000000 01110011 */
+                    /* ../target/riscv/insn32.decode:91 */
                     if (trans_ecall(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 case 0x20:
                     /* 00000000 00010000 00000000 01110011 */
+                    /* ../target/riscv/insn32.decode:92 */
                     if (trans_ebreak(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 case 0x40:
                     /* 00000000 00100000 00000000 01110011 */
+                    /* ../target/riscv/insn32.decode:93 */
                     if (trans_uret(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x10000000:
                 /* 0001000. ........ .0000000 01110011 */
                 switch ((insn >> 20) & 0x1f) {
                 case 0x2:
                     /* 00010000 0010.... .0000000 01110011 */
-                    decode_insn32_extract_decode_insn32_Fmt_28(ctx, &u.f_empty, insn);
+                    decode_insn32_extract_decode_insn32_Fmt_29(ctx, &u.f_empty, insn);
                     switch ((insn >> 15) & 0x1f) {
                     case 0x0:
                         /* 00010000 00100000 00000000 01110011 */
+                        /* ../target/riscv/insn32.decode:94 */
                         if (trans_sret(ctx, &u.f_empty)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x4:
                     /* 00010000 0100.... .0000000 01110011 */
+                    /* ../target/riscv/insn32.decode:98 */
                     decode_insn32_extract_sfence_vm(ctx, &u.f_decode_insn3223, insn);
                     if (trans_sfence_vm(ctx, &u.f_decode_insn3223)) return true;
-                    return false;
+                    break;
                 case 0x5:
                     /* 00010000 0101.... .0000000 01110011 */
-                    decode_insn32_extract_decode_insn32_Fmt_28(ctx, &u.f_empty, insn);
+                    decode_insn32_extract_decode_insn32_Fmt_29(ctx, &u.f_empty, insn);
                     switch ((insn >> 15) & 0x1f) {
                     case 0x0:
                         /* 00010000 01010000 00000000 01110011 */
+                        /* ../target/riscv/insn32.decode:96 */
                         if (trans_wfi(ctx, &u.f_empty)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x12000000:
                 /* 0001001. ........ .0000000 01110011 */
+                /* ../target/riscv/insn32.decode:97 */
                 decode_insn32_extract_sfence_vma(ctx, &u.f_decode_insn3222, insn);
                 if (trans_sfence_vma(ctx, &u.f_decode_insn3222)) return true;
-                return false;
+                break;
             case 0x22000000:
                 /* 0010001. ........ .0000000 01110011 */
+                /* ../target/riscv/insn32.decode:238 */
                 decode_insn32_extract_hfence_vvma(ctx, &u.f_decode_insn3222, insn);
                 if (trans_hfence_vvma(ctx, &u.f_decode_insn3222)) return true;
-                return false;
+                break;
             case 0x30000000:
                 /* 0011000. ........ .0000000 01110011 */
-                decode_insn32_extract_decode_insn32_Fmt_28(ctx, &u.f_empty, insn);
+                decode_insn32_extract_decode_insn32_Fmt_29(ctx, &u.f_empty, insn);
                 switch ((insn >> 15) & 0x3ff) {
                 case 0x40:
                     /* 00110000 00100000 00000000 01110011 */
+                    /* ../target/riscv/insn32.decode:95 */
                     if (trans_mret(ctx, &u.f_empty)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x62000000:
                 /* 0110001. ........ .0000000 01110011 */
+                /* ../target/riscv/insn32.decode:237 */
                 decode_insn32_extract_hfence_gvma(ctx, &u.f_decode_insn3222, insn);
                 if (trans_hfence_gvma(ctx, &u.f_decode_insn3222)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* ........ ........ .001.... .1110011 */
+            /* ../target/riscv/insn32.decode:140 */
             decode_insn32_extract_csr(ctx, &u.f_decode_insn3214, insn);
             if (trans_csrrw(ctx, &u.f_decode_insn3214)) return true;
-            return false;
+            break;
         case 0x2:
             /* ........ ........ .010.... .1110011 */
+            /* ../target/riscv/insn32.decode:141 */
             decode_insn32_extract_csr(ctx, &u.f_decode_insn3214, insn);
             if (trans_csrrs(ctx, &u.f_decode_insn3214)) return true;
-            return false;
+            break;
         case 0x3:
             /* ........ ........ .011.... .1110011 */
+            /* ../target/riscv/insn32.decode:142 */
             decode_insn32_extract_csr(ctx, &u.f_decode_insn3214, insn);
             if (trans_csrrc(ctx, &u.f_decode_insn3214)) return true;
-            return false;
+            break;
+        case 0x4:
+            /* ........ ........ .100.... .1110011 */
+            switch ((insn >> 25) & 0x7f) {
+            case 0x30:
+                /* 0110000. ........ .100.... .1110011 */
+                decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
+                switch ((insn >> 20) & 0x1f) {
+                case 0x0:
+                    /* 01100000 0000.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:227 */
+                    if (trans_hlv_b(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                case 0x1:
+                    /* 01100000 0001.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:228 */
+                    if (trans_hlv_bu(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                }
+                break;
+            case 0x31:
+                /* 0110001. ........ .100.... .1110011 */
+                decode_insn32_extract_r2_s(ctx, &u.f_decode_insn3222, insn);
+                switch ((insn >> 7) & 0x1f) {
+                case 0x0:
+                    /* 0110001. ........ .1000000 01110011 */
+                    /* ../target/riscv/insn32.decode:234 */
+                    if (trans_hsv_b(ctx, &u.f_decode_insn3222)) return true;
+                    break;
+                }
+                break;
+            case 0x32:
+                /* 0110010. ........ .100.... .1110011 */
+                decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
+                switch ((insn >> 20) & 0x1f) {
+                case 0x0:
+                    /* 01100100 0000.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:229 */
+                    if (trans_hlv_h(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                case 0x1:
+                    /* 01100100 0001.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:230 */
+                    if (trans_hlv_hu(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                case 0x3:
+                    /* 01100100 0011.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:231 */
+                    if (trans_hlvx_hu(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                }
+                break;
+            case 0x33:
+                /* 0110011. ........ .100.... .1110011 */
+                decode_insn32_extract_r2_s(ctx, &u.f_decode_insn3222, insn);
+                switch ((insn >> 7) & 0x1f) {
+                case 0x0:
+                    /* 0110011. ........ .1000000 01110011 */
+                    /* ../target/riscv/insn32.decode:235 */
+                    if (trans_hsv_h(ctx, &u.f_decode_insn3222)) return true;
+                    break;
+                }
+                break;
+            case 0x34:
+                /* 0110100. ........ .100.... .1110011 */
+                decode_insn32_extract_r2(ctx, &u.f_decode_insn3218, insn);
+                switch ((insn >> 20) & 0x1f) {
+                case 0x0:
+                    /* 01101000 0000.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:232 */
+                    if (trans_hlv_w(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                case 0x3:
+                    /* 01101000 0011.... .100.... .1110011 */
+                    /* ../target/riscv/insn32.decode:233 */
+                    if (trans_hlvx_wu(ctx, &u.f_decode_insn3218)) return true;
+                    break;
+                }
+                break;
+            case 0x35:
+                /* 0110101. ........ .100.... .1110011 */
+                decode_insn32_extract_r2_s(ctx, &u.f_decode_insn3222, insn);
+                switch ((insn >> 7) & 0x1f) {
+                case 0x0:
+                    /* 0110101. ........ .1000000 01110011 */
+                    /* ../target/riscv/insn32.decode:236 */
+                    if (trans_hsv_w(ctx, &u.f_decode_insn3222)) return true;
+                    break;
+                }
+                break;
+            }
+            break;
         case 0x5:
             /* ........ ........ .101.... .1110011 */
+            /* ../target/riscv/insn32.decode:143 */
             decode_insn32_extract_csr(ctx, &u.f_decode_insn3214, insn);
             if (trans_csrrwi(ctx, &u.f_decode_insn3214)) return true;
-            return false;
+            break;
         case 0x6:
             /* ........ ........ .110.... .1110011 */
+            /* ../target/riscv/insn32.decode:144 */
             decode_insn32_extract_csr(ctx, &u.f_decode_insn3214, insn);
             if (trans_csrrsi(ctx, &u.f_decode_insn3214)) return true;
-            return false;
+            break;
         case 0x7:
             /* ........ ........ .111.... .1110011 */
+            /* ../target/riscv/insn32.decode:145 */
             decode_insn32_extract_csr(ctx, &u.f_decode_insn3214, insn);
             if (trans_csrrci(ctx, &u.f_decode_insn3214)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }

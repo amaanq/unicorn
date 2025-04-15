@@ -15,7 +15,7 @@
 #include "internal.h"
 #include "sysemu/tcg.h"
 #include "qemu-common.h"
-//#include "hw/pci/pci.h"
+#include "hw/s390x/pv.h"
 
 #define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc) \
     {                                                                    \
@@ -196,6 +196,9 @@ bool s390_has_feat(struct uc_struct *uc, S390Feat feat)
         if (feat == S390_FEAT_ZPCI) {
             return true;
         }
+        return false;
+    }
+    if (feat == S390_FEAT_DIAG_318 && s390_is_pv()) {
         return false;
     }
     return test_bit(feat, cpu->model->features);

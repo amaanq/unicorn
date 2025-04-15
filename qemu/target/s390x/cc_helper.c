@@ -339,9 +339,36 @@ static uint32_t cc_calc_icm(uint64_t mask, uint64_t val)
     }
 }
 
-static uint32_t cc_calc_sla(uint64_t src, int shift)
+static uint32_t cc_calc_sla_32(uint32_t src, int shift)
 {
-    uint64_t mask = -1ULL << (63 - shift);
+    uint32_t mask = ((1U << shift) - 1U) << (32 - shift);
+    uint32_t sign = 1U << 31;
+    uint32_t match;
+    int32_t r;
+
+    /* Check if the sign bit stays the same.  */
+    if (src & sign) {
+        match = mask;
+    } else {
+        match = 0;
+    }
+    if ((src & mask) != match) {
+        /* Overflow.  */
+        return 3;
+    }
+
+    r = ((src << shift) & ~sign) | (src & sign);
+    if (r == 0) {
+        return 0;
+    } else if (r < 0) {
+        return 1;
+    }
+    return 2;
+}
+
+static uint32_t cc_calc_sla_64(uint64_t src, int shift)
+{
+    uint64_t mask = ((1ULL << shift) - 1ULL) << (64 - shift);
     uint64_t sign = 1ULL << 63;
     uint64_t match;
     int64_t r;
@@ -388,6 +415,32 @@ static uint32_t cc_calc_vc(uint64_t low, uint64_t high)
         /* some elements but not all match */
         return 1;
     }
+}
+
+static uint32_t cc_calc_muls_32(int64_t res)
+{
+    const int64_t tmp = res >> 31;
+
+    if (!res) {
+        return 0;
+    } else if (tmp && tmp != -1) {
+        return 3;
+    } else if (res < 0) {
+        return 1;
+    }
+    return 2;
+}
+
+static uint64_t cc_calc_muls_64(int64_t res_high, uint64_t res_low)
+{
+    if (!res_high && !res_low) {
+        return 0;
+    } else if (res_high + (res_low >> 63) != 0) {
+        return 3;
+    } else if (res_high < 0) {
+        return 1;
+    }
+    return 2;
 }
 
 static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
@@ -457,6 +510,9 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
     case CC_OP_COMP_64:
         r =  cc_calc_comp_64(dst);
         break;
+    case CC_OP_MULS_64:
+        r = cc_calc_muls_64(src, dst);
+        break;
 
     case CC_OP_ADD_32:
         r =  cc_calc_add_32(src, dst, vr);
@@ -485,12 +541,18 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
     case CC_OP_COMP_32:
         r =  cc_calc_comp_32(dst);
         break;
+    case CC_OP_MULS_32:
+        r = cc_calc_muls_32(dst);
+        break;
 
     case CC_OP_ICM:
         r =  cc_calc_icm(src, dst);
         break;
-    case CC_OP_SLA:
-        r =  cc_calc_sla(src, dst);
+    case CC_OP_SLA_32:
+        r =  cc_calc_sla_32(src, dst);
+        break;
+    case CC_OP_SLA_64:
+        r =  cc_calc_sla_64(src, dst);
         break;
     case CC_OP_FLOGR:
         r = cc_calc_flogr(dst);

@@ -477,95 +477,95 @@ static bool disas_t16(DisasContext *ctx, uint16_t insn)
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 00000... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:137 */
+            /* ../target/arm/t16.decode:137 */
             u.f_s_rrr_shi.shty = 0;
             if (trans_MOV_rxri(ctx, &u.f_s_rrr_shi)) return true;
-            return false;
+            break;
         case 0x1:
             /* 00001... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:138 */
+            /* ../target/arm/t16.decode:138 */
             u.f_s_rrr_shi.shty = 1;
             if (trans_MOV_rxri(ctx, &u.f_s_rrr_shi)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x1:
         /* 0001.... ........ */
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 00010... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:139 */
+            /* ../target/arm/t16.decode:139 */
             disas_t16_extract_shift_i(ctx, &u.f_s_rrr_shi, insn);
             u.f_s_rrr_shi.shty = 2;
             if (trans_MOV_rxri(ctx, &u.f_s_rrr_shi)) return true;
-            return false;
+            break;
         case 0x1:
             /* 00011... ........ */
             switch ((insn >> 9) & 0x3) {
             case 0x0:
                 /* 0001100. ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:146 */
+                /* ../target/arm/t16.decode:146 */
                 disas_t16_extract_addsub_3(ctx, &u.f_s_rrr_shi, insn);
                 if (trans_ADD_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x1:
                 /* 0001101. ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:147 */
+                /* ../target/arm/t16.decode:147 */
                 disas_t16_extract_addsub_3(ctx, &u.f_s_rrr_shi, insn);
                 if (trans_SUB_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x2:
                 /* 0001110. ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:154 */
+                /* ../target/arm/t16.decode:154 */
                 disas_t16_extract_addsub_2i(ctx, &u.f_s_rri_rot, insn);
                 if (trans_ADD_rri(ctx, &u.f_s_rri_rot)) return true;
-                return false;
+                break;
             case 0x3:
                 /* 0001111. ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:155 */
+                /* ../target/arm/t16.decode:155 */
                 disas_t16_extract_addsub_2i(ctx, &u.f_s_rri_rot, insn);
                 if (trans_SUB_rri(ctx, &u.f_s_rri_rot)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x2:
         /* 0010.... ........ */
         disas_t16_extract_arith_1i(ctx, &u.f_s_rri_rot, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 00100... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:163 */
+            /* ../target/arm/t16.decode:163 */
             u.f_s_rri_rot.s = t16_setflags(ctx);
             if (trans_MOV_rxi(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x1:
             /* 00101... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:164 */
+            /* ../target/arm/t16.decode:164 */
             u.f_s_rri_rot.s = 1;
             if (trans_CMP_xri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x3:
         /* 0011.... ........ */
         disas_t16_extract_arith_1i(ctx, &u.f_s_rri_rot, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 00110... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:165 */
+            /* ../target/arm/t16.decode:165 */
             u.f_s_rri_rot.s = t16_setflags(ctx);
             if (trans_ADD_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         case 0x1:
             /* 00111... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:166 */
+            /* ../target/arm/t16.decode:166 */
             u.f_s_rri_rot.s = t16_setflags(ctx);
             if (trans_SUB_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x4:
         /* 0100.... ........ */
         switch ((insn >> 11) & 0x1) {
@@ -577,308 +577,308 @@ static bool disas_t16(DisasContext *ctx, uint16_t insn)
                 switch ((insn >> 6) & 0x3) {
                 case 0x0:
                     /* 01000000 00...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:53 */
+                    /* ../target/arm/t16.decode:53 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_AND_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01000000 01...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:54 */
+                    /* ../target/arm/t16.decode:54 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_EOR_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 01000000 10...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:55 */
+                    /* ../target/arm/t16.decode:55 */
                     disas_t16_extract_lxl_shr(ctx, &u.f_s_rrr_shr, insn);
                     u.f_s_rrr_shr.shty = 0;
                     if (trans_MOV_rxrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 01000000 11...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:56 */
+                    /* ../target/arm/t16.decode:56 */
                     disas_t16_extract_lxl_shr(ctx, &u.f_s_rrr_shr, insn);
                     u.f_s_rrr_shr.shty = 1;
                     if (trans_MOV_rxrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 01000001 ........ */
                 switch ((insn >> 6) & 0x3) {
                 case 0x0:
                     /* 01000001 00...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:57 */
+                    /* ../target/arm/t16.decode:57 */
                     disas_t16_extract_lxl_shr(ctx, &u.f_s_rrr_shr, insn);
                     u.f_s_rrr_shr.shty = 2;
                     if (trans_MOV_rxrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01000001 01...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:58 */
+                    /* ../target/arm/t16.decode:58 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_ADC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 01000001 10...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:59 */
+                    /* ../target/arm/t16.decode:59 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_SBC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 01000001 11...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:60 */
+                    /* ../target/arm/t16.decode:60 */
                     disas_t16_extract_lxl_shr(ctx, &u.f_s_rrr_shr, insn);
                     u.f_s_rrr_shr.shty = 3;
                     if (trans_MOV_rxrr(ctx, &u.f_s_rrr_shr)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x2:
                 /* 01000010 ........ */
                 switch ((insn >> 6) & 0x3) {
                 case 0x0:
                     /* 01000010 00...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:61 */
+                    /* ../target/arm/t16.decode:61 */
                     disas_t16_extract_xll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_TST_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01000010 01...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:62 */
+                    /* ../target/arm/t16.decode:62 */
                     disas_t16_extract_disas_t16_Fmt_3(ctx, &u.f_s_rri_rot, insn);
                     if (trans_RSB_rri(ctx, &u.f_s_rri_rot)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 01000010 10...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:63 */
+                    /* ../target/arm/t16.decode:63 */
                     disas_t16_extract_xll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_CMP_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 01000010 11...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:64 */
+                    /* ../target/arm/t16.decode:64 */
                     disas_t16_extract_xll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_CMN_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x3:
                 /* 01000011 ........ */
                 switch ((insn >> 6) & 0x3) {
                 case 0x0:
                     /* 01000011 00...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:65 */
+                    /* ../target/arm/t16.decode:65 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_ORR_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 01000011 01...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:66 */
+                    /* ../target/arm/t16.decode:66 */
                     disas_t16_extract_disas_t16_Fmt_4(ctx, &u.f_s_rrrr, insn);
                     if (trans_MUL(ctx, &u.f_s_rrrr)) return true;
-                    return false;
+                    break;
                 case 0x2:
                     /* 01000011 10...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:67 */
+                    /* ../target/arm/t16.decode:67 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_BIC_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 case 0x3:
                     /* 01000011 11...... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:68 */
+                    /* ../target/arm/t16.decode:68 */
                     disas_t16_extract_lll_noshr(ctx, &u.f_s_rrr_shi, insn);
                     if (trans_MVN_rxri(ctx, &u.f_s_rrr_shi)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x4:
                 /* 01000100 ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:174 */
+                /* ../target/arm/t16.decode:174 */
                 disas_t16_extract_addsub_2h(ctx, &u.f_s_rrr_shi, insn);
                 u.f_s_rrr_shi.s = 0;
                 if (trans_ADD_rrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x5:
                 /* 01000101 ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:175 */
+                /* ../target/arm/t16.decode:175 */
                 disas_t16_extract_addsub_2h(ctx, &u.f_s_rrr_shi, insn);
                 u.f_s_rrr_shi.s = 1;
                 if (trans_CMP_xrri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x6:
                 /* 01000110 ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:176 */
+                /* ../target/arm/t16.decode:176 */
                 disas_t16_extract_addsub_2h(ctx, &u.f_s_rrr_shi, insn);
                 u.f_s_rrr_shi.s = 0;
                 if (trans_MOV_rxri(ctx, &u.f_s_rrr_shi)) return true;
-                return false;
+                break;
             case 0x7:
                 /* 01000111 ........ */
                 disas_t16_extract_branchr(ctx, &u.f_r, insn);
                 switch (insn & 0x00000087) {
                 case 0x00000000:
                     /* 01000111 0....000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:191 */
+                    /* ../target/arm/t16.decode:191 */
                     if (trans_BX(ctx, &u.f_r)) return true;
-                    return false;
+                    break;
                 case 0x00000004:
                     /* 01000111 0....100 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:193 */
+                    /* ../target/arm/t16.decode:193 */
                     if (trans_BXNS(ctx, &u.f_r)) return true;
-                    return false;
+                    break;
                 case 0x00000080:
                     /* 01000111 1....000 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:192 */
+                    /* ../target/arm/t16.decode:192 */
                     if (trans_BLX_r(ctx, &u.f_r)) return true;
-                    return false;
+                    break;
                 case 0x00000084:
                     /* 01000111 1....100 */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:194 */
+                    /* ../target/arm/t16.decode:194 */
                     if (trans_BLXNS(ctx, &u.f_r)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* 01001... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:118 */
+            /* ../target/arm/t16.decode:118 */
             disas_t16_extract_ldst_spec_i(ctx, &u.f_ldst_ri, insn);
             u.f_ldst_ri.rn = 15;
             if (trans_LDR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x5:
         /* 0101.... ........ */
         disas_t16_extract_ldst_rr(ctx, &u.f_ldst_rr, insn);
         switch ((insn >> 9) & 0x7) {
         case 0x0:
             /* 0101000. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:75 */
+            /* ../target/arm/t16.decode:75 */
             if (trans_STR_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x1:
             /* 0101001. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:76 */
+            /* ../target/arm/t16.decode:76 */
             if (trans_STRH_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x2:
             /* 0101010. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:77 */
+            /* ../target/arm/t16.decode:77 */
             if (trans_STRB_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x3:
             /* 0101011. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:78 */
+            /* ../target/arm/t16.decode:78 */
             if (trans_LDRSB_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x4:
             /* 0101100. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:79 */
+            /* ../target/arm/t16.decode:79 */
             if (trans_LDR_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x5:
             /* 0101101. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:80 */
+            /* ../target/arm/t16.decode:80 */
             if (trans_LDRH_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x6:
             /* 0101110. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:81 */
+            /* ../target/arm/t16.decode:81 */
             if (trans_LDRB_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         case 0x7:
             /* 0101111. ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:82 */
+            /* ../target/arm/t16.decode:82 */
             if (trans_LDRSH_rr(ctx, &u.f_ldst_rr)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x6:
         /* 0110.... ........ */
         disas_t16_extract_ldst_ri_4(ctx, &u.f_ldst_ri, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 01100... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:93 */
+            /* ../target/arm/t16.decode:93 */
             if (trans_STR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x1:
             /* 01101... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:94 */
+            /* ../target/arm/t16.decode:94 */
             if (trans_LDR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x7:
         /* 0111.... ........ */
         disas_t16_extract_ldst_ri_1(ctx, &u.f_ldst_ri, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 01110... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:95 */
+            /* ../target/arm/t16.decode:95 */
             if (trans_STRB_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x1:
             /* 01111... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:96 */
+            /* ../target/arm/t16.decode:96 */
             if (trans_LDRB_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x8:
         /* 1000.... ........ */
         disas_t16_extract_ldst_ri_2(ctx, &u.f_ldst_ri, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 10000... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:104 */
+            /* ../target/arm/t16.decode:104 */
             if (trans_STRH_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x1:
             /* 10001... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:105 */
+            /* ../target/arm/t16.decode:105 */
             if (trans_LDRH_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0x9:
         /* 1001.... ........ */
         disas_t16_extract_ldst_spec_i(ctx, &u.f_ldst_ri, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 10010... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:113 */
+            /* ../target/arm/t16.decode:113 */
             u.f_ldst_ri.rn = 13;
             if (trans_STR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         case 0x1:
             /* 10011... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:114 */
+            /* ../target/arm/t16.decode:114 */
             u.f_ldst_ri.rn = 13;
             if (trans_LDR_ri(ctx, &u.f_ldst_ri)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xa:
         /* 1010.... ........ */
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 10100... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:122 */
+            /* ../target/arm/t16.decode:122 */
             disas_t16_extract_disas_t16_Fmt_10(ctx, &u.f_ri, insn);
             if (trans_ADR(ctx, &u.f_ri)) return true;
-            return false;
+            break;
         case 0x1:
             /* 10101... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:123 */
+            /* ../target/arm/t16.decode:123 */
             disas_t16_extract_disas_t16_Fmt_11(ctx, &u.f_s_rri_rot, insn);
             if (trans_ADD_rri(ctx, &u.f_s_rri_rot)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xb:
         /* 1011.... ........ */
         switch ((insn >> 10) & 0x1) {
@@ -890,100 +890,100 @@ static bool disas_t16(DisasContext *ctx, uint16_t insn)
                 switch (insn & 0x00000a80) {
                 case 0x00000000:
                     /* 10110000 0....... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:184 */
+                    /* ../target/arm/t16.decode:184 */
                     disas_t16_extract_addsub_sp_i(ctx, &u.f_s_rri_rot, insn);
                     if (trans_ADD_rri(ctx, &u.f_s_rri_rot)) return true;
-                    return false;
+                    break;
                 case 0x00000080:
                     /* 10110000 1....... */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:185 */
+                    /* ../target/arm/t16.decode:185 */
                     disas_t16_extract_addsub_sp_i(ctx, &u.f_s_rri_rot, insn);
                     if (trans_SUB_rri(ctx, &u.f_s_rri_rot)) return true;
-                    return false;
+                    break;
                 case 0x00000200:
                     /* 10110010 0....... */
                     disas_t16_extract_extend(ctx, &u.f_rrr_rot, insn);
                     switch ((insn >> 6) & 0x1) {
                     case 0x0:
                         /* 10110010 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:200 */
+                        /* ../target/arm/t16.decode:200 */
                         if (trans_SXTAH(ctx, &u.f_rrr_rot)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 10110010 01...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:201 */
+                        /* ../target/arm/t16.decode:201 */
                         if (trans_SXTAB(ctx, &u.f_rrr_rot)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000280:
                     /* 10110010 1....... */
                     disas_t16_extract_extend(ctx, &u.f_rrr_rot, insn);
                     switch ((insn >> 6) & 0x1) {
                     case 0x0:
                         /* 10110010 10...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:202 */
+                        /* ../target/arm/t16.decode:202 */
                         if (trans_UXTAH(ctx, &u.f_rrr_rot)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 10110010 11...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:203 */
+                        /* ../target/arm/t16.decode:203 */
                         if (trans_UXTAB(ctx, &u.f_rrr_rot)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000a00:
                     /* 10111010 0....... */
                     disas_t16_extract_rdm(ctx, &u.f_rr, insn);
                     switch ((insn >> 6) & 0x1) {
                     case 0x0:
                         /* 10111010 00...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:219 */
+                        /* ../target/arm/t16.decode:219 */
                         if (trans_REV(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 10111010 01...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:220 */
+                        /* ../target/arm/t16.decode:220 */
                         if (trans_REV16(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x00000a80:
                     /* 10111010 1....... */
                     switch ((insn >> 6) & 0x1) {
                     case 0x0:
                         /* 10111010 10...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:246 */
+                        /* ../target/arm/t16.decode:246 */
                         disas_t16_extract_disas_t16_Fmt_27(ctx, &u.f_i, insn);
                         if (trans_HLT(ctx, &u.f_i)) return true;
-                        return false;
+                        break;
                     case 0x1:
                         /* 10111010 11...... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:221 */
+                        /* ../target/arm/t16.decode:221 */
                         disas_t16_extract_rdm(ctx, &u.f_rr, insn);
                         if (trans_REVSH(ctx, &u.f_rr)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x1:
                 /* 1011.0.1 ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:248 */
+                /* ../target/arm/t16.decode:248 */
                 disas_t16_extract_disas_t16_Fmt_29(ctx, &u.f_disas_t1618, insn);
                 if (trans_CBZ(ctx, &u.f_disas_t1618)) return true;
-                return false;
+                break;
             }
-            return false;
+            break;
         case 0x1:
             /* 1011.1.. ........ */
             switch (insn & 0x00000a00) {
             case 0x00000000:
                 /* 1011010. ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:255 */
+                /* ../target/arm/t16.decode:255 */
                 disas_t16_extract_disas_t16_Fmt_30(ctx, &u.f_ldst_block, insn);
                 if (trans_STM(ctx, &u.f_ldst_block)) return true;
-                return false;
+                break;
             case 0x00000200:
                 /* 1011011. ........ */
                 switch ((insn >> 5) & 0xf) {
@@ -993,149 +993,150 @@ static bool disas_t16(DisasContext *ctx, uint16_t insn)
                     switch (insn & 0x00000017) {
                     case 0x00000010:
                         /* 10110110 0101.000 */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:209 */
+                        /* ../target/arm/t16.decode:209 */
                         if (trans_SETEND(ctx, &u.f_setend)) return true;
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 case 0x3:
                     /* 10110110 011..... */
                     switch ((insn >> 3) & 0x1) {
                     case 0x0:
                         /* 10110110 011.0... */
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:211 */
+                        /* ../target/arm/t16.decode:211 */
                         disas_t16_extract_disas_t16_Fmt_22(ctx, &u.f_cps, insn);
                         if (trans_CPS(ctx, &u.f_cps)) return true;
                         if ((insn & 0x00000004) == 0x00000000) {
                             /* 10110110 011.00.. */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:212 */
+                            /* ../target/arm/t16.decode:212 */
                             disas_t16_extract_disas_t16_Fmt_23(ctx, &u.f_disas_t1616, insn);
                             if (trans_CPS_v7m(ctx, &u.f_disas_t1616)) return true;
                         }
-                        return false;
+                        break;
                     }
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             case 0x00000800:
                 /* 1011110. ........ */
-                /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:257 */
+                /* ../target/arm/t16.decode:257 */
                 disas_t16_extract_disas_t16_Fmt_31(ctx, &u.f_ldst_block, insn);
                 if (trans_LDM_t16(ctx, &u.f_ldst_block)) return true;
-                return false;
+                break;
             case 0x00000a00:
                 /* 1011111. ........ */
                 switch ((insn >> 8) & 0x1) {
                 case 0x0:
                     /* 10111110 ........ */
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:247 */
+                    /* ../target/arm/t16.decode:247 */
                     disas_t16_extract_disas_t16_Fmt_28(ctx, &u.f_i, insn);
                     if (trans_BKPT(ctx, &u.f_i)) return true;
-                    return false;
+                    break;
                 case 0x1:
                     /* 10111111 ........ */
                     if ((insn & 0x0000000f) == 0x00000000) {
                         /* 10111111 ....0000 */
                         if ((insn & 0x000000f0) == 0x00000010) {
                             /* 10111111 00010000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:227 */
+                            /* ../target/arm/t16.decode:227 */
                             disas_t16_extract_disas_t16_Fmt_25(ctx, &u.f_empty, insn);
                             if (trans_YIELD(ctx, &u.f_empty)) return true;
                         }
                         if ((insn & 0x000000f0) == 0x00000020) {
                             /* 10111111 00100000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:228 */
+                            /* ../target/arm/t16.decode:228 */
                             disas_t16_extract_disas_t16_Fmt_25(ctx, &u.f_empty, insn);
                             if (trans_WFE(ctx, &u.f_empty)) return true;
                         }
                         if ((insn & 0x000000f0) == 0x00000030) {
                             /* 10111111 00110000 */
-                            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:229 */
+                            /* ../target/arm/t16.decode:229 */
                             disas_t16_extract_disas_t16_Fmt_25(ctx, &u.f_empty, insn);
                             if (trans_WFI(ctx, &u.f_empty)) return true;
                         }
-                        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:237 */
+                        /* ../target/arm/t16.decode:237 */
                         disas_t16_extract_disas_t16_Fmt_25(ctx, &u.f_empty, insn);
                         if (trans_NOP(ctx, &u.f_empty)) return true;
                     }
-                    /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:239 */
+                    /* ../target/arm/t16.decode:239 */
                     disas_t16_extract_disas_t16_Fmt_26(ctx, &u.f_disas_t1617, insn);
                     if (trans_IT(ctx, &u.f_disas_t1617)) return true;
-                    return false;
+                    break;
                 }
-                return false;
+                break;
             }
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xc:
         /* 1100.... ........ */
         disas_t16_extract_ldstm(ctx, &u.f_ldst_block, insn);
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 11000... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:130 */
+            /* ../target/arm/t16.decode:130 */
             if (trans_STM(ctx, &u.f_ldst_block)) return true;
-            return false;
+            break;
         case 0x1:
             /* 11001... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:131 */
+            /* ../target/arm/t16.decode:131 */
             if (trans_LDM_t16(ctx, &u.f_ldst_block)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xd:
         /* 1101.... ........ */
         if ((insn & 0x00000f00) == 0x00000e00) {
             /* 11011110 ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:265 */
+            /* ../target/arm/t16.decode:265 */
             disas_t16_extract_disas_t16_Fmt_25(ctx, &u.f_empty, insn);
             if (trans_UDF(ctx, &u.f_empty)) return true;
         }
         if ((insn & 0x00000f00) == 0x00000f00) {
             /* 11011111 ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:266 */
+            /* ../target/arm/t16.decode:266 */
             disas_t16_extract_disas_t16_Fmt_28(ctx, &u.f_i, insn);
             if (trans_SVC(ctx, &u.f_i)) return true;
         }
-        /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:267 */
+        /* ../target/arm/t16.decode:267 */
         disas_t16_extract_disas_t16_Fmt_32(ctx, &u.f_ci, insn);
         if (trans_B_cond_thumb(ctx, &u.f_ci)) return true;
-        return false;
+        break;
     case 0xe:
         /* 1110.... ........ */
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 11100... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:274 */
+            /* ../target/arm/t16.decode:274 */
             disas_t16_extract_disas_t16_Fmt_33(ctx, &u.f_i, insn);
             if (trans_B(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x1:
             /* 11101... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:279 */
+            /* ../target/arm/t16.decode:279 */
             disas_t16_extract_disas_t16_Fmt_34(ctx, &u.f_i, insn);
             if (trans_BLX_suffix(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     case 0xf:
         /* 1111.... ........ */
         switch ((insn >> 11) & 0x1) {
         case 0x0:
             /* 11110... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:280 */
+            /* ../target/arm/t16.decode:280 */
             disas_t16_extract_disas_t16_Fmt_35(ctx, &u.f_i, insn);
             if (trans_BL_BLX_prefix(ctx, &u.f_i)) return true;
-            return false;
+            break;
         case 0x1:
             /* 11111... ........ */
-            /* /mnt/c/Users/me/Documents/projects/unicorn2/tmp/tmp/qemu-5.0.0/target/arm/t16.decode:281 */
+            /* ../target/arm/t16.decode:281 */
             disas_t16_extract_disas_t16_Fmt_34(ctx, &u.f_i, insn);
             if (trans_BL_suffix(ctx, &u.f_i)) return true;
-            return false;
+            break;
         }
-        return false;
+        break;
     }
     return false;
 }
+

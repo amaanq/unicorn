@@ -660,7 +660,8 @@ static void gen_op_calc_cc(DisasContext *s)
     case CC_OP_LTUGTU_64:
     case CC_OP_TM_32:
     case CC_OP_TM_64:
-    case CC_OP_SLA:
+    case CC_OP_SLA_32:
+    case CC_OP_SLA_64:
     case CC_OP_NZ_F128:
     case CC_OP_VC:
         /* 2 arguments */
@@ -4269,19 +4270,10 @@ static DisasJumpType op_soc(DisasContext *s, DisasOps *o)
 
 static DisasJumpType op_sla(DisasContext *s, DisasOps *o)
 {
-    TCGv_i64 t;
     TCGContext *tcg_ctx = s->uc->tcg_ctx;
     uint64_t sign = 1ull << s->insn->data;
-    if (s->insn->data == 31) {
-        t = tcg_temp_new_i64(tcg_ctx);
-        tcg_gen_shli_i64(tcg_ctx, t, o->in1, 32);
-    } else {
-        t = o->in1;
-    }
-    gen_op_update2_cc_i64(s, CC_OP_SLA, t, o->in2);
-    if (s->insn->data == 31) {
-        tcg_temp_free_i64(tcg_ctx, t);
-    }
+    enum cc_op cco = s->insn->data == 31 ? CC_OP_SLA_32 : CC_OP_SLA_64;
+    gen_op_update2_cc_i64(s, cco, o->in1, o->in2);
     tcg_gen_shl_i64(tcg_ctx, o->out, o->in1, o->in2);
     /* The arithmetic left shift is curious in that it does not affect
        the sign bit.  Copy that over from the source unchanged.  */
